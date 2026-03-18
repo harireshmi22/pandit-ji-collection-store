@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "orderItems": [
         {
@@ -21,4 +22,29 @@
     "taxPrice": 10,
     "shippingPrice": 10,
     "totalPrice": 120
+=======
+{
+    "orderItems": [
+        {
+            "product": "65b266e51f8426090c29f27a",
+            "name": "Test Product",
+            "quantity": 1,
+            "price": 100,
+            "image": "/test.jpg"
+        }
+    ],
+    "shippingAddress": {
+        "fullName": "Test User",
+        "email": "test@example.com",
+        "address": "123 Test St",
+        "city": "Test City",
+        "country": "Testland",
+        "phone": "Not provided"
+    },
+    "paymentMethod": "Credit Card",
+    "itemsPrice": 100,
+    "taxPrice": 10,
+    "shippingPrice": 10,
+    "totalPrice": 120
+>>>>>>> 01ca697 (files added with fixed bugs)
 }

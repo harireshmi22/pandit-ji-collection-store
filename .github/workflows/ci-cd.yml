@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: CI/CD Pipeline
 
 on:
@@ -44,3 +45,51 @@ jobs:
       run: |
         echo "Add your deployment commands here"
         # Example: Deploy to Vercel, AWS, etc.
+=======
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Run ESLint
+      run: npm run lint
+    
+    - name: Build application
+      run: npm run build
+      env:
+        NEXTAUTH_SECRET: test-secret-key-for-ci
+        NEXTAUTH_URL: http://localhost:3000
+        MONGODB_URI: mongodb://localhost:27017/test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Production
+      run: |
+        echo "Add your deployment commands here"
+        # Example: Deploy to Vercel, AWS, etc.
+>>>>>>> 01ca697 (files added with fixed bugs)

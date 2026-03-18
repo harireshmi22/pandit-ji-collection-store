@@ -72,11 +72,25 @@ function LoginForm() {
                 </button>
             </form>
 
+<<<<<<< HEAD
             <p className='mt-6 text-center text-sm text-neutral-500'>
                 Don&apos;t have an account?{' '}
                 <Link href='/signup' className='text-neutral-900 font-medium hover:underline'>Sign up</Link>
             </p>
 
+=======
+            <div className='flex justify-between items-center'>
+                <p className='mt-6 text-center text-sm text-neutral-500'>
+                    Don&apos;t have an account?{' '}
+                    <Link href='/signup' className='text-neutral-900 font-medium hover:underline'>Sign up</Link>
+                </p>
+
+
+                <p className='mt-6 text-center text-sm text-neutral-500'>
+                    <Link href='/forgot-password' className='text-neutral-900 font-medium hover:underline'>forgot password?</Link>
+                </p>
+            </div>
+>>>>>>> 01ca697 (files added with fixed bugs)
             <div className='mt-6 pt-6 border-t border-neutral-100 text-center'>
                 <Link href='/admin/login' className='text-xs text-neutral-400 hover:text-neutral-600 transition-colors'>Admin Login &rarr;</Link>
             </div>
