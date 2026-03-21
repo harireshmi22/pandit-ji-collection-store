@@ -86,9 +86,10 @@ pandit-ji-collection-store-main/
 
 ### Prerequisites
 - Node.js 18+ 
-- MongoDB (local or cloud)
+- MongoDB Atlas or local MongoDB
 - Redis (optional, for caching)
 - Git
+- Cloudinary account (for image uploads)
 
 ### Installation
 
@@ -107,11 +108,11 @@ pandit-ji-collection-store-main/
    Create a `.env.local` file with the following variables:
    ```env
    # Database
-   MONGODB_URI=mongodb://localhost:27017/pandit-ji-store
+   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/pandit-ji-store?retryWrites=true&w=majority
    REDIS_URL=redis://localhost:6379
    
    # Authentication
-   NEXTAUTH_SECRET=your-secret-key
+   NEXTAUTH_SECRET=your-secret-key-here
    NEXTAUTH_URL=http://localhost:3000
    
    # Cloudinary (for image uploads)
@@ -120,26 +121,66 @@ pandit-ji-collection-store-main/
    CLOUDINARY_API_SECRET=your-api-secret
    ```
 
-4. **Run Database Setup**
+4. **Create Admin User**
+   ```bash
+   # Create admin user with default credentials
+   node -e "
+   import dotenv from 'dotenv';
+   import path from 'path';
+   import { fileURLToPath } from 'url';
+   const __filename = fileURLToPath(import.meta.url);
+   const __dirname = path.dirname(__filename);
+   dotenv.config({ path: path.join(__dirname, '.env.local') });
+   import { dbConnect } from './src/lib/dbConnect.js';
+   import User from './src/models/User.js';
+   (async () => {
+     await dbConnect();
+     await User.deleteOne({ email: 'admin@panditji.com' });
+     const admin = new User({
+       name: 'Admin User',
+       email: 'admin@panditji.com',
+       password: 'admin123',
+       role: 'admin',
+       phone: '+91 98765 43210',
+       address: 'Admin Office',
+       city: 'Mumbai',
+       state: 'Maharashtra',
+       zipcode: '400001'
+     });
+     await admin.save();
+     console.log('✅ Admin user created! Email: admin@panditji.com, Password: admin123');
+     process.exit(0);
+   })();
+   "
+   ```
+
+5. **Run Database Setup**
    ```bash
    npm run db:indexes
    ```
 
-5. **Start Development Server**
+6. **Start Development Server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser**
+7. **Open your browser**
    Navigate to `http://localhost:3000`
+
+8. **Admin Access**
+   - Go to `http://localhost:3000/admin/login`
+   - Email: `admin@panditji.com`
+   - Password: `admin123`
 
 ## 📖 Usage Guide
 
 ### Admin Dashboard
 
 1. **Access Admin Panel**
-   - Navigate to `/admin`
-   - Login with admin credentials
+   - Navigate to `/admin/login`
+   - Login with admin credentials:
+     - Email: `admin@panditji.com`
+     - Password: `admin123`
 
 2. **Product Management**
    - **View Products**: See all products with search and filtering

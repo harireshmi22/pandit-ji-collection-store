@@ -4,11 +4,19 @@ import { NextResponse } from 'next/server'
 
 export async function POST(req) {
     try {
-        const { name, email, password } = await req.json()
+        const { name, email, password, role = 'user' } = await req.json()
 
         if (!name || !email || !password) {
             return NextResponse.json(
                 { message: "Please provide all required fields" },
+                { status: 400 }
+            )
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            return NextResponse.json(
+                { message: "Password must be at least 6 characters long" },
                 { status: 400 }
             )
         }
@@ -30,6 +38,7 @@ export async function POST(req) {
                 name,
                 email,
                 password, // Hashing happens in User model pre-save hook
+                role // Allow role to be set (for admin creation)
             })
 
             return NextResponse.json(

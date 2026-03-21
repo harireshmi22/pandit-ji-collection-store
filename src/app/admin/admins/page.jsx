@@ -22,11 +22,17 @@ export default function AdminAdminsPage() {
     const fetchAdmins = useCallback(async () => {
         try {
             setLoading(true)
-            const result = await userService.getAllData()
-            const adminUsers = (result || []).filter(u => u.role === 'admin')
-            setAdmins(adminUsers)
+            const res = await fetch('/api/admin/admins')
+            if (res.ok) {
+                const data = await res.json()
+                setAdmins(data.admins || [])
+            } else {
+                console.error('Failed to fetch admins')
+                setAdmins([])
+            }
         } catch (error) {
             console.error("Failed to fetch admins:", error)
+            setAdmins([])
         } finally {
             setLoading(false)
         }
@@ -41,10 +47,14 @@ export default function AdminAdminsPage() {
     const handleAddAdmin = async (e) => {
         e.preventDefault()
         try {
-            const res = await fetch('/api/auth/signup', {
+            const res = await fetch('/api/admin/admins', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...newAdmin, role: 'admin' })
+                body: JSON.stringify({
+                    name: newAdmin.name,
+                    email: newAdmin.email,
+                    password: newAdmin.password
+                })
             })
             if (res.ok) {
                 showToast('Admin added successfully')
