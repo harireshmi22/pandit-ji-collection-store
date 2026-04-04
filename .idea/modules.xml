@@ -1,0 +1,18 @@
+<<<<<<< HEAD
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/pandit-ji-collection-store.iml" filepath="$PROJECT_DIR$/.idea/pandit-ji-collection-store.iml" />
+    </modules>
+  </component>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/pandit-ji-collection-store.iml" filepath="$PROJECT_DIR$/.idea/pandit-ji-collection-store.iml" />
+    </modules>
+  </component>
+>>>>>>> 01ca697 (files added with fixed bugs)
+</project>
