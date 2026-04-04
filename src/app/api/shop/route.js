@@ -130,23 +130,6 @@ export async function GET(request) {
     );
   }
 }
-export async function GET(request) {
-  try {
-    await dbConnect();
-
-    const product = await Product.find({});
-    return NextResponse.json({
-      success: true,
-      data: product,
-    });
-  } catch (error) {
-    console.error("[SHOP] GET error:", error);
-    return NextResponse.json(
-      { success: false, error: "Internal Server Error" },
-      { status: 500 },
-    );
-  }
-}
 
 export async function POST(request) {
   try {

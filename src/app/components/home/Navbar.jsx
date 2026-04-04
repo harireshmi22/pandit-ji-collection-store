@@ -38,9 +38,9 @@ export default function Navbar() {
                     </div>
 
                     <div className='flex items-center gap-1'>
-                        <form onSubmit={handleSearch} className='hidden lg:flex items-center bg-neutral-50 rounded-full px-3.5 py-2 w-52 focus-within:bg-white focus-within:ring-1 focus-within:ring-neutral-200 transition-all'>
+                        <form onSubmit={handleSearch} className='hidden lg:flex items-center bg-neutral-50 border border-neutral-200 rounded-full px-3.5 py-2 w-52 focus-within:bg-white focus-within:border-neutral-300 transition-all'>
                             <Search className='w-3.5 h-3.5 text-neutral-400' />
-                            <input type='text' placeholder='Search...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className='bg-transparent border-none text-sm pl-2 w-full focus:outline-none placeholder-neutral-400' />
+                            <input type='text' placeholder='Search...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className='w-full pl-2 text-sm bg-transparent border-none outline-none focus:outline-none focus:ring-0 placeholder-neutral-400' />
                         </form>
 
                         <Link href='/wishlist' className='relative p-2.5 hover:bg-neutral-50 rounded-full transition-colors'>
@@ -86,9 +86,9 @@ export default function Navbar() {
                         <Link href='/shop?category=New%20in' onClick={() => setIsMenuOpen(false)} className='block px-3 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg'>New In</Link>
                         <Link href='/about' onClick={() => setIsMenuOpen(false)} className='block px-3 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg'>About</Link>
                         <Link href='/orders' onClick={() => setIsMenuOpen(false)} className='block px-3 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg'>Orders</Link>
-                        <form onSubmit={handleSearch} className='flex items-center bg-neutral-50 rounded-lg px-3 py-2.5 mt-2'>
+                        <form onSubmit={handleSearch} className='flex items-center bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 mt-2 focus-within:bg-white focus-within:border-neutral-300 transition-all'>
                             <Search className='w-4 h-4 text-neutral-400' />
-                            <input type='text' placeholder='Search...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className='bg-transparent border-none text-sm pl-2 w-full focus:outline-none' />
+                            <input type='text' placeholder='Search...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className='w-full pl-2 text-sm bg-transparent border-none outline-none focus:outline-none focus:ring-0 placeholder-neutral-400' />
                         </form>
                         <div className='pt-3 border-t border-neutral-100 mt-2'>
                             {session ? (

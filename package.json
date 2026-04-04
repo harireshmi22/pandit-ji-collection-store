@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@upstash/redis": "^1.36.3",
+    "axios": "^1.13.1",
     "bcryptjs": "^3.0.3",
     "bullmq": "^5.67.3",
     "cloudinary": "^2.9.0",
