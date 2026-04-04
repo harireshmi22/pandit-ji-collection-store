@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-const ResetPassword = () => {
+const ResetPasswordContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -190,4 +190,20 @@ const ResetPassword = () => {
     );
 };
 
-export default ResetPassword;
+const ResetPasswordFallback = () => (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-rose-50 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md rounded-2xl border border-amber-100 bg-white/90 backdrop-blur shadow-xl p-6 sm:p-8">
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                <p className="text-sm text-blue-700">Loading reset page...</p>
+            </div>
+        </div>
+    </div>
+);
+
+export default function ResetPasswordPage() {
+    return (
+        <Suspense fallback={<ResetPasswordFallback />}>
+            <ResetPasswordContent />
+        </Suspense>
+    );
+}
