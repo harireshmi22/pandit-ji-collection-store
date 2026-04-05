@@ -110,8 +110,10 @@ export function CartProvider({ children }) {
             lastName: shippingInfo.lastName,
             address: shippingInfo.address,
             city: shippingInfo.city,
-            postalCode: shippingInfo.zipCode || shippingInfo.postalCode,
+            zipCode: shippingInfo.zipCode || shippingInfo.postalCode,
+            postalCode: shippingInfo.postalCode || shippingInfo.zipCode,
             country: shippingInfo.country,
+            phone: shippingInfo.phone || '',
         }
         saveShippingDetails(detailsToSave)
         setSavedShippingDetails(detailsToSave)

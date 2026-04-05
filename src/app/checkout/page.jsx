@@ -26,9 +26,9 @@ export default function CheckoutPage() {
         lastName: savedShippingDetails?.lastName || '',
         address: savedShippingDetails?.address || '',
         city: savedShippingDetails?.city || '',
-        zipCode: savedShippingDetails?.zipCode || '',
+        zipCode: savedShippingDetails?.zipCode || savedShippingDetails?.postalCode || '',
         country: savedShippingDetails?.country || '',
-        cardNumber: '', expiryDate: '', cvv: '', nameOnCard: '',
+        phone: savedShippingDetails?.phone || '',
     }))
 
     const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -37,29 +37,83 @@ export default function CheckoutPage() {
         e.preventDefault()
         setIsSubmitting(true)
         try {
-            const shipping = cartTotal >= 100 ? 0 : 10
-            const tax = cartTotal * 0.1
-            const finalTotal = cartTotal + shipping + tax
             const shippingInfo = {
                 fullName: `${formData.firstName} ${formData.lastName}`,
                 email: formData.email, address: formData.address, city: formData.city,
                 postalCode: formData.zipCode, country: formData.country, phone: formData.phone || 'Not provided',
             }
-            saveShippingInfo({ ...shippingInfo, firstName: formData.firstName, lastName: formData.lastName, zipCode: formData.zipCode })
+            saveShippingInfo({ ...shippingInfo, firstName: formData.firstName, lastName: formData.lastName, zipCode: formData.zipCode, phone: formData.phone })
+
             const orderItems = cartItems.map(item => ({
-                product: item.id, name: item.name, quantity: item.quantity, price: item.price,
-                image: item.image && item.image.startsWith('data:') ? '/images/placeholder-product.svg' : item.image,
-                size: item.selectedSize
+                product: item.id,
+                quantity: item.quantity,
+                size: item.selectedSize,
             }))
-            const res = await fetch('/api/orders', {
+
+            const createOrderRes = await fetch('/api/payments/razorpay/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderItems, shippingAddress: shippingInfo, paymentMethod: 'Credit Card', itemsPrice: cartTotal, taxPrice: tax, shippingPrice: shipping, totalPrice: finalTotal }),
+                body: JSON.stringify({ orderItems, shippingAddress: shippingInfo }),
             })
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.message || 'Error creating order')
-            clearCart()
-            router.push(`/order/${data._id}`)
+
+            const data = await createOrderRes.json()
+            if (!createOrderRes.ok) throw new Error(data.message || 'Error creating Razorpay order')
+
+            const scriptLoaded = await new Promise((resolve) => {
+                if (window.Razorpay) return resolve(true)
+                const script = document.createElement('script')
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+                script.onload = () => resolve(true)
+                script.onerror = () => resolve(false)
+                document.body.appendChild(script)
+            })
+
+            if (!scriptLoaded) {
+                throw new Error('Unable to load Razorpay checkout SDK')
+            }
+
+            const razorpay = new window.Razorpay({
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency,
+                name: 'Pandit Ji Collection',
+                description: `Order ${String(data.internalOrderId).slice(-8).toUpperCase()}`,
+                order_id: data.razorpayOrderId,
+                prefill: data.prefill,
+                theme: { color: '#171717' },
+                handler: async function (response) {
+                    try {
+                        const verifyRes = await fetch('/api/payments/razorpay/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                internalOrderId: data.internalOrderId,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                            }),
+                        })
+
+                        const verifyData = await verifyRes.json()
+                        if (!verifyRes.ok) {
+                            throw new Error(verifyData.message || 'Payment verification failed')
+                        }
+
+                        clearCart()
+                        router.push(`/order/${verifyData.internalOrderId}`)
+                    } catch (error) {
+                        alert(error.message || 'Payment verification failed. Contact support if amount was debited.')
+                    } finally {
+                        setIsSubmitting(false)
+                    }
+                },
+                modal: {
+                    ondismiss: () => setIsSubmitting(false),
+                },
+            })
+
+            razorpay.on('payment.failed', () => setIsSubmitting(false))
+            razorpay.open()
         } catch (error) {
             setIsSubmitting(false)
             alert(error.message || 'Error processing order. Please try again.')
@@ -106,18 +160,19 @@ export default function CheckoutPage() {
                                         <input type='text' name='zipCode' value={formData.zipCode} onChange={handleInputChange} required className={inputClass} placeholder='ZIP code' />
                                     </div>
                                     <input type='text' name='country' value={formData.country} onChange={handleInputChange} required className={inputClass} placeholder='Country' />
+                                    <input type='text' name='phone' value={formData.phone} onChange={handleInputChange} className={inputClass} placeholder='Phone (optional)' />
                                 </div>
                             </div>
                             {/* Payment */}
                             <div className='border border-neutral-100 rounded-2xl p-5'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Payment</h2>
-                                <div className='space-y-4'>
-                                    <input type='text' name='cardNumber' value={formData.cardNumber} onChange={handleInputChange} required maxLength={19} className={inputClass} placeholder='Card number' />
-                                    <input type='text' name='nameOnCard' value={formData.nameOnCard} onChange={handleInputChange} required className={inputClass} placeholder='Name on card' />
-                                    <div className='grid grid-cols-2 gap-4'>
-                                        <input type='text' name='expiryDate' value={formData.expiryDate} onChange={handleInputChange} required maxLength={5} className={inputClass} placeholder='MM/YY' />
-                                        <input type='text' name='cvv' value={formData.cvv} onChange={handleInputChange} required maxLength={3} className={inputClass} placeholder='CVV' />
-                                    </div>
+                                <div className='space-y-3'>
+                                    <p className='text-sm text-neutral-600'>
+                                        You will be redirected to Razorpay secure checkout where customers can pay using UPI, cards, netbanking, and wallets.
+                                    </p>
+                                    <p className='text-xs text-neutral-500'>
+                                        Card details are never collected or stored by this website.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +205,7 @@ export default function CheckoutPage() {
                                 <button type='submit' disabled={isSubmitting}
                                     className='w-full flex items-center justify-center gap-2 py-3.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-40 cursor-pointer'>
                                     <Lock className='w-3.5 h-3.5' />
-                                    {isSubmitting ? 'Processing...' : 'Complete Order'}
+                                    {isSubmitting ? 'Processing...' : 'Pay Securely with Razorpay'}
                                 </button>
                                 <p className='text-[11px] text-neutral-400 text-center mt-3'>Secure & encrypted checkout</p>
                             </div>

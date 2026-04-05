@@ -23,11 +23,19 @@ const orderItemSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true
+  },
+  size: {
+    type: String,
+    default: 'M'
   }
 });
 
 const shippingAddressSchema = new mongoose.Schema({
   fullName: {
+    type: String,
+    required: true
+  },
+  email: {
     type: String,
     required: true
   },
@@ -68,14 +76,37 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
-      enum: ['PayPal', 'Credit Card', 'Cash on Delivery', 'UPI'],
+      enum: ['PayPal', 'Credit Card', 'Cash on Delivery', 'UPI', 'Razorpay'],
       default: 'Cash on Delivery'
+    },
+    paymentGateway: {
+      type: String,
+      enum: ['razorpay'],
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'created', 'authorized', 'captured', 'failed', 'refunded'],
+      default: 'pending'
+    },
+    paymentGatewayOrderId: {
+      type: String,
+      index: true,
+      sparse: true
+    },
+    paymentGatewayPaymentId: {
+      type: String,
+      sparse: true
+    },
+    paymentGatewaySignature: {
+      type: String,
+      select: false
     },
     paymentResult: {
       id: String,
       status: String,
       update_time: String,
-      email_address: String
+      email_address: String,
+      raw: mongoose.Schema.Types.Mixed
     },
     itemsPrice: {
       type: Number,
@@ -139,6 +170,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
+orderSchema.index({ paymentGatewayOrderId: 1 });
 
 export default mongoose.models.Order || mongoose.model('Order', orderSchema);
 

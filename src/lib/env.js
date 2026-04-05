@@ -5,6 +5,10 @@
     "CLOUDINARY_CLOUD_NAME",
     "CLOUDINARY_API_KEY",
     "CLOUDINARY_API_SECRET",
+    "RAZORPAY_KEY_ID",
+    "RAZORPAY_KEY_SECRET",
+    "RAZORPAY_WEBHOOK_SECRET",
+    "RAZORPAY_CURRENCY",
   ];
 
   export function validateEnv() {
@@ -27,6 +31,12 @@
         apiKey: process.env.CLOUDINARY_API_KEY,
         apiSecret: process.env.CLOUDINARY_API_SECRET,
       },
+      razorpay: {
+        keyId: process.env.RAZORPAY_KEY_ID,
+        keySecret: process.env.RAZORPAY_KEY_SECRET,
+        webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+        currency: process.env.RAZORPAY_CURRENCY || "INR",
+      },
     };
   }
 
@@ -43,6 +53,12 @@
         cloudName: process.env.CLOUDINARY_CLOUD_NAME,
         apiKey: process.env.CLOUDINARY_API_KEY,
         apiSecret: process.env.CLOUDINARY_API_SECRET,
+      },
+      razorpay: {
+        keyId: process.env.RAZORPAY_KEY_ID,
+        keySecret: process.env.RAZORPAY_KEY_SECRET,
+        webhookSecret: process.env.RAZORPAY_WEBHOOK_SECRET,
+        currency: process.env.RAZORPAY_CURRENCY || "INR",
       },
     };
   }
