@@ -30,13 +30,11 @@ function validateShippingAddress(shippingAddress) {
 
 export async function POST(req) {
   try {
-    // 
     const session = await auth();
     if (!session?.user?.id) {
       return NextResponse.json({ message: 'Not authorized' }, { status: 401 });
     }
 
-    // 
     const body = await req.json();
     const orderItems = Array.isArray(body.orderItems) ? body.orderItems : [];
     const shippingAddress = normalizeShippingAddress(body.shippingAddress);
@@ -99,7 +97,6 @@ export async function POST(req) {
     const razorpayOrder = await razorpay.orders.create({
       amount: toPaise(totalPrice),
       currency,
-      payment_capture: 1,
       receipt: `order_${Date.now()}`,
       notes: {
         userId: session.user.id,

@@ -19,6 +19,7 @@
     "test:redis": "node src/scripts/test-redis.js"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.3",
     "axios": "^1.13.1",
     "bcryptjs": "^3.0.3",
