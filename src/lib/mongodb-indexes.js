@@ -51,8 +51,12 @@ export async function createIndexes() {
     console.log('[INDEX] All indexes created successfully');
 
   } catch (error) {
-    console.error('[INDEX] Error creating indexes:', error);
-    throw error;
+    if (error.code === 85 || (error.message && error.message.includes('already exists'))) {
+      console.log('[INDEX] Note: Indexes already exist or conflict. Continuing...');
+    } else {
+      console.error('[INDEX] Error creating indexes:', error);
+      throw error;
+    }
   }
 }
 

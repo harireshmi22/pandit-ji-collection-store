@@ -25,10 +25,15 @@ if (fs.existsSync(envPath)) {
   }
 }
 
-import { redisHelpers } from '../lib/redis.js';
-
 async function testRedis() {
   console.log('🔴 Testing Redis connection...');
+  
+  const { default: redis } = await import('../lib/redis.js');
+  
+  if (!redis) {
+    console.error('❌ Redis client is not initialized. Please check your UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables.');
+    return false;
+  }
   
   try {
     const testKey = 'test:redis';
@@ -38,11 +43,11 @@ async function testRedis() {
     };
     
     // Test SET
-    const setResult = await redisHelpers.set(testKey, testData, { ex: 60 });
+    const setResult = await redis.set(testKey, testData, { ex: 60 });
     console.log('SET Result:', setResult);
     
     // Test GET
-    const getResult = await redisHelpers.get(testKey);
+    const getResult = await redis.get(testKey);
     console.log('GET Result:', getResult);
     
     // Verify data integrity
@@ -50,7 +55,7 @@ async function testRedis() {
       console.log('✅ Redis connection successful - Data integrity verified');
       
       // Clean up
-      await redisHelpers.del(testKey);
+      await redis.del(testKey);
       console.log('🧹 Test key cleaned up');
       
       return true;

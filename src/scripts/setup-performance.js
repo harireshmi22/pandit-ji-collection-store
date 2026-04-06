@@ -1,13 +1,33 @@
-import { createIndexes } from '../lib/mongodb-indexes.js';
-import { redisHelpers } from '../lib/redis.js';
+import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Load env before imports
+const envPath = path.join(__dirname, '../../.env.local');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      let [key, ...valueParts] = trimmed.split('=');
+      let value = valueParts.join('=').trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      process.env[key] = value;
+    }
+  }
+}
+
 async function setupPerformanceOptimizations() {
   console.log('🚀 Setting up performance optimizations...');
+  
+  const { default: redis } = await import('../lib/redis.js');
+  const { createIndexes } = await import('../lib/mongodb-indexes.js');
   
   try {
     // 1. Create MongoDB indexes
@@ -17,21 +37,27 @@ async function setupPerformanceOptimizations() {
     // 2. Test Redis connection
     console.log('🔴 Testing Redis connection...');
     const testKey = 'performance:test';
-    await redisHelpers.set(testKey, { message: 'Redis is working!' }, { ex: 60 });
-    const testResult = await redisHelpers.get(testKey);
     
-    if (testResult) {
-      console.log('✅ Redis connection successful');
-      await redisHelpers.del(testKey);
+    if (redis) {
+      await redis.set(testKey, { message: 'Redis is working!' }, { ex: 60 });
+      const testResult = await redis.get(testKey);
+      
+      if (testResult) {
+        console.log('✅ Redis connection successful');
+        await redis.del(testKey);
+      } else {
+        console.log('❌ Redis connection failed');
+      }
+      
+      // 3. Clear any existing performance-related cache
+      console.log('🧹 Clearing performance cache...');
+      await redis.flushdb();
     } else {
-      console.log('❌ Redis connection failed');
+       console.log('⚠️ Redis client not initialized.');
     }
     
-    // 3. Clear any existing performance-related cache
-    console.log('🧹 Clearing performance cache...');
-    await redisHelpers.flush();
-    
     console.log('✅ Performance optimizations setup complete!');
+    process.exit(0);
     
   } catch (error) {
     console.error('❌ Setup failed:', error);

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { redisHelpers } from './redis.js';
+import redis from './redis.js';
 
 // Connection state management
 let connectionPromise = null;
@@ -24,12 +24,7 @@ export async function dbConnect() {
         maxPoolSize: 10, // Maximum number of sockets in the connection pool
         serverSelectionTimeoutMS: 5000, // How long to try selecting a server before giving up
         socketTimeoutMS: 45000, // How long a send or receive on a socket can take before timing out
-        bufferMaxEntries: 0, // Disable mongoose buffering
         bufferCommands: false, // Disable mongoose buffering
-        
-        // Performance optimizations
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
         
         // Retry settings
         retryWrites: true,
@@ -84,7 +79,7 @@ export const cacheHelper = {
   async getOrSet(key, fetchFunction, ttl = 300) {
     try {
       // Try to get from cache first
-      const cached = await redisHelpers.get(key);
+      const cached = await redis.get(key);
       if (cached) {
         console.log(`[CACHE] HIT for key: ${key}`);
         return cached;
@@ -97,7 +92,7 @@ export const cacheHelper = {
       
       // Cache the result
       if (data) {
-        await redisHelpers.set(key, data, { ex: ttl });
+        await redis.set(key, data, { ex: ttl });
         console.log(`[CACHE] SET for key: ${key} (TTL: ${ttl}s)`);
       }
       
@@ -113,7 +108,7 @@ export const cacheHelper = {
     try {
       // For simple pattern matching, you might need to implement pattern-based deletion
       // This is a simplified version
-      await redisHelpers.del(pattern);
+      await redis.del(pattern);
       console.log(`[CACHE] Invalidated key: ${pattern}`);
     } catch (error) {
       console.error(`[CACHE] Invalidation error for ${pattern}:`, error);
