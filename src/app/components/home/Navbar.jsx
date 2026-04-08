@@ -171,7 +171,7 @@ export default function Navbar() {
                             </div>
                             <div className='min-w-0'>
                                 <p className='text-sm text-neutral-800 truncate'>{item.name}</p>
-                                <p className='text-xs text-neutral-500 truncate'>{item.brand || 'Product'}{item.price ? ` · $${item.price}` : ''}</p>
+                                <p className='text-xs text-neutral-500 truncate'>{item.brand || 'Product'}{item.price ? ` · ₹${item.price}` : ''}</p>
                             </div>
                         </div>
                     </button>

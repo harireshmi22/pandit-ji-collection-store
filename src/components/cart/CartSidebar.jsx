@@ -40,7 +40,7 @@ export default function CartSidebar() {
                                     <div className='flex-1 flex flex-col justify-between min-w-0'>
                                         <h3 className='text-xs font-medium text-neutral-900 truncate'>{item.name}</h3>
                                         <p className='text-[11px] text-neutral-400'>Size: {item.selectedSize || 'M'} &middot; Qty: {item.quantity}</p>
-                                        <p className='text-sm font-semibold text-neutral-900'>${(item.price * item.quantity).toFixed(2)}</p>
+                                        <p className='text-sm font-semibold text-neutral-900'>₹{(item.price * item.quantity).toFixed(2)}</p>
                                     </div>
                                 </div>
                             ))
@@ -51,7 +51,7 @@ export default function CartSidebar() {
                         <div className='p-5 border-t border-neutral-100'>
                             <div className='flex justify-between items-center mb-4'>
                                 <span className='text-sm text-neutral-600'>Total</span>
-                                <span className='text-lg font-bold text-neutral-900'>${cartTotal.toFixed(2)}</span>
+                                <span className='text-lg font-bold text-neutral-900'>₹{cartTotal.toFixed(2)}</span>
                             </div>
                             <button onClick={handleCheckout} className='w-full bg-neutral-900 text-white py-3 text-sm font-medium rounded-full hover:bg-neutral-800 transition-colors cursor-pointer'>
                                 Checkout

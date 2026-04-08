@@ -86,7 +86,7 @@ export default function FeaturedDeals() {
                                             <h3 className='text-lg font-semibold text-neutral-900 group-hover:text-neutral-600 transition-colors'>{product.name}</h3>
                                             <p className='text-sm text-neutral-400 mt-0.5 line-clamp-1'>{product.description}</p>
                                         </div>
-                                        <p className='text-lg font-semibold text-neutral-900'>${product.price}</p>
+                                        <p className='text-lg font-semibold text-neutral-900'>₹{product.price}</p>
                                     </div>
                                 </div>
                             </Link>

@@ -31,19 +31,19 @@ export default function ProductDetailPage() {
 
     useEffect(() => {
         if (!productId) return
-        ;(async () => {
-            try {
-                setLoading(true)
-                const res = await fetch(`/api/products/${productId}`)
-                const data = await res.json()
-                if (data.success) setProduct(data.data)
-                else setError(data.message || 'Product not found')
-            } catch (err) {
-                setError('Error loading product')
-            } finally {
-                setLoading(false)
-            }
-        })()
+            ; (async () => {
+                try {
+                    setLoading(true)
+                    const res = await fetch(`/api/products/${productId}`)
+                    const data = await res.json()
+                    if (data.success) setProduct(data.data)
+                    else setError(data.message || 'Product not found')
+                } catch (err) {
+                    setError('Error loading product')
+                } finally {
+                    setLoading(false)
+                }
+            })()
     }, [productId])
 
     if (loading) {
@@ -122,7 +122,7 @@ export default function ProductDetailPage() {
                         {product.brand && <p className='text-xs font-medium text-neutral-400 uppercase tracking-widest mb-2'>{product.brand}</p>}
                         <h1 className='text-2xl lg:text-3xl font-bold text-neutral-900 mb-3'>{product.name}</h1>
                         <div className='flex items-baseline gap-3 mb-6'>
-                            <p className='text-2xl font-bold text-neutral-900'>${product.price?.toFixed(2)}</p>
+                            <p className='text-2xl font-bold text-neutral-900'>₹{product.price?.toFixed(2)}</p>
                             <p className={`text-xs font-medium ${product.stock > 5 ? 'text-emerald-600' : product.stock > 0 ? 'text-amber-600' : 'text-red-500'}`}>
                                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                             </p>
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
 
                         {/* Info */}
                         <div className='space-y-3 pt-6 border-t border-neutral-100'>
-                            {['Free shipping over $100', '30-day easy returns', 'Secure checkout'].map(info => (
+                            {['Free shipping over ₹100', '30-day easy returns', 'Secure checkout'].map(info => (
                                 <div key={info} className='flex items-center gap-3'>
                                     <div className='w-1.5 h-1.5 rounded-full bg-neutral-300' />
                                     <p className='text-sm text-neutral-500'>{info}</p>
@@ -212,7 +212,7 @@ export default function ProductDetailPage() {
                             )}
                             <div className='bg-neutral-50 rounded-xl p-4 mb-6 text-sm'>
                                 <p className='text-neutral-600'>{product.name} &middot; {selectedSize} &middot; Qty {quantity}</p>
-                                <p className='font-semibold text-neutral-900 mt-1'>${(product.price * quantity).toFixed(2)}</p>
+                                <p className='font-semibold text-neutral-900 mt-1'>₹{(product.price * quantity).toFixed(2)}</p>
                             </div>
                             <div className='flex gap-3'>
                                 <button onClick={() => setShowConfirmDialog(false)} className='flex-1 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors cursor-pointer'>Cancel</button>

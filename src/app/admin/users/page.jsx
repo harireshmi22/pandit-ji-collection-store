@@ -121,7 +121,7 @@ export default function AdminUsersPage() {
                                             <span className='text-sm font-medium text-neutral-700'>{user.orders || 0}</span>
                                         </td>
                                         <td className='px-5 py-3.5'>
-                                            <span className='text-sm font-semibold text-neutral-900'>${(user.totalSpent || 0).toLocaleString()}</span>
+                                            <span className='text-sm font-semibold text-neutral-900'>₹{(user.totalSpent || 0).toLocaleString('en-IN')}</span>
                                         </td>
                                     </tr>
                                 ))

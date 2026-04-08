@@ -42,7 +42,7 @@ const ProductCard = ({ product }) => {
                 <h3 className='text-sm font-medium text-neutral-900 truncate group-hover:text-neutral-600 transition-colors'>{product.name}</h3>
                 <div className='flex justify-between items-center mt-1'>
                     <p className='text-xs text-neutral-400'>{product.brand || 'Brand'}</p>
-                    <p className='text-sm font-semibold text-neutral-900'>${product.price}</p>
+                    <p className='text-sm font-semibold text-neutral-900'>₹{product.price}</p>
                 </div>
             </div>
         </Link>

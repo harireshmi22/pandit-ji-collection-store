@@ -189,18 +189,18 @@ export default function CheckoutPage() {
                                             <div className='min-w-0 flex-1'>
                                                 <p className='text-xs font-medium text-neutral-900 truncate'>{item.name}</p>
                                                 <p className='text-[11px] text-neutral-400'>Qty: {item.quantity}</p>
-                                                <p className='text-xs font-semibold text-neutral-900'>${(item.price * item.quantity).toFixed(2)}</p>
+                                                <p className='text-xs font-semibold text-neutral-900'>₹{(item.price * item.quantity).toFixed(2)}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                                 <div className='space-y-2 text-sm pt-4 border-t border-neutral-100 mb-4'>
-                                    <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>${cartTotal.toFixed(2)}</span></div>
-                                    <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div>
-                                    <div className='flex justify-between text-neutral-600'><span>Tax</span><span>${tax.toFixed(2)}</span></div>
+                                    <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>₹{cartTotal.toFixed(2)}</span></div>
+                                    <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span></div>
+                                    <div className='flex justify-between text-neutral-600'><span>Tax</span><span>₹{tax.toFixed(2)}</span></div>
                                 </div>
                                 <div className='flex justify-between text-lg font-bold text-neutral-900 pt-4 border-t border-neutral-100 mb-6'>
-                                    <span>Total</span><span>${finalTotal.toFixed(2)}</span>
+                                    <span>Total</span><span>₹{finalTotal.toFixed(2)}</span>
                                 </div>
                                 <button type='submit' disabled={isSubmitting}
                                     className='w-full flex items-center justify-center gap-2 py-3.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-40 cursor-pointer'>

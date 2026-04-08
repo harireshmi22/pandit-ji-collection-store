@@ -106,7 +106,7 @@ export default function OrdersPage() {
                                             )}
                                         </div>
                                         <div className='flex items-center justify-between'>
-                                            <p className='text-lg font-semibold text-neutral-900'>${order.totalPrice?.toFixed(2)}</p>
+                                            <p className='text-lg font-semibold text-neutral-900'>₹{order.totalPrice?.toFixed(2)}</p>
                                             <span className='text-xs text-neutral-400 group-hover:text-neutral-600 transition-colors flex items-center gap-1'>
                                                 View details <ArrowRight className='w-3 h-3' />
                                             </span>

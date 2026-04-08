@@ -76,14 +76,14 @@ export default function AdminAnalyticsPage() {
     const metrics = [
         {
             label: 'Total Revenue',
-            value: `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            value: `₹${totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             icon: DollarSign,
             color: 'bg-emerald-50 text-emerald-600',
             sub: `From ${orders.length} orders`,
         },
         {
             label: 'Avg Order Value',
-            value: `$${avgOrderValue.toFixed(2)}`,
+            value: `₹${avgOrderValue.toFixed(2)}`,
             icon: TrendingUp,
             color: 'bg-blue-50 text-blue-600',
             sub: 'Per order average',
@@ -153,7 +153,7 @@ export default function AdminAnalyticsPage() {
                                             className='h-full bg-neutral-900 rounded-lg flex items-center justify-end pr-2 transition-all duration-500'
                                             style={{ width: `${Math.max((value / maxMonthly) * 100, 8)}%` }}
                                         >
-                                            <span className='text-[10px] font-semibold text-white'>${value.toFixed(0)}</span>
+                                            <span className='text-[10px] font-semibold text-white'>₹{value.toFixed(0)}</span>
                                         </div>
                                     </div>
                                 </div>

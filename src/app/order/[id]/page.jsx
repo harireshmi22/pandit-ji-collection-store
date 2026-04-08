@@ -83,7 +83,7 @@ export default function OrderDetailPage() {
                                         <div className='flex-1 min-w-0'>
                                             <h3 className='text-sm font-medium text-neutral-900 truncate'>{item.name}</h3>
                                             <p className='text-xs text-neutral-400 mt-0.5'>Size: {item.size || 'M'} &middot; Qty: {item.quantity}</p>
-                                            <p className='text-sm font-semibold text-neutral-900 mt-1'>${item.price?.toFixed(2)}</p>
+                                            <p className='text-sm font-semibold text-neutral-900 mt-1'>₹{item.price?.toFixed(2)}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -124,12 +124,12 @@ export default function OrderDetailPage() {
                         <div className='border border-neutral-100 rounded-2xl p-5 sticky top-24'>
                             <h2 className='text-sm font-semibold text-neutral-900 mb-5 pb-4 border-b border-neutral-100'>Order Summary</h2>
                             <div className='space-y-3 text-sm mb-5'>
-                                <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>${order.itemsPrice?.toFixed(2)}</span></div>
-                                <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{order.shippingPrice === 0 ? 'Free' : `$${order.shippingPrice?.toFixed(2)}`}</span></div>
-                                <div className='flex justify-between text-neutral-600'><span>Tax</span><span>${order.taxPrice?.toFixed(2)}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>₹{order.itemsPrice?.toFixed(2)}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{order.shippingPrice === 0 ? 'Free' : `₹${order.shippingPrice?.toFixed(2)}`}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Tax</span><span>₹{order.taxPrice?.toFixed(2)}</span></div>
                             </div>
                             <div className='flex justify-between text-lg font-bold text-neutral-900 pt-4 border-t border-neutral-100'>
-                                <span>Total</span><span>${order.totalPrice?.toFixed(2)}</span>
+                                <span>Total</span><span>₹{order.totalPrice?.toFixed(2)}</span>
                             </div>
                             <div className='mt-6 space-y-2'>
                                 <Link href='/orders' className='block w-full text-center py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors'>All Orders</Link>

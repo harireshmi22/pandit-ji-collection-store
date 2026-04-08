@@ -121,16 +121,14 @@ export default function AdminOrdersPage() {
                     <button
                         key={s}
                         onClick={() => setStatusFilter(s)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
-                            statusFilter === s
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${statusFilter === s
                                 ? 'bg-neutral-900 text-white'
                                 : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
-                        }`}
+                            }`}
                     >
                         {s === 'all' ? 'All' : s}
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] ${
-                            statusFilter === s ? 'bg-white/20' : 'bg-neutral-100'
-                        }`}>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] ${statusFilter === s ? 'bg-white/20' : 'bg-neutral-100'
+                            }`}>
                             {statusCounts[s] || 0}
                         </span>
                     </button>
@@ -189,7 +187,7 @@ export default function AdminOrdersPage() {
                                                 {order.orderItems?.length || 0} items
                                             </td>
                                             <td className='px-5 py-3.5 text-sm font-semibold text-neutral-900'>
-                                                ${order.totalPrice?.toFixed(2)}
+                                                ₹{order.totalPrice?.toFixed(2)}
                                             </td>
                                             <td className='px-5 py-3.5'>
                                                 <select

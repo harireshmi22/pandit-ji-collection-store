@@ -116,7 +116,7 @@ export default function ProfilePage() {
                                         <p className='text-xs text-neutral-400 mt-1'>Wishlist</p>
                                     </div>
                                     <div className='border border-neutral-100 rounded-2xl p-5 text-center'>
-                                        <p className='text-2xl font-bold text-neutral-900'>${orders.reduce((a, o) => a + (o.totalPrice || 0), 0).toFixed(0)}</p>
+                                        <p className='text-2xl font-bold text-neutral-900'>₹{orders.reduce((a, o) => a + (o.totalPrice || 0), 0).toFixed(0)}</p>
                                         <p className='text-xs text-neutral-400 mt-1'>Total Spent</p>
                                     </div>
                                 </div>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
                                                             <p className='text-xs text-neutral-400'>#{order._id.slice(-8).toUpperCase()}</p>
                                                             <p className='text-sm text-neutral-600'>{new Date(order.createdAt).toLocaleDateString()}</p>
                                                         </div>
-                                                        <p className='text-sm font-semibold text-neutral-900'>${order.totalPrice?.toFixed(2)}</p>
+                                                        <p className='text-sm font-semibold text-neutral-900'>₹{order.totalPrice?.toFixed(2)}</p>
                                                     </div>
                                                     <div className='flex gap-2'>
                                                         {order.orderItems?.slice(0, 3).map((item, i) => (
@@ -173,7 +173,7 @@ export default function ProfilePage() {
                                                     <Image src={p.image} alt={p.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 33vw' />
                                                 </div>
                                                 <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
-                                                <p className='text-xs font-semibold text-neutral-900 mt-0.5'>${p.price}</p>
+                                                <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
                                             </Link>
                                         ))}
                                     </div>

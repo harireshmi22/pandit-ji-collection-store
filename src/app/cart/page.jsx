@@ -64,7 +64,7 @@ export default function CartPage() {
                                             <button onClick={() => updateQuantity(item.id, item.selectedSize, item.quantity + 1)} className='p-1.5 hover:bg-neutral-200 rounded-full transition-colors cursor-pointer'><Plus className='w-3 h-3' /></button>
                                         </div>
                                         <div className='flex items-center gap-3'>
-                                            <p className='text-sm font-semibold text-neutral-900'>${(item.price * item.quantity).toFixed(2)}</p>
+                                            <p className='text-sm font-semibold text-neutral-900'>₹{(item.price * item.quantity).toFixed(2)}</p>
                                             <button onClick={() => removeFromCart(item.id, item.selectedSize)} className='p-1.5 text-neutral-400 hover:text-red-500 transition-colors cursor-pointer'><Trash2 className='w-4 h-4' /></button>
                                         </div>
                                     </div>
@@ -78,12 +78,12 @@ export default function CartPage() {
                         <div className='sticky top-24 border border-neutral-100 rounded-2xl p-5'>
                             <h2 className='text-sm font-semibold text-neutral-900 mb-5 pb-4 border-b border-neutral-100'>Order Summary</h2>
                             <div className='space-y-3 text-sm mb-5'>
-                                <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>${cartTotal.toFixed(2)}</span></div>
-                                <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span></div>
-                                <div className='flex justify-between text-neutral-600'><span>Tax</span><span>${tax.toFixed(2)}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>₹{cartTotal.toFixed(2)}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`}</span></div>
+                                <div className='flex justify-between text-neutral-600'><span>Tax</span><span>₹{tax.toFixed(2)}</span></div>
                             </div>
                             <div className='flex justify-between text-lg font-bold text-neutral-900 pt-4 border-t border-neutral-100 mb-6'>
-                                <span>Total</span><span>${finalTotal.toFixed(2)}</span>
+                                <span>Total</span><span>₹{finalTotal.toFixed(2)}</span>
                             </div>
                             <Link href='/checkout' className='block w-full text-center py-3.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors'>
                                 Proceed to Checkout

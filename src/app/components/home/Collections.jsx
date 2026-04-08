@@ -127,7 +127,7 @@ export default function Collections() {
                                     </div>
 
                                     <div className='text-left'>
-                                        <p className='font-semibold'>${product.price} {product.type || 'T-shirt'}</p>
+                                        <p className='font-semibold'>₹{product.price} {product.type || 'T-shirt'}</p>
                                         <p className='text-sm text-gray-600'>{product.brand || product.name}</p>
                                     </div>
                                 </div>

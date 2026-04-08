@@ -166,7 +166,7 @@ function SearchContent() {
                                             </div>
                                             <div className='min-w-0'>
                                                 <p className='text-sm text-neutral-800 truncate'>{item.name}</p>
-                                                <p className='text-xs text-neutral-500 truncate'>{item.brand || 'Product'}{item.price ? ` · $${item.price}` : ''}</p>
+                                                <p className='text-xs text-neutral-500 truncate'>{item.brand || 'Product'}{item.price ? ` · ₹${item.price}` : ''}</p>
                                             </div>
                                         </div>
                                     </button>
@@ -241,10 +241,10 @@ function SearchContent() {
                             <div key={p._id} className='group relative'>
                                 <Link href={`/shop/${p._id}`} className='block'>
                                     <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
-                                            {getProductImage(p) ? <Image src={getProductImage(p)} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
+                                        {getProductImage(p) ? <Image src={getProductImage(p)} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
                                     </div>
                                     <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
-                                    <p className='text-xs font-semibold text-neutral-900 mt-0.5'>${p.price}</p>
+                                    <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
                                 </Link>
                                 <button onClick={() => toggleWishlist({ id: p._id, name: p.name, price: p.price, image: getProductImage(p) })} className='absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all z-10 cursor-pointer'>
                                     <Heart className={`w-4 h-4 ${isInWishlist(p._id) ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />

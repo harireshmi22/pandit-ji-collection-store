@@ -218,7 +218,7 @@ export default function AdminProductsPage() {
                                         <h3 className='text-sm font-medium text-neutral-900 truncate'>{product.name}</h3>
                                         <p className='text-xs text-neutral-400 mt-0.5'>{product.category} {product.brand ? `/ ${product.brand}` : ''}</p>
                                     </div>
-                                    <p className='text-sm font-bold text-neutral-900 shrink-0'>${product.price}</p>
+                                    <p className='text-sm font-bold text-neutral-900 shrink-0'>₹{product.price}</p>
                                 </div>
                                 <div className='flex items-center justify-between mt-3 pt-3 border-t border-neutral-100'>
                                     <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${product.stock > 10 ? 'bg-emerald-50 text-emerald-700' : product.stock > 0 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>

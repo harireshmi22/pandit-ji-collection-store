@@ -45,7 +45,7 @@ export default function AdminDashboardPage() {
     const statCards = [
         {
             label: 'Total Revenue',
-            value: `$${(stats?.totalRevenue || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+            value: `₹${(stats?.totalRevenue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
             change: stats?.revenueChange || 0,
             icon: DollarSign,
             color: 'bg-emerald-50 text-emerald-600',
@@ -188,7 +188,7 @@ export default function AdminDashboardPage() {
                                             </span>
                                         </td>
                                         <td className='px-5 py-3.5 text-right'>
-                                            <span className='text-sm font-semibold text-neutral-900'>${order.totalPrice?.toFixed(2)}</span>
+                                            <span className='text-sm font-semibold text-neutral-900'>₹{order.totalPrice?.toFixed(2)}</span>
                                         </td>
                                         <td className='px-5 py-3.5'>
                                             <Link

@@ -45,7 +45,7 @@ export default function WishlistPage() {
                                     </div>
                                     <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
                                     {p.brand && <p className='text-[10px] text-neutral-400'>{p.brand}</p>}
-                                    <p className='text-xs font-semibold text-neutral-900 mt-0.5'>${p.price}</p>
+                                    <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
                                 </Link>
 
                                 {/* Remove */}

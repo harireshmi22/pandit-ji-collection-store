@@ -94,8 +94,8 @@ export default function AdminSettingsPage() {
                             onChange={(e) => handleChange('currency', e.target.value)}
                             className='w-full px-3 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none cursor-pointer appearance-none'
                         >
-                            <option value="INR">INR (Rs.)</option>
-                            <option value="USD">USD ($)</option>
+                            <option value="INR">INR (₹)</option>
+                            <option value="USD">USD (US Dollar)</option>
                             <option value="EUR">EUR (Euro)</option>
                             <option value="GBP">GBP (Pound)</option>
                         </select>
@@ -136,14 +136,14 @@ export default function AdminSettingsPage() {
                         type="number"
                         value={settings.shippingCost}
                         onChange={(e) => handleChange('shippingCost', e.target.value)}
-                        prefix={settings.currency === 'INR' ? 'Rs.' : '$'}
+                        prefix={settings.currency === 'INR' ? '₹' : '₹'}
                     />
                     <InputField
                         label="Free Shipping Above"
                         type="number"
                         value={settings.freeShippingThreshold}
                         onChange={(e) => handleChange('freeShippingThreshold', e.target.value)}
-                        prefix={settings.currency === 'INR' ? 'Rs.' : '$'}
+                        prefix={settings.currency === 'INR' ? '₹' : '₹'}
                     />
                 </div>
             </div>
