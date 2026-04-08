@@ -10,346 +10,145 @@ dotenv.config({ path: path.join(__dirname, '../.env.local') });
 import { dbConnect } from '../src/lib/dbConnect.js';
 import Product from '../src/models/Product.js';
 
-const sampleProducts = [
-  {
-    name: 'Classic Black Blazer',
-    description: 'A timeless blazer perfect for formal occasions. Made from premium wool blend with a modern slim fit.',
-    price: 299.99,
-    originalPrice: 399.99,
-    category: 'Top Wear',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Black',
-    material: 'Wool Blend',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=667&fit=crop'],
-    stock: 15,
-    rating: 4.5,
-    reviews: 28,
-    featured: true,
-    isNewArrival: false,
-    discount: 25,
-  },
-  {
-    name: 'White Casual Shirt',
-    description: 'Comfortable cotton shirt for everyday wear. Breathable fabric with a relaxed fit.',
-    price: 89.99,
-    originalPrice: 119.99,
-    category: 'Top Wear',
-    brand: 'Urban Threads',
-    gender: 'Men',
-    color: 'White',
-    material: 'Cotton',
-    size: 'L',
-    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&h=667&fit=crop'],
-    stock: 25,
-    rating: 4.3,
-    reviews: 45,
-    featured: false,
-    isNewArrival: true,
-    discount: 25,
-  },
-  {
-    name: 'Slim Fit Blue Jeans',
-    description: 'Modern slim fit jeans with stretch comfort. Perfect for casual and semi-formal occasions.',
-    price: 129.99,
-    originalPrice: 169.99,
-    category: 'Bottom Wear',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Blue',
-    material: 'Denim',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&h=667&fit=crop'],
-    stock: 30,
-    rating: 4.6,
-    reviews: 67,
-    featured: false,
-    isNewArrival: false,
-    discount: 24,
-  },
-  {
-    name: 'Graphic Print T-Shirt',
-    description: 'Premium cotton t-shirt with bold graphic print. Soft, breathable, and ultra-comfortable.',
-    price: 49.99,
-    originalPrice: 69.99,
-    category: 'Top Wear',
-    brand: 'Street Style',
-    gender: 'Unisex',
-    color: 'Black',
-    material: 'Cotton',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&h=667&fit=crop'],
-    stock: 40,
-    rating: 4.6,
-    reviews: 89,
-    featured: true,
-    isNewArrival: true,
-    discount: 29,
-  },
-  {
-    name: 'Brown Leather Jacket',
-    description: 'Genuine leather jacket with classic biker styling. Premium quality craftsmanship.',
-    price: 399.99,
-    originalPrice: 549.99,
-    category: 'Outerwear',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Brown',
-    material: 'Leather',
-    size: 'L',
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=667&fit=crop'],
-    stock: 10,
-    rating: 4.8,
-    reviews: 56,
-    featured: true,
-    isNewArrival: false,
-    discount: 27,
-  },
-  {
-    name: 'Floral Summer Dress',
-    description: 'Lightweight floral dress perfect for summer outings. Elegant and comfortable.',
-    price: 159.99,
-    originalPrice: 199.99,
-    category: 'Top Wear',
-    brand: 'Zara',
-    gender: 'Women',
-    color: 'Pink',
-    material: 'Chiffon',
-    size: 'S',
-    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500&h=667&fit=crop'],
-    stock: 20,
-    rating: 4.7,
-    reviews: 34,
-    featured: true,
-    isNewArrival: true,
-    discount: 20,
-  },
-  {
-    name: 'Sports Running Shoes',
-    description: 'Lightweight running shoes with cushioned sole. Designed for maximum comfort and performance.',
-    price: 179.99,
-    originalPrice: 229.99,
-    category: 'Footwear',
-    brand: 'Urban Threads',
-    gender: 'Unisex',
-    color: 'White',
-    material: 'Mesh',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=667&fit=crop'],
-    stock: 35,
-    rating: 4.4,
-    reviews: 72,
-    featured: false,
-    isNewArrival: true,
-    discount: 22,
-  },
-  {
-    name: 'Aviator Sunglasses',
-    description: 'Classic aviator sunglasses with UV400 protection. Lightweight metal frame.',
-    price: 59.99,
-    originalPrice: 79.99,
-    category: 'Accessories',
-    brand: 'Street Style',
-    gender: 'Unisex',
-    color: 'Gold',
-    material: 'Metal',
-    size: 'One Size',
-    image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&h=667&fit=crop'],
-    stock: 50,
-    rating: 4.2,
-    reviews: 91,
-    featured: false,
-    isNewArrival: false,
-    discount: 25,
-  },
-  {
-    name: 'Navy Chino Pants',
-    description: 'Tailored chino pants in navy blue. Perfect for smart casual occasions.',
-    price: 99.99,
-    originalPrice: 139.99,
-    category: 'Bottom Wear',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Navy',
-    material: 'Cotton Twill',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=500&h=667&fit=crop'],
-    stock: 22,
-    rating: 4.5,
-    reviews: 38,
-    featured: false,
-    isNewArrival: true,
-    discount: 29,
-  },
-  {
-    name: 'Wool Overcoat',
-    description: 'Elegant wool overcoat for winter. Double-breasted with satin lining.',
-    price: 349.99,
-    originalPrice: 449.99,
-    category: 'Outerwear',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Charcoal',
-    material: 'Wool',
-    size: 'L',
-    image: 'https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500&h=667&fit=crop'],
-    stock: 8,
-    rating: 4.9,
-    reviews: 19,
-    featured: true,
-    isNewArrival: false,
-    discount: 22,
-  },
-  {
-    name: 'Striped Polo Shirt',
-    description: 'Classic striped polo shirt with ribbed collar. Comfortable and stylish.',
-    price: 69.99,
-    originalPrice: 89.99,
-    category: 'Top Wear',
-    brand: 'Urban Threads',
-    gender: 'Men',
-    color: 'Blue',
-    material: 'Pique Cotton',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1625910513413-5fc421e0fd4f?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1625910513413-5fc421e0fd4f?w=500&h=667&fit=crop'],
-    stock: 30,
-    rating: 4.3,
-    reviews: 52,
-    featured: false,
-    isNewArrival: false,
-    discount: 22,
-  },
-  {
-    name: 'Leather Belt',
-    description: 'Premium genuine leather belt with brushed metal buckle. Classic and versatile.',
-    price: 44.99,
-    originalPrice: 59.99,
-    category: 'Accessories',
-    brand: 'Pandit Ji Collection',
-    gender: 'Men',
-    color: 'Brown',
-    material: 'Leather',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=667&fit=crop'],
-    stock: 45,
-    rating: 4.6,
-    reviews: 63,
-    featured: false,
-    isNewArrival: true,
-    discount: 25,
-  },
-  {
-    name: 'Denim Jacket',
-    description: 'Classic denim jacket with a modern wash. Versatile layering piece for all seasons.',
-    price: 149.99,
-    originalPrice: 199.99,
-    category: 'Outerwear',
-    brand: 'Street Style',
-    gender: 'Unisex',
-    color: 'Blue',
-    material: 'Denim',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?w=500&h=667&fit=crop'],
-    stock: 18,
-    rating: 4.4,
-    reviews: 41,
-    featured: false,
-    isNewArrival: true,
-    discount: 25,
-  },
-  {
-    name: 'Women Knit Sweater',
-    description: 'Cozy knit sweater in soft merino wool blend. Perfect for layering.',
-    price: 119.99,
-    originalPrice: 159.99,
-    category: 'Top Wear',
-    brand: 'Zara',
-    gender: 'Women',
-    color: 'Cream',
-    material: 'Merino Wool',
-    size: 'S',
-    image: 'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?w=500&h=667&fit=crop'],
-    stock: 25,
-    rating: 4.5,
-    reviews: 37,
-    featured: false,
-    isNewArrival: false,
-    discount: 25,
-  },
-  {
-    name: 'Canvas Sneakers',
-    description: 'Classic low-top canvas sneakers. Timeless design meets everyday comfort.',
-    price: 79.99,
-    originalPrice: 99.99,
-    category: 'Footwear',
-    brand: 'Street Style',
-    gender: 'Unisex',
-    color: 'White',
-    material: 'Canvas',
-    size: 'M',
-    image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&h=667&fit=crop'],
-    stock: 40,
-    rating: 4.5,
-    reviews: 85,
-    featured: true,
-    isNewArrival: false,
-    discount: 20,
-  },
-  {
-    name: 'Silk Scarf',
-    description: 'Luxurious patterned silk scarf. A versatile accessory for any outfit.',
-    price: 39.99,
-    originalPrice: 54.99,
-    category: 'Accessories',
-    brand: 'Zara',
-    gender: 'Women',
-    color: 'Multi',
-    material: 'Silk',
-    size: 'One Size',
-    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&h=667&fit=crop',
-    images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&h=667&fit=crop'],
-    stock: 55,
-    rating: 4.3,
-    reviews: 29,
-    featured: false,
-    isNewArrival: true,
-    discount: 27,
-  },
-];
+const categories = ['T-shirt', 'Formal', 'Top Wear', 'Bottom Wear'];
+const brands = ['Pandit Ji Collection', 'Urban Threads', 'Street Style', 'Zara'];
+const genders = ['Men', 'Women', 'Unisex'];
+const colors = ['Black', 'White', 'Blue', 'Navy', 'Brown', 'Cream', 'Charcoal', 'Pink', 'Olive'];
+const materials = ['Cotton', 'Denim', 'Wool Blend', 'Linen', 'Leather', 'Canvas', 'Mesh', 'Silk'];
+const sizes = ['S', 'M', 'L', 'XL', 'One Size'];
+const adjectiveWords = ['Classic', 'Premium', 'Modern', 'Urban', 'Elegant', 'Comfort', 'Slim Fit', 'Signature'];
+
+const categoryProductWords = {
+  'T-shirt': ['Crew Tee', 'Graphic Tee', 'Polo Tee', 'Essential Tee'],
+  Formal: ['Formal Shirt', 'Dress Shirt', 'Office Blazer', 'Formal Trouser'],
+  'Top Wear': ['Top', 'Shirt', 'Kurti Top', 'Casual Blouse'],
+  'Bottom Wear': ['Jeans', 'Chinos', 'Trousers', 'Pants'],
+};
+
+const categoryImages = {
+  'T-shirt': [
+    'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1618354691438-25bc04584c23?w=900&h=1100&fit=crop',
+  ],
+  Formal: [
+    'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=900&h=1100&fit=crop',
+  ],
+  'Top Wear': [
+    'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=900&h=1100&fit=crop',
+  ],
+  'Bottom Wear': [
+    'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=900&h=1100&fit=crop',
+    'https://images.unsplash.com/photo-1542272604-787c3835535d?w=900&h=1100&fit=crop',
+  ],
+};
+
+function randomItem(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function buildProductName(index, category) {
+  const productWords = categoryProductWords[category] || ['Product'];
+  return `${randomItem(adjectiveWords)} ${randomItem(colors)} ${randomItem(productWords)} ${index + 1}`;
+}
+
+function buildProductDescription(name, category, material) {
+  return `${name} for everyday comfort. Built with ${material} and crafted for ${category.toLowerCase()} styling.`;
+}
+
+function buildImage(index, category) {
+  const pool = categoryImages[category] || [];
+  if (pool.length === 0) {
+    return `https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&h=1100&fit=crop&seed=${index + 1}`;
+  }
+  return pool[index % pool.length];
+}
+
+function createProduct(index) {
+  const category = randomItem(categories);
+  const brand = randomItem(brands);
+  const gender = randomItem(genders);
+  const color = randomItem(colors);
+  const material = randomItem(materials);
+  const size = randomItem(sizes.slice(0, 4));
+  const price = randomInt(899, 6999);
+  const discount = randomInt(10, 35);
+  const originalPrice = Number((price / (1 - discount / 100)).toFixed(2));
+  const rating = Number((Math.random() * 1.5 + 3.5).toFixed(1));
+  const name = buildProductName(index, category);
+  const image = buildImage(index, category);
+
+  return {
+    name,
+    description: buildProductDescription(name, category, material),
+    price,
+    originalPrice,
+    category,
+    brand,
+    gender,
+    color,
+    material,
+    size,
+    image,
+    images: [image],
+    stock: randomInt(5, 80),
+    rating,
+    reviews: randomInt(0, 120),
+    featured: Math.random() > 0.75,
+    isNewArrival: Math.random() > 0.5,
+    discount,
+  };
+}
+
+function generateProducts(count = 20) {
+  return Array.from({ length: count }, (_, index) => createProduct(index));
+}
+
+function parseCliArgs() {
+  const args = process.argv.slice(2);
+  const countArg = args.find((arg) => arg.startsWith('--count='));
+  const modeArg = args.find((arg) => arg.startsWith('--mode='));
+
+  const parsedCount = countArg ? Number(countArg.split('=')[1]) : 20;
+  const count = Number.isInteger(parsedCount) && parsedCount > 0 ? parsedCount : 20;
+  const mode = modeArg ? modeArg.split('=')[1] : 'replace';
+
+  return {
+    count,
+    mode: mode === 'append' ? 'append' : 'replace',
+  };
+}
 
 async function seedDatabase() {
   try {
+    const { count, mode } = parseCliArgs();
+    const generatedProducts = generateProducts(count);
+
     await dbConnect();
-    
-    // Clear existing products
-    await Product.deleteMany({});
-    console.log('Cleared existing products');
-    
-    // Insert sample products
-    const insertedProducts = await Product.insertMany(sampleProducts);
+
+    if (mode === 'replace') {
+      await Product.deleteMany({});
+      console.log('Cleared existing products (mode=replace)');
+    } else {
+      console.log('Keeping existing products (mode=append)');
+    }
+
+    const insertedProducts = await Product.insertMany(generatedProducts);
     console.log(`✅ Successfully inserted ${insertedProducts.length} products`);
-    
-    // Log the inserted products
+
     insertedProducts.forEach((product, index) => {
-      console.log(`${index + 1}. ${product.name} - $${product.price}`);
+      console.log(`${index + 1}. ${product.name} - INR ${product.price}`);
     });
-    
+
     process.exit(0);
   } catch (error) {
     console.error('❌ Error seeding database:', error);

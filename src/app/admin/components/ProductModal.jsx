@@ -37,6 +37,7 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
         if (product) {
             setFormData(product)
             setImagePreview(product.image || '')
+            setImageFile(null)
         } else {
             setFormData({
                 name: '', description: '', price: '', originalPrice: '',
@@ -45,6 +46,7 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
                 rating: 0, reviews: 0, featured: false, isNewArrival: true, discount: '',
             })
             setImagePreview('')
+            setImageFile(null)
         }
         setErrors({})
     }, [product, isOpen])
@@ -81,6 +83,19 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
         }
     }
 
+    const handleImageUrlChange = (e) => {
+        const url = e.target.value
+        setFormData(prev => ({ ...prev, image: url }))
+        setImageFile(null)
+        setImagePreview(url || '')
+    }
+
+    const clearImage = () => {
+        setImageFile(null)
+        setImagePreview('')
+        setFormData(prev => ({ ...prev, image: '', images: [] }))
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         if (!validate()) return
@@ -100,7 +115,11 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
                 }
             }
 
-            await onSave({ ...formData, image: imageUrl })
+            await onSave({
+                ...formData,
+                image: imageUrl,
+                images: imageUrl ? [imageUrl] : [],
+            })
         } catch (err) {
             setErrors({ submit: 'Failed to save. Please try again.' })
         } finally {
@@ -153,6 +172,25 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
                                         <p className='text-xs text-neutral-300 mt-1'>PNG, JPG up to 5MB</p>
                                     </div>
                                 )}
+                            </div>
+                            <div className='mt-3 space-y-2'>
+                                <InputField
+                                    label="Image URL"
+                                    name="image"
+                                    value={formData.image}
+                                    onChange={handleImageUrlChange}
+                                    placeholder="https://images.unsplash.com/..."
+                                />
+                                <div className='flex items-center gap-2'>
+                                    <button
+                                        type='button'
+                                        onClick={clearImage}
+                                        className='px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors'
+                                    >
+                                        Remove Image
+                                    </button>
+                                    <p className='text-xs text-neutral-400'>Upload a file or paste an image URL</p>
+                                </div>
                             </div>
                         </div>
 

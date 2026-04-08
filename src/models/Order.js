@@ -90,7 +90,6 @@ const orderSchema = new mongoose.Schema(
     },
     paymentGatewayOrderId: {
       type: String,
-      index: true,
       sparse: true
     },
     paymentGatewayPaymentId: {
@@ -170,7 +169,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
-orderSchema.index({ paymentGatewayOrderId: 1 });
+orderSchema.index({ paymentGatewayOrderId: 1 }, { sparse: true });
 
 export default mongoose.models.Order || mongoose.model('Order', orderSchema);
 

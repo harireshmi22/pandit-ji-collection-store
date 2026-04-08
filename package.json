@@ -14,6 +14,8 @@
     "lint:fix": "eslint --fix",
     "docker:build": "docker build -t pandit-ji-collection .",
     "docker:run": "docker run -p 3000:3000 pandit-ji-collection",
+    "seed:products": "node scripts/seed-database.js --count=20 --mode=replace",
+    "seed:products:append": "node scripts/seed-database.js --count=20 --mode=append",
     "setup:perf": "node src/scripts/setup-performance.js",
     "db:indexes": "node -e \"require('./src/lib/mongodb-indexes.js').createIndexes()\"",
     "test:redis": "node src/scripts/test-redis.js"
