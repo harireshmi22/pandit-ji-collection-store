@@ -24,12 +24,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             authorize: async (credentials) => {
                 try {
+                    const email = credentials?.email?.toString().trim().toLowerCase()
+                    const password = credentials?.password?.toString()
+
+                    if (!email || !password) {
+                        return null
+                    }
 
                     // 1. Connect to MongoDB
                     await dbConnect()
 
                     // 2. Find user by email
-                    const user = await User.findOne({ email: credentials.email }).select("+password")
+                    const user = await User.findOne({ email }).select("+password")
 
                     // 3. If no user found, return null 
                     if (!user) {
@@ -38,7 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }
 
                     // Use matchPassword method from User model
-                    const isMatch = await user.matchPassword(credentials.password)
+                    const isMatch = await user.matchPassword(password)
 
                     // 4. If password doesn't match, return null
                     if (!isMatch) {

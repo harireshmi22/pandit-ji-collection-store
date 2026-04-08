@@ -6,7 +6,10 @@ export async function POST(req) {
     try {
         const { name, email, password, role = 'user' } = await req.json()
 
-        if (!name || !email || !password) {
+        const normalizedName = name?.toString().trim()
+        const normalizedEmail = email?.toString().trim().toLowerCase()
+
+        if (!normalizedName || !normalizedEmail || !password) {
             return NextResponse.json(
                 { message: "Please provide all required fields" },
                 { status: 400 }
@@ -25,7 +28,7 @@ export async function POST(req) {
         try {
             await dbConnect()
 
-            const userExists = await User.findOne({ email })
+            const userExists = await User.findOne({ email: normalizedEmail })
 
             if (userExists) {
                 return NextResponse.json(
@@ -35,8 +38,8 @@ export async function POST(req) {
             }
 
             const user = await User.create({
-                name,
-                email,
+                name: normalizedName,
+                email: normalizedEmail,
                 password, // Hashing happens in User model pre-save hook
                 role // Allow role to be set (for admin creation)
             })

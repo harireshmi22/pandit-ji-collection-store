@@ -33,9 +33,24 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
     const [imagePreview, setImagePreview] = useState('')
     const [imageFile, setImageFile] = useState(null)
 
+    const parseCsv = (value) => {
+        if (!value) return []
+        return [...new Set(String(value).split(',').map(item => item.trim()).filter(Boolean))]
+    }
+
+    const stringifyList = (value, fallback = '') => {
+        if (Array.isArray(value) && value.length > 0) return value.join(', ')
+        return fallback
+    }
+
     useEffect(() => {
         if (product) {
-            setFormData(product)
+            setFormData({
+                ...product,
+                size: stringifyList(product.sizes, product.size || ''),
+                color: stringifyList(product.colors, product.color || ''),
+                material: stringifyList(product.materials, product.material || ''),
+            })
             setImagePreview(product.image || '')
             setImageFile(null)
         } else {
@@ -119,6 +134,9 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
                 ...formData,
                 image: imageUrl,
                 images: imageUrl ? [imageUrl] : [],
+                sizes: parseCsv(formData.size),
+                colors: parseCsv(formData.color),
+                materials: parseCsv(formData.material),
             })
         } catch (err) {
             setErrors({ submit: 'Failed to save. Please try again.' })
@@ -233,9 +251,9 @@ export default function ProductModal({ isOpen, product, onClose, onSave }) {
                                     {genders.map(g => <option key={g} value={g}>{g}</option>)}
                                 </select>
                             </div>
-                            <InputField label="Size" name="size" value={formData.size} onChange={handleChange} error={errors.size} placeholder="S, M, L, XL" />
-                            <InputField label="Color" name="color" value={formData.color} onChange={handleChange} error={errors.color} placeholder="Black, Blue" />
-                            <InputField label="Material" name="material" value={formData.material} onChange={handleChange} error={errors.material} placeholder="Cotton" />
+                            <InputField label="Sizes" name="size" value={formData.size} onChange={handleChange} error={errors.size} placeholder="S, M, L" />
+                            <InputField label="Colors" name="color" value={formData.color} onChange={handleChange} error={errors.color} placeholder="Black, Blue" />
+                            <InputField label="Materials" name="material" value={formData.material} onChange={handleChange} error={errors.material} placeholder="Cotton, Linen" />
                         </div>
 
                         {/* Description */}

@@ -180,6 +180,18 @@ export async function POST(req) {
 
         const body = await req.json();
 
+        const normalizeList = (value) => {
+            if (!value) return [];
+            if (Array.isArray(value)) {
+                return [...new Set(value.map((item) => String(item).trim()).filter(Boolean))];
+            }
+            return [...new Set(String(value).split(',').map((item) => item.trim()).filter(Boolean))];
+        };
+
+        const normalizedSizes = normalizeList(body.sizes || body.size);
+        const normalizedColors = normalizeList(body.colors || body.color);
+        const normalizedMaterials = normalizeList(body.materials || body.material);
+
         // Validate required fields
         const { name, description, price, category, brand } = body;
         if (!name || !description || !price || !category || !brand) {
@@ -214,9 +226,12 @@ export async function POST(req) {
             image: body.image || "/images/placeholder.jpg",
             images: body.images || [body.image || "/images/placeholder.jpg"],
             stock: body.stock || 0,
-            sizes: body.sizes || ["S", "M", "L", "XL"],
-            colors: body.colors || ["Black"],
-            materials: body.materials || [],
+            size: normalizedSizes[0] || body.size || 'M',
+            sizes: normalizedSizes.length > 0 ? normalizedSizes : ["S", "M", "L", "XL"],
+            color: normalizedColors[0] || body.color || 'Black',
+            colors: normalizedColors.length > 0 ? normalizedColors : ["Black"],
+            material: normalizedMaterials[0] || body.material || '',
+            materials: normalizedMaterials,
             rating: 0,
             reviews: 0,
             isNewArrival: body.isNewArrival || false,

@@ -23,8 +23,11 @@ const productSchema = new mongoose.Schema(
     brand: String,
     gender: String,
     size: String,
+    sizes: [String],
     color: String,
+    colors: [String],
     material: String,
+    materials: [String],
 
 
     image: String,

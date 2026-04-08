@@ -11,8 +11,6 @@ import ProductSwiper from '@/app/components/home/ProductSwiper'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 
-const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
-
 export default function ProductDetailPage() {
     const params = useParams()
     const router = useRouter()
@@ -24,6 +22,7 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [selectedSize, setSelectedSize] = useState('M')
+    const [selectedColor, setSelectedColor] = useState('')
     const [quantity, setQuantity] = useState(1)
     const [addedToCart, setAddedToCart] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
@@ -45,6 +44,23 @@ export default function ProductDetailPage() {
                 }
             })()
     }, [productId])
+
+    const availableSizes = (Array.isArray(product?.sizes) && product.sizes.length > 0)
+        ? product.sizes
+        : (product?.size ? [product.size] : ['M'])
+
+    const availableColors = (Array.isArray(product?.colors) && product.colors.length > 0)
+        ? product.colors
+        : (product?.color ? [product.color] : [])
+
+    useEffect(() => {
+        if (availableSizes.length > 0) {
+            setSelectedSize(availableSizes[0])
+        }
+        if (availableColors.length > 0) {
+            setSelectedColor(availableColors[0])
+        }
+    }, [product?._id])
 
     if (loading) {
         return (
@@ -130,10 +146,10 @@ export default function ProductDetailPage() {
 
                         {product.description && <p className='text-sm text-neutral-500 leading-relaxed mb-8'>{product.description}</p>}
 
-                        {(product.material || product.color) && (
+                        {(product.material || product.color || availableColors.length > 0) && (
                             <div className='grid grid-cols-2 gap-4 mb-8 pb-8 border-b border-neutral-100'>
                                 {product.material && <div><p className='text-xs text-neutral-400 mb-0.5'>Material</p><p className='text-sm font-medium text-neutral-900'>{product.material}</p></div>}
-                                {product.color && <div><p className='text-xs text-neutral-400 mb-0.5'>Color</p><p className='text-sm font-medium text-neutral-900'>{product.color}</p></div>}
+                                {(selectedColor || product.color) && <div><p className='text-xs text-neutral-400 mb-0.5'>Color</p><p className='text-sm font-medium text-neutral-900'>{selectedColor || product.color}</p></div>}
                             </div>
                         )}
 
@@ -141,7 +157,7 @@ export default function ProductDetailPage() {
                         <div className='mb-6'>
                             <p className='text-xs font-medium text-neutral-900 uppercase tracking-wider mb-3'>Size</p>
                             <div className='flex flex-wrap gap-2'>
-                                {sizes.map(size => (
+                                {availableSizes.map(size => (
                                     <button key={size} onClick={() => setSelectedSize(size)}
                                         className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all cursor-pointer ${selectedSize === size ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}>
                                         {size}
@@ -149,6 +165,23 @@ export default function ProductDetailPage() {
                                 ))}
                             </div>
                         </div>
+
+                        {availableColors.length > 0 && (
+                            <div className='mb-6'>
+                                <p className='text-xs font-medium text-neutral-900 uppercase tracking-wider mb-3'>Color</p>
+                                <div className='flex flex-wrap gap-2'>
+                                    {availableColors.map(color => (
+                                        <button
+                                            key={color}
+                                            onClick={() => setSelectedColor(color)}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${selectedColor === color ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
+                                        >
+                                            {color}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Quantity */}
                         <div className='mb-8'>

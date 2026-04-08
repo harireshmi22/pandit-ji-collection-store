@@ -181,11 +181,34 @@ export async function PUT(request, { params }) {
 		const { id } = params;
 		const body = await request.json();
 
+		const normalizeList = (value) => {
+			if (!value) return [];
+			if (Array.isArray(value)) {
+				return [...new Set(value.map((item) => String(item).trim()).filter(Boolean))];
+			}
+			return [...new Set(String(value).split(',').map((item) => item.trim()).filter(Boolean))];
+		};
+
+		const normalizedSizes = normalizeList(body.sizes ?? body.size);
+		const normalizedColors = normalizeList(body.colors ?? body.color);
+		const normalizedMaterials = normalizeList(body.materials ?? body.material);
+
+		const payload = {
+			...body,
+			updatedAt: new Date(),
+			size: normalizedSizes[0] || body.size || 'M',
+			sizes: normalizedSizes.length > 0 ? normalizedSizes : ['M'],
+			color: normalizedColors[0] || body.color || 'Black',
+			colors: normalizedColors.length > 0 ? normalizedColors : ['Black'],
+			material: normalizedMaterials[0] || body.material || '',
+			materials: normalizedMaterials,
+		};
+
 		await dbConnect();
 
 		const updatedProduct = await Product.findByIdAndUpdate(
 			id,
-			{ ...body, updatedAt: new Date() },
+			payload,
 			{ new: true, runValidators: true },
 		).lean();
 
