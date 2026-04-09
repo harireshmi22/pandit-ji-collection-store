@@ -10,7 +10,7 @@ import { useCart } from '@/context/CartContext'
 import { Heart, ShoppingBag, X, ArrowRight } from 'lucide-react'
 
 export default function WishlistPage() {
-    const { wishlistItems, removeFromWishlist, clearWishlist } = useWishlist()
+    const { wishlistItems, removeFromWishlist, clearWishlist, isLoading } = useWishlist()
     const { addToCart } = useCart()
 
     return (
@@ -20,14 +20,26 @@ export default function WishlistPage() {
                 <div className='flex items-center justify-between mb-8'>
                     <div>
                         <h1 className='text-2xl md:text-3xl font-bold text-neutral-900'>Wishlist</h1>
-                        <p className='text-sm text-neutral-500 mt-1'>{wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'}</p>
+                        <p className='text-sm text-neutral-500 mt-1'>
+                            {isLoading ? 'Loading your wishlist...' : `${wishlistItems.length} ${wishlistItems.length === 1 ? 'item' : 'items'}`}
+                        </p>
                     </div>
-                    {wishlistItems.length > 0 && (
+                    {!isLoading && wishlistItems.length > 0 && (
                         <button onClick={clearWishlist} className='text-xs text-neutral-400 hover:text-neutral-600 transition-colors cursor-pointer'>Clear All</button>
                     )}
                 </div>
 
-                {wishlistItems.length === 0 ? (
+                {isLoading ? (
+                    <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+                        {[...Array(4)].map((_, index) => (
+                            <div key={index} className='animate-pulse'>
+                                <div className='aspect-3/4 bg-neutral-100 rounded-2xl mb-2' />
+                                <div className='h-3 bg-neutral-100 rounded w-3/4 mb-1' />
+                                <div className='h-3 bg-neutral-100 rounded w-1/2' />
+                            </div>
+                        ))}
+                    </div>
+                ) : wishlistItems.length === 0 ? (
                     <div className='text-center py-20'>
                         <Heart className='w-10 h-10 text-neutral-200 mx-auto mb-3' />
                         <p className='text-sm text-neutral-500 mb-4'>Your wishlist is empty</p>
