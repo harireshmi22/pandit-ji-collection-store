@@ -29,12 +29,37 @@ function LoginForm() {
         setIsLoading(true)
         setError('')
         try {
+            const emailToCheck = formData.email?.trim().toLowerCase()
+
+            const checkUserResponse = await fetch('/api/auth/check-user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailToCheck }),
+            })
+
+            if (!checkUserResponse.ok) {
+                setError('Unable to verify your account right now. Please try again.')
+                return
+            }
+
+            const checkUserData = await checkUserResponse.json()
+
+            if (!checkUserData?.exists) {
+                setError('You are not registered. Please sign up first.')
+                return
+            }
+
             const result = await signIn('credentials', { email: formData.email, password: formData.password, redirect: false })
             if (result?.error) {
-                setError(result.status === 429 || result.error.includes('Too many') ? 'Too many login attempts. Please try again later.' : 'Please check your email or password.')
+                setError(result.status === 429 || result.error.includes('Too many') ? 'Too many login attempts. Please try again later.' : 'Please check your password and try again.')
             } else { router.push(callbackUrl); router.refresh() }
         } catch { setError('Too many login attempts. Please try again later.') }
         finally { setIsLoading(false) }
+    }
+
+    const handleChangeInput = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value })
+        setError('')
     }
 
     return (
@@ -43,6 +68,7 @@ function LoginForm() {
                 email={formData.email}
                 password={formData.password}
                 rememberMe={rememberMe}
+                handleChangeInput={handleChangeInput}
                 showPassword={showPassword}
                 isLoading={isLoading}
                 error={error}

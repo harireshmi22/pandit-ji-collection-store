@@ -89,8 +89,7 @@ const orderSchema = new mongoose.Schema(
       default: 'pending'
     },
     paymentGatewayOrderId: {
-      type: String,
-      sparse: true
+      type: String
     },
     paymentGatewayPaymentId: {
       type: String,

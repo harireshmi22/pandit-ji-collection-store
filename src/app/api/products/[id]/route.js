@@ -7,6 +7,17 @@ import redis, { memCache } from "@/lib/redis";
 // GET /api/products/[id] - Fetch a single product by ID with Redis caching
 const PRODUCT_DETAIL_CACHE_TTL_SECONDS = 300;
 
+const isDataUri = (value) =>
+	typeof value === "string" && value.trim().toLowerCase().startsWith("data:");
+
+const isAllowedProductImage = (value) => {
+	if (!value || typeof value !== "string") return true;
+	const trimmed = value.trim();
+
+	if (trimmed.startsWith("/")) return true;
+	return trimmed.startsWith("https://res.cloudinary.com/");
+};
+
 export async function GET(request, { params }) {
 	try {
 		// Handle async params for Next.js 16
@@ -203,6 +214,40 @@ export async function PUT(request, { params }) {
 			material: normalizedMaterials[0] || body.material || '',
 			materials: normalizedMaterials,
 		};
+
+		if (isDataUri(payload.image)) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Base64 image data is not allowed. Upload image to Cloudinary first.",
+				},
+				{ status: 400 },
+			);
+		}
+
+		if (!isAllowedProductImage(payload.image)) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Image must be a Cloudinary URL (res.cloudinary.com) or a local placeholder path.",
+				},
+				{ status: 400 },
+			);
+		}
+
+		const incomingImages = Array.isArray(payload.images) ? payload.images : [];
+		const hasInvalidImages = incomingImages.some(
+			(img) => !isAllowedProductImage(img) || isDataUri(img),
+		);
+		if (hasInvalidImages) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "All images must be Cloudinary URLs (or local placeholder paths).",
+				},
+				{ status: 400 },
+			);
+		}
 
 		await dbConnect();
 

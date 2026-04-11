@@ -2,20 +2,12 @@ export const uploadToCloudinary = async (file) => {
 	if (!file) return null;
 
 	const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-	const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET; // You'll need to set this up in Cloudinary settings
+	const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
-	// TODO: Add Cloudinary credentials to .env.local
 	if (!cloudName || !uploadPreset) {
-		console.warn(
-			"Cloudinary credentials missing. Falling back to base64 (not recommended for production).",
+		throw new Error(
+			"Cloudinary is not configured. Set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET.",
 		);
-		// Fallback to base64 if no keys (maintain current behavior but warn)
-		return new Promise((resolve, reject) => {
-			const reader = new FileReader();
-			reader.readAsDataURL(file);
-			reader.onload = () => resolve(reader.result);
-			reader.onerror = (error) => reject(error);
-		});
 	}
 
 	console.log("Cloudinary upload starting:", {

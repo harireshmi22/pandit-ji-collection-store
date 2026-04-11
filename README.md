@@ -1,418 +1,166 @@
-# 🛍️ Pandit Ji Collection Store
+# Pandit Ji Collection Store
 
-A modern, full-featured e-commerce platform built with Next.js, MongoDB, and Redis. This project showcases a complete product management system with advanced features like caching, real-time updates, and a responsive admin dashboard.
+Pandit Ji Collection Store is a full-stack ecommerce project built with Next.js App Router, MongoDB, and NextAuth.
+It includes a storefront, admin area, user accounts, cart, wishlist, order flow, and Razorpay integration.
 
-## ✨ Key Features
+## Current Project Highlights
 
-### 🛒 E-commerce Functionality
-- **Product Management**: Full CRUD operations for products with validation
-- **Advanced Search & Filtering**: Search by name, description, brand; filter by category, colors, sizes, materials
-- **Smart Sorting**: Sort by price, rating, popularity, name, and newest arrivals
-- **Product Variants**: Support for multiple sizes, colors, and materials
-- **Inventory Management**: Stock tracking and management
-- **Featured Products**: Highlight special products and new arrivals
+- Next.js 16 + React 19 application using App Router
+- User and admin authentication with NextAuth credentials flow
+- Product catalog with search, filters, sort, and pagination
+- Admin dashboard for product, order, analytics, and user management
+- Cart persistence with Redis or in-memory fallback
+- Wishlist persistence:
+  - Guest users: local storage
+  - Logged-in users: MongoDB-backed wishlist via API
+  - Guest wishlist auto-syncs to account on login
+- Order creation APIs with stock updates
+- Razorpay order creation, verification, and webhook support
+- Cloudinary-based image storage
 
-### 🎨 Modern UI/UX
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Interactive Components**: Built with React, Framer Motion animations
-- **Admin Dashboard**: Comprehensive analytics and management interface
-- **Real-time Updates**: Live data synchronization
-- **Loading States**: Smooth user experience with proper loading indicators
+## Tech Stack
 
-### 🚀 Performance & Scalability
-- **Multi-layer Caching**: Redis + in-memory caching for blazing fast responses
-- **Database Optimization**: MongoDB with optimized queries and indexing
-- **API Optimization**: RESTful APIs with proper error handling
-- **Image Management**: Cloudinary integration for image uploads
-- **Background Jobs**: BullMQ for processing background tasks
+- Frontend: Next.js, React, Tailwind CSS, Framer Motion, Lucide
+- Backend: Next.js Route Handlers, Mongoose, NextAuth
+- Data: MongoDB, optional Redis/Upstash
+- Payments: Razorpay
+- Email: Resend
+- Tooling: ESLint, Docker
 
-### 🔐 Security & Authentication
-- **NextAuth.js**: Secure authentication system
-- **Role-based Access**: Admin and user role management
-- **API Security**: Protected routes and data validation
-- **Environment Variables**: Secure configuration management
+## Repository Structure
 
-## 🛠️ Tech Stack
-
-### Frontend
-- **Next.js 16** - React framework with App Router
-- **React 19** - UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **Lucide React** - Icon library
-- **Swiper** - Carousel/slider component
-
-### Backend
-- **Node.js** - Runtime environment
-- **MongoDB** - NoSQL database with Mongoose ODM
-- **Redis** - In-memory data store for caching
-- **NextAuth.js** - Authentication solution
-- **BullMQ** - Queue system for background jobs
-
-### Development & Deployment
-- **Docker** - Containerization
-- **ESLint** - Code linting
-- **PostCSS** - CSS processing
-- **Cloudinary** - Cloud image management
-
-## 📁 Project Structure
-
-```
-pandit-ji-collection-store-main/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── admin/             # Admin dashboard routes
-│   │   │   ├── products/      # Product management
-│   │   │   ├── analytics/     # Analytics dashboard
-│   │   │   ├── orders/        # Order management
-│   │   │   └── users/         # User management
-│   │   ├── api/               # API routes
-│   │   │   ├── products/      # Product CRUD APIs
-│   │   │   ├── admin/         # Admin APIs
-│   │   │   └── auth/          # Authentication APIs
-│   │   └── (shop)/            # Shop pages
-│   ├── components/            # Reusable components
-│   ├── context/              # React context providers
-│   ├── lib/                  # Utility functions
-│   ├── models/               # Database models
-│   ├── scripts/              # Helper scripts
-│   └── service/              # External service integrations
-├── public/                   # Static assets
-├── docs/                     # Documentation
-└── docker-compose.yml        # Docker configuration
+```text
+src/
+  app/
+    admin/                Admin routes and dashboard pages
+    api/                  Route handlers (auth, products, orders, cart, wishlist, payments)
+    shop/                 Storefront listing and product details
+    wishlist/             Wishlist page
+    cart/ checkout/       Cart and checkout pages
+  context/                Cart, wishlist, auth/session context providers
+  lib/                    DB, redis, payment, env, utils
+  models/                 Mongoose models
+  scripts/                Project scripts
+scripts/
+  seed-database.js        Product seeding script
 ```
 
-## 🚀 Getting Started
+## Prerequisites
 
-### Prerequisites
-- Node.js 18+ 
-- MongoDB Atlas or local MongoDB
-- Redis (optional, for caching)
-- Git
-- Cloudinary account (for image uploads)
+- Node.js 20.9.0 or later
+- MongoDB (local or Atlas)
+- Redis (optional, app falls back to in-memory cache)
 
-### Installation
+## Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/harireshmi22/pandit-ji-collection-store.git
-   cd pandit-ji-collection-store-main
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   Create a `.env.local` file with the following variables:
-   ```env
-   # Database
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/pandit-ji-store?retryWrites=true&w=majority
-   REDIS_URL=redis://localhost:6379
-   
-   # Authentication
-   NEXTAUTH_SECRET=your-secret-key-here
-   NEXTAUTH_URL=http://localhost:3000
-   
-   # Cloudinary (for image uploads)
-   CLOUDINARY_CLOUD_NAME=your-cloud-name
-   CLOUDINARY_API_KEY=your-api-key
-   CLOUDINARY_API_SECRET=your-api-secret
-   ```
-
-4. **Create Admin User**
-   ```bash
-   # Create admin user with default credentials
-   node -e "
-   import dotenv from 'dotenv';
-   import path from 'path';
-   import { fileURLToPath } from 'url';
-   const __filename = fileURLToPath(import.meta.url);
-   const __dirname = path.dirname(__filename);
-   dotenv.config({ path: path.join(__dirname, '.env.local') });
-   import { dbConnect } from './src/lib/dbConnect.js';
-   import User from './src/models/User.js';
-   (async () => {
-     await dbConnect();
-     await User.deleteOne({ email: 'admin@panditji.com' });
-     const admin = new User({
-       name: 'Admin User',
-       email: 'admin@panditji.com',
-       password: 'admin123',
-       role: 'admin',
-       phone: '+91 98765 43210',
-       address: 'Admin Office',
-       city: 'Mumbai',
-       state: 'Maharashtra',
-       zipcode: '400001'
-     });
-     await admin.save();
-     console.log('✅ Admin user created! Email: admin@panditji.com, Password: admin123');
-     process.exit(0);
-   })();
-   "
-   ```
-
-5. **Run Database Setup**
-   ```bash
-   npm run db:indexes
-   ```
-
-6. **Start Development Server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
-   Navigate to `http://localhost:3000`
-
-8. **Admin Access**
-   - Go to `http://localhost:3000/admin/login`
-   - Email: `admin@panditji.com`
-   - Password: `admin123`
-
-## 📖 Usage Guide
-
-### Admin Dashboard
-
-1. **Access Admin Panel**
-   - Navigate to `/admin/login`
-   - Login with admin credentials:
-     - Email: `admin@panditji.com`
-     - Password: `admin123`
-
-2. **Product Management**
-   - **View Products**: See all products with search and filtering
-   - **Add Product**: Click "Add Product" button
-   - **Edit Product**: Click on any product to edit
-   - **Delete Product**: Use the delete button with confirmation
-
-3. **Analytics**
-   - View sales statistics
-   - Monitor product performance
-   - Track user activity
-
-### Shopping Experience
-
-1. **Browse Products**
-   - Use search bar to find products
-   - Apply filters for category, brand, price
-   - Sort products by various criteria
-
-2. **Product Details**
-   - View comprehensive product information
-   - Check available sizes and colors
-   - Read reviews and ratings
-
-3. **Shopping Cart**
-   - Add products to cart
-   - Update quantities
-   - Proceed to checkout
-
-## 🔧 API Reference
-
-### Products API
-
-#### GET /api/products
-Fetch products with optional filtering and pagination.
-
-**Query Parameters:**
-- `search` - Search term for name, description, brand
-- `category` - Filter by category
-- `brand` - Filter by brand  
-- `colors` - Filter by colors (comma-separated)
-- `sizes` - Filter by sizes (comma-separated)
-- `materials` - Filter by materials (comma-separated)
-- `featured` - Filter featured products (true/false)
-- `isNewArrival` - Filter new arrivals (true/false)
-- `sort` - Sort order (price_asc, price_desc, rating, popular, name)
-- `page` - Page number (default: 1)
-- `limit` - Items per page (default: 20)
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": [...],
-  "pagination": {
-    "total": 100,
-    "page": 1,
-    "limit": 20,
-    "pages": 5
-  },
-  "source": "database",
-  "cache": {
-    "hit": false,
-    "layer": "none"
-  }
-}
-```
-
-#### POST /api/products
-Create a new product.
-
-**Request Body:**
-```json
-{
-  "name": "Product Name",
-  "description": "Product description",
-  "price": 99.99,
-  "category": "Clothing",
-  "brand": "Brand Name",
-  "image": "/images/product.jpg",
-  "sizes": ["S", "M", "L", "XL"],
-  "colors": ["Black", "White"],
-  "materials": ["Cotton"],
-  "stock": 100,
-  "featured": false,
-  "isNewArrival": true
-}
-```
-
-#### GET /api/products/[id]
-Get a single product by ID.
-
-#### PUT /api/products/[id]
-Update a product by ID.
-
-#### DELETE /api/products/[id]
-Delete a product by ID.
-
-## 🎯 Key Features Explained
-
-### Caching System
-The application implements a sophisticated multi-layer caching strategy:
-
-1. **Redis Cache** - Primary cache layer for distributed environments
-2. **In-Memory Cache** - Fallback cache for single-instance deployments
-3. **Cache Invalidation** - Automatic cache clearing on data updates
-4. **TTL Management** - Configurable cache expiration times
-
-### Performance Optimizations
-- **Parallel Database Queries** - Execute count and data queries simultaneously
-- **Database Indexing** - Optimized indexes for common query patterns
-- **Lazy Loading** - Load components and data only when needed
-- **Image Optimization** - Automatic image resizing and optimization
-
-### Security Features
-- **Input Validation** - Comprehensive validation for all user inputs
-- **SQL Injection Prevention** - Parameterized queries and sanitization
-- **XSS Protection** - Content Security Policy and input sanitization
-- **Rate Limiting** - API rate limiting to prevent abuse
-
-## 🐳 Docker Support
-
-### Development with Docker
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Production Deployment
-```bash
-# Build production image
-docker build -t pandit-ji-collection .
-
-# Run production container
-docker run -p 3000:3000 pandit-ji-collection
-```
-
-## 📊 Monitoring & Analytics
-
-### Available Metrics
-- **Product Performance** - Views, conversions, ratings
-- **Sales Analytics** - Revenue, order count, average order value
-- **User Behavior** - Session duration, page views, bounce rate
-- **System Performance** - Response times, cache hit rates, error rates
-
-### Admin Dashboard Features
-- **Real-time Statistics** - Live data updates
-- **Visual Charts** - Interactive data visualization
-- **Export Reports** - Download analytics data
-- **Custom Date Ranges** - Flexible time period filtering
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 Development Scripts
+1. Clone and install dependencies.
 
 ```bash
-# Development
-npm run dev              # Start development server
-npm run build           # Build for production
-npm run start           # Start production server
-
-# Code Quality
-npm run lint            # Run ESLint
-npm run lint:fix        # Fix linting issues
-
-# Database
-npm run db:indexes      # Create database indexes
-
-# Docker
-npm run docker:build    # Build Docker image
-npm run docker:run      # Run Docker container
-
-# Performance
-npm run setup:perf      # Setup performance optimizations
-npm run test:redis      # Test Redis connection
+git clone https://github.com/harireshmi22/pandit-ji-collection-store.git
+cd pandit-ji-collection-store
+npm install
 ```
 
-## 🐛 Troubleshooting
+1. Create .env.local in the project root.
 
-### Common Issues
+```env
+# Required
+MONGODB_URI=mongodb://127.0.0.1:27017/panditji
+NEXTAUTH_SECRET=replace-with-strong-secret
+NEXTAUTH_URL=http://localhost:3000
 
-1. **MongoDB Connection Error**
-   - Ensure MongoDB is running
-   - Check connection string in `.env.local`
-   - Verify network connectivity
+# Optional: Redis / Upstash
+REDIS_URL=redis://127.0.0.1:6379
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
 
-2. **Redis Cache Issues**
-   - Redis is optional - app works without it
-   - Check Redis server status
-   - Verify Redis URL configuration
+# Optional: Cloudinary
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
-3. **Image Upload Problems**
-   - Verify Cloudinary credentials
-   - Check image size limits
-   - Ensure proper file formats
+# Optional: Razorpay
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+RAZORPAY_CURRENCY=INR
 
-4. **Authentication Issues**
-   - Verify NEXTAUTH_SECRET is set
-   - Check NEXTAUTH_URL configuration
-   - Clear browser cookies
+# Optional: Email
+RESEND_API_KEY=
+```
 
-## 📄 License
+1. Run development server.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+npm run dev
+```
 
-## 🙏 Acknowledgments
+1. Open the app.
 
-- Built with modern web technologies
-- Inspired by e-commerce best practices
-- Community-driven development
+- Storefront: <http://localhost:3000>
+- Admin login: <http://localhost:3000/admin/login>
 
-## 📞 Support
+## NPM Scripts
 
-For support and questions:
-- Create an issue on GitHub
-- Check the documentation in `/docs`
-- Review the code comments for detailed explanations
+- npm run dev: start local dev server
+- npm run build: production build
+- npm run start: run built app
+- npm run lint: lint project
+- npm run lint:fix: auto-fix lint issues
+- npm run seed:products: seed 20 products (replace)
+- npm run seed:products:append: seed 20 products (append)
+- npm run db:indexes: create MongoDB indexes
+- npm run setup:perf: setup performance helpers
+- npm run test:redis: test redis connectivity
+- npm run docker:build: build Docker image
+- npm run docker:run: run Docker image
 
----
+## Key API Routes
 
-**Happy Coding! 🚀**
+- Products
+  - GET /api/products
+  - POST /api/products
+  - GET /api/products/:id
+  - PUT /api/products/:id
+  - DELETE /api/products/:id
 
-*Built with ❤️ using Next.js, MongoDB, and modern web technologies*
+- Cart
+  - GET /api/cart
+  - POST /api/cart
+
+- Wishlist
+  - GET /api/wishlist
+  - POST /api/wishlist
+  - DELETE /api/wishlist
+
+- Orders
+  - GET /api/orders
+  - POST /api/orders
+  - GET /api/orders/:id
+
+- Payments
+  - POST /api/payments/razorpay/create-order
+  - POST /api/payments/razorpay/verify
+  - POST /api/payments/razorpay/webhook
+
+## Documentation Map
+
+- Product seeding: PRODUCT_SEEDING_GUIDE.md
+- Razorpay integration: RAZORPAY_PRODUCTION_INTEGRATION.md
+- Search performance notes: SEARCH_PERFORMANCE_SUGGESTION_PATTERN.md
+- Improvement plan: IMPROVEMENT_PLAN.md
+- Change and engineering approach: CODE_IMPROVEMENT_PLAYBOOK.md
+
+## Development Notes
+
+- The repository may contain active in-progress local edits in some files.
+- Keep commits scoped by concern (feature, fix, docs) for easier rollback and review.
+- For data persistence features, always verify:
+  - guest behavior
+  - logged-in behavior
+  - API persistence
+  - UI loading and empty states
+
+## License
+
+No license file is currently included in this repository.

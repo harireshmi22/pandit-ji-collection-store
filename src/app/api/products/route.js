@@ -6,6 +6,18 @@ import redis, { memCache } from "@/lib/redis";
 // GET /api/products - Fetch products with search and filtering
 const PRODUCTS_CACHE_TTL_SECONDS = 300;
 
+const isDataUri = (value) =>
+    typeof value === "string" && value.trim().toLowerCase().startsWith("data:");
+
+const isAllowedProductImage = (value) => {
+    if (!value || typeof value !== "string") return true;
+    const trimmed = value.trim();
+
+    // Allow local placeholders and Cloudinary-hosted URLs only.
+    if (trimmed.startsWith("/")) return true;
+    return trimmed.startsWith("https://res.cloudinary.com/");
+};
+
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
@@ -211,6 +223,38 @@ export async function POST(req) {
                 {
                     success: false,
                     message: "Price must be a positive number",
+                },
+                { status: 400 },
+            );
+        }
+
+        if (isDataUri(body.image)) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Base64 image data is not allowed. Upload image to Cloudinary first.",
+                },
+                { status: 400 },
+            );
+        }
+
+        if (!isAllowedProductImage(body.image)) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Image must be a Cloudinary URL (res.cloudinary.com) or a local placeholder path.",
+                },
+                { status: 400 },
+            );
+        }
+
+        const incomingImages = Array.isArray(body.images) ? body.images : [];
+        const hasInvalidImages = incomingImages.some((img) => !isAllowedProductImage(img) || isDataUri(img));
+        if (hasInvalidImages) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "All images must be Cloudinary URLs (or local placeholder paths).",
                 },
                 { status: 400 },
             );

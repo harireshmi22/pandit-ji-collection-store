@@ -148,7 +148,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div className='overflow-x-auto'>
-                    <table className='w-full min-w-[700px]'>
+                    <table className='w-full min-w-175'>
                         <thead>
                             <tr className='border-b border-neutral-100'>
                                 <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Order</th>
