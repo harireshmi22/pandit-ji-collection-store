@@ -7,6 +7,28 @@ import { auth } from '@/auth';
 import redis, { memCache } from '@/lib/redis';
 import { RedisKeys } from '@/lib/redis-keys';
 
+function normalizeShippingAddress(shippingAddress = {}) {
+    return {
+        fullName: shippingAddress.fullName || '',
+        email: shippingAddress.email || '',
+        address: shippingAddress.address || '',
+        city: shippingAddress.city || '',
+        postalCode: shippingAddress.postalCode || shippingAddress.zipCode || '',
+        country: shippingAddress.country || '',
+        phone: shippingAddress.phone || '',
+    };
+}
+
+function validateShippingAddress(shippingAddress) {
+    const requiredFields = ['fullName', 'email', 'address', 'city', 'postalCode', 'country'];
+    for (const field of requiredFields) {
+        if (!shippingAddress[field] || String(shippingAddress[field]).trim() === '') {
+            return `Missing shipping field: ${field}`;
+        }
+    }
+    return null;
+}
+
 // Force rebuild - fix import path
 // GET all orders (Admin only) or User's orders
 export async function GET(req) {
@@ -91,10 +113,6 @@ export async function POST(req) {
             orderItems,
             shippingAddress,
             paymentMethod,
-            itemsPrice,
-            taxPrice,
-            shippingPrice,
-            totalPrice,
         } = body;
 
         if (!orderItems || orderItems.length === 0) {
@@ -102,6 +120,12 @@ export async function POST(req) {
         }
 
         await dbConnect();
+
+        const normalizedShippingAddress = normalizeShippingAddress(shippingAddress);
+        const shippingError = validateShippingAddress(normalizedShippingAddress);
+        if (shippingError) {
+            return NextResponse.json({ message: shippingError }, { status: 400 });
+        }
 
         // Helper to check if string is valid MongoDB ObjectId
         const isValidObjectId = (id) => {
@@ -113,12 +137,52 @@ export async function POST(req) {
             }
         };
 
+        const productIds = [...new Set(orderItems.map((item) => item.product?.toString()))];
+        const invalidProductId = productIds.find((id) => !isValidObjectId(id));
+        if (invalidProductId) {
+            return NextResponse.json({ message: 'One or more products are invalid.' }, { status: 400 });
+        }
+
+        const dbProducts = await Product.find({ _id: { $in: productIds } }).lean();
+        const productMap = new Map(dbProducts.map((product) => [product._id.toString(), product]));
+
+        const normalizedOrderItems = [];
+        for (const item of orderItems) {
+            const dbProduct = productMap.get(item.product.toString());
+            if (!dbProduct) {
+                return NextResponse.json({ message: `Product not found: ${item.product}` }, { status: 404 });
+            }
+
+            const quantity = Number(item.quantity || 0);
+            if (!Number.isInteger(quantity) || quantity <= 0) {
+                return NextResponse.json({ message: `Invalid quantity for ${dbProduct.name}` }, { status: 400 });
+            }
+
+            if (dbProduct.stock < quantity) {
+                return NextResponse.json({ message: `${dbProduct.name} is out of stock.` }, { status: 400 });
+            }
+
+            normalizedOrderItems.push({
+                product: dbProduct._id,
+                name: dbProduct.name,
+                quantity,
+                price: Number(dbProduct.price),
+                image: (Array.isArray(dbProduct.images) && dbProduct.images[0]) || dbProduct.image || '/images/placeholder-product.svg',
+                size: item.size || item.selectedSize || 'M',
+            });
+        }
+
+        const itemsPrice = normalizedOrderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const shippingPrice = itemsPrice >= 100 ? 0 : 10;
+        const taxPrice = Number((itemsPrice * 0.1).toFixed(2));
+        const totalPrice = Number((itemsPrice + shippingPrice + taxPrice).toFixed(2));
+
         // 1. Inventory Check & Reservation (Redis) — graceful if Redis is unavailable
         const reservedItems = [];
         if (redis) {
             try {
                 // 1a. Pre-check and Initialize Stock in Redis (Parallel)
-                const stockCheckPromises = orderItems.map(async (item) => {
+                const stockCheckPromises = normalizedOrderItems.map(async (item) => {
                     if (!isValidObjectId(item.product)) return;
                     const stockKey = RedisKeys.STOCK(item.product);
                     const exists = await redis.exists(stockKey);
@@ -134,7 +198,7 @@ export async function POST(req) {
                 await Promise.all(stockCheckPromises);
 
                 // 1b. Reserve Stock (Sequential Atomic Decrements)
-                for (const item of orderItems) {
+                for (const item of normalizedOrderItems) {
                     if (!isValidObjectId(item.product)) continue;
                     const stockKey = RedisKeys.STOCK(item.product);
                     const newStock = await redis.decrby(stockKey, item.quantity);
@@ -159,20 +223,22 @@ export async function POST(req) {
         // 2. Create Order in DB
         const order = new Order({
             user: session.user.id,
-            orderItems,
-            shippingAddress,
-            paymentMethod,
+            orderItems: normalizedOrderItems,
+            shippingAddress: normalizedShippingAddress,
+            paymentMethod: paymentMethod || 'Cash on Delivery',
             itemsPrice,
             taxPrice,
             shippingPrice,
             totalPrice,
+            paymentStatus: 'pending',
+            isPaid: false,
         });
 
         const createdOrder = await order.save();
 
         // 3. Sync DB Stock (Decrement in MongoDB)
         // We do this asynchronously or blocking. Blocking is safer for consistency.
-        for (const item of orderItems) {
+        for (const item of normalizedOrderItems) {
             await Product.findByIdAndUpdate(item.product, {
                 $inc: { stock: -item.quantity }
             });

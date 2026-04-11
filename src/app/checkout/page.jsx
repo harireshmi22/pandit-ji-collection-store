@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import Navbar from '../components/home/Navbar'
@@ -12,9 +12,12 @@ import { ArrowLeft, Lock, Loader } from 'lucide-react'
 
 export default function CheckoutPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const paymentParam = searchParams.get('payment')
     const { data: session, status } = useSession()
     const { cartItems, cartTotal, clearCart, saveShippingInfo, savedShippingDetails } = useCart()
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [paymentMethod, setPaymentMethod] = useState(paymentParam === 'cod' ? 'Cash on Delivery' : 'Razorpay')
 
     React.useEffect(() => {
         if (status === 'unauthenticated') router.push('/login?callbackUrl=/checkout')
@@ -49,6 +52,35 @@ export default function CheckoutPage() {
                 quantity: item.quantity,
                 size: item.selectedSize,
             }))
+
+            const shipping = cartTotal >= 100 ? 0 : 10
+            const tax = cartTotal * 0.1
+            const finalTotal = cartTotal + shipping + tax
+
+            if (paymentMethod === 'Cash on Delivery') {
+                const codRes = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderItems,
+                        shippingAddress: shippingInfo,
+                        paymentMethod: 'Cash on Delivery',
+                        itemsPrice: cartTotal,
+                        taxPrice: tax,
+                        shippingPrice: shipping,
+                        totalPrice: finalTotal,
+                    }),
+                })
+
+                const codData = await codRes.json()
+                if (!codRes.ok) {
+                    throw new Error(codData.message || 'Unable to place COD order')
+                }
+
+                clearCart()
+                router.push(`/order/${codData._id}?success=1&payment=cod`)
+                return
+            }
 
             const createOrderRes = await fetch('/api/payments/razorpay/create-order', {
                 method: 'POST',
@@ -100,7 +132,7 @@ export default function CheckoutPage() {
                         }
 
                         clearCart()
-                        router.push(`/order/${verifyData.internalOrderId}`)
+                        router.push(`/order/${verifyData.internalOrderId}?success=1&payment=online`)
                     } catch (error) {
                         alert(error.message || 'Payment verification failed. Contact support if amount was debited.')
                     } finally {
@@ -131,7 +163,7 @@ export default function CheckoutPage() {
     const shipping = cartTotal >= 100 ? 0 : 10
     const tax = cartTotal * 0.1
     const finalTotal = cartTotal + shipping + tax
-    const inputClass = 'w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none transition-all'
+    const inputClass = 'w-full px-4 py-3 border border-neutral-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all'
 
     return (
         <div className='min-h-screen bg-white'>
@@ -146,7 +178,7 @@ export default function CheckoutPage() {
                     <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
                         <div className='lg:col-span-2 space-y-6'>
                             {/* Shipping */}
-                            <div className='border border-neutral-100 rounded-2xl p-5'>
+                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Shipping Information</h2>
                                 <div className='space-y-4'>
                                     <input type='email' name='email' value={formData.email} onChange={handleInputChange} required className={inputClass} placeholder='Email address' />
@@ -164,21 +196,46 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
                             {/* Payment */}
-                            <div className='border border-neutral-100 rounded-2xl p-5'>
+                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Payment</h2>
-                                <div className='space-y-3'>
-                                    <p className='text-sm text-neutral-600'>
-                                        You will be redirected to Razorpay secure checkout where customers can pay using UPI, cards, netbanking, and wallets.
-                                    </p>
-                                    <p className='text-xs text-neutral-500'>
-                                        Card details are never collected or stored by this website.
-                                    </p>
+                                <div className='space-y-4'>
+                                    <label className='flex items-start gap-3 p-3 border border-neutral-300 rounded-xl bg-white cursor-pointer'>
+                                        <input
+                                            type='radio'
+                                            name='paymentMethod'
+                                            value='Razorpay'
+                                            checked={paymentMethod === 'Razorpay'}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className='mt-1'
+                                        />
+                                        <div>
+                                            <p className='text-sm font-medium text-neutral-900'>Pay Online (Razorpay)</p>
+                                            <p className='text-xs text-neutral-500'>UPI, cards, netbanking, and wallets.</p>
+                                        </div>
+                                    </label>
+                                    <label className='flex items-start gap-3 p-3 border border-neutral-300 rounded-xl bg-white cursor-pointer'>
+                                        <input
+                                            type='radio'
+                                            name='paymentMethod'
+                                            value='Cash on Delivery'
+                                            checked={paymentMethod === 'Cash on Delivery'}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className='mt-1'
+                                        />
+                                        <div>
+                                            <p className='text-sm font-medium text-neutral-900'>Cash on Delivery (COD)</p>
+                                            <p className='text-xs text-neutral-500'>Pay in cash when your order arrives.</p>
+                                        </div>
+                                    </label>
+                                    {paymentMethod === 'Razorpay' && (
+                                        <p className='text-xs text-neutral-500'>Card details are never collected or stored by this website.</p>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <div className='sticky top-24 border border-neutral-100 rounded-2xl p-5'>
+                            <div className='sticky top-24 border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5 pb-4 border-b border-neutral-100'>Summary</h2>
                                 <div className='space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar'>
                                     {cartItems.map(item => (
@@ -203,11 +260,13 @@ export default function CheckoutPage() {
                                     <span>Total</span><span>₹{finalTotal.toFixed(2)}</span>
                                 </div>
                                 <button type='submit' disabled={isSubmitting}
-                                    className='w-full flex items-center justify-center gap-2 py-3.5 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-40 cursor-pointer'>
+                                    className='w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-40 cursor-pointer shadow-[0_12px_24px_-14px_rgba(37,99,235,0.6)]'>
                                     <Lock className='w-3.5 h-3.5' />
-                                    {isSubmitting ? 'Processing...' : 'Pay Securely with Razorpay'}
+                                    {isSubmitting ? 'Processing...' : paymentMethod === 'Cash on Delivery' ? 'Place COD Order' : 'Pay Securely with Razorpay'}
                                 </button>
-                                <p className='text-[11px] text-neutral-400 text-center mt-3'>Secure & encrypted checkout</p>
+                                <p className='text-[11px] text-neutral-400 text-center mt-3'>
+                                    {paymentMethod === 'Cash on Delivery' ? 'Order will be confirmed and payable on delivery.' : 'Secure & encrypted checkout'}
+                                </p>
                             </div>
                         </div>
                     </div>

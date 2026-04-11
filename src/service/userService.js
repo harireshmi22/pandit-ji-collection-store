@@ -5,14 +5,16 @@ const BASE_URL = "/api/users"
 
 export const userService = {
 
-    getAllData: async () => {
+    getAllData: async ({ spentRange = 'all' } = {}) => {
         try {
-            const response = await fetch(BASE_URL)
+            const response = await fetch(`${BASE_URL}?spentRange=${encodeURIComponent(spentRange)}`)
             const result = await response.json()
 
             if (response.ok) {
                 return result.data
             }
+
+            console.log(result.data)
         } catch (error) {
             console.error("Error fetching users:", error)
             toast.error("Failed to fetch users")

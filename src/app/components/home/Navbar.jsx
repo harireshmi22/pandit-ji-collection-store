@@ -149,9 +149,9 @@ export default function Navbar() {
         if (!showSuggestions || (!suggestionsLoading && suggestions.length === 0)) return null
 
         return (
-            <div className='absolute top-full left-0 right-0 mt-2 bg-white border border-neutral-200 rounded-2xl shadow-xl overflow-hidden z-50'>
+            <div className='absolute top-full left-0 right-0 mt-2 bg-white border border-blue-100 rounded-2xl shadow-xl overflow-hidden max-h-96 overflow-y-auto no-scrollbar z-50'>
                 {suggestionsLoading && (
-                    <div className='px-4 py-3 text-xs text-neutral-500'>Searching...</div>
+                    <div className='px-4 py-3 text-sm text-neutral-500'>Searching...</div>
                 )}
                 {!suggestionsLoading && suggestions.map((item, index) => (
                     <button
@@ -159,19 +159,19 @@ export default function Navbar() {
                         id={`navbar-suggestion-${index}`}
                         type='button'
                         onClick={() => onSuggestionClick(item)}
-                        className={`w-full px-3 py-2.5 text-left transition-colors ${activeSuggestionIndex === index ? 'bg-neutral-100' : 'hover:bg-neutral-50'}`}
+                        className={`w-full px-4 py-3 text-left transition-colors ${activeSuggestionIndex === index ? 'bg-blue-50' : 'hover:bg-blue-50/60'}`}
                     >
-                        <div className='flex items-center gap-3'>
-                            <div className='relative w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden shrink-0'>
+                        <div className='flex items-center gap-3.5'>
+                            <div className='relative w-12 h-12 rounded-xl bg-neutral-100 overflow-hidden shrink-0 ring-1 ring-neutral-100'>
                                 {item.image ? (
-                                    <Image src={item.image} fill alt={item.name} className='object-cover' sizes='40px' />
+                                    <Image src={item.image} fill alt={item.name} className='object-cover' sizes='48px' />
                                 ) : (
                                     <div className='w-full h-full flex items-center justify-center text-[10px] text-neutral-400'>No image</div>
                                 )}
                             </div>
                             <div className='min-w-0'>
-                                <p className='text-sm text-neutral-800 truncate'>{item.name}</p>
-                                <p className='text-xs text-neutral-500 truncate'>{item.brand || 'Product'}{item.price ? ` · ₹${item.price}` : ''}</p>
+                                <p className='text-sm font-medium text-neutral-900 truncate'>{item.name}</p>
+                                <p className='text-xs text-neutral-600 truncate'>{item.brand || 'Product'}{item.price ? ` · ₹${item.price}` : ''}</p>
                             </div>
                         </div>
                     </button>
@@ -181,22 +181,22 @@ export default function Navbar() {
     }
 
     return (
-        <header className='sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-neutral-100'>
+        <header className='sticky top-0 z-50 bg-white/78 backdrop-blur-xl border-b border-blue-100/80'>
             <nav className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 <div className='flex items-center justify-between h-16'>
-                    <Link href='/' className='text-lg font-semibold tracking-tight'>
+                    <Link href='/' className='text-lg font-semibold tracking-tight text-neutral-900 hover:text-blue-700 transition-colors'>
                         Pandit Ji Collection
                     </Link>
 
                     <div className='hidden md:flex items-center gap-8'>
-                        <Link href='/shop' className='text-[13px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide uppercase'>Shop</Link>
-                        <Link href='/shop?category=New%20in' className='text-[13px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide uppercase'>New In</Link>
-                        <Link href='/about' className='text-[13px] font-medium text-neutral-500 hover:text-neutral-900 transition-colors tracking-wide uppercase'>About</Link>
+                        <Link href='/shop' className='text-[13px] font-medium text-neutral-500 hover:text-blue-700 transition-colors tracking-wide uppercase'>Shop</Link>
+                        <Link href='/shop?category=New%20in' className='text-[13px] font-medium text-neutral-500 hover:text-blue-700 transition-colors tracking-wide uppercase'>New In</Link>
+                        <Link href='/about' className='text-[13px] font-medium text-neutral-500 hover:text-blue-700 transition-colors tracking-wide uppercase'>About</Link>
                     </div>
 
                     <div className='flex items-center gap-1'>
                         <div ref={desktopSearchRef} className='hidden lg:block relative'>
-                            <form onSubmit={handleSearch} className='flex items-center bg-neutral-50 border border-neutral-200 rounded-full px-3.5 py-2 w-52 focus-within:bg-white focus-within:border-neutral-300 transition-all'>
+                            <form onSubmit={handleSearch} className='flex items-center bg-white border border-neutral-200 rounded-full px-3.5 py-2 w-72 xl:w-80 focus-within:bg-white focus-within:border-blue-300 transition-all shadow-sm'>
                                 <Search className='w-3.5 h-3.5 text-neutral-400' />
                                 <input
                                     type='text'
@@ -211,14 +211,14 @@ export default function Navbar() {
                             {renderSuggestions()}
                         </div>
 
-                        <Link href='/wishlist' className='relative p-2.5 hover:bg-neutral-50 rounded-full transition-colors'>
+                        <Link href='/wishlist' className='relative p-2.5 hover:bg-blue-50 rounded-full transition-colors'>
                             <Heart className='w-4.5 h-4.5 text-neutral-600' />
-                            {wishlistCount > 0 && <span className='absolute top-1 right-1 w-4 h-4 bg-neutral-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center'>{wishlistCount}</span>}
+                            {wishlistCount > 0 && <span className='absolute top-1 right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-medium rounded-full flex items-center justify-center'>{wishlistCount}</span>}
                         </Link>
 
-                        <button onClick={() => setIsCartOpen(true)} className='relative p-2.5 hover:bg-neutral-50 rounded-full transition-colors'>
+                        <button onClick={() => setIsCartOpen(true)} className='relative p-2.5 hover:bg-blue-50 rounded-full transition-colors'>
                             <ShoppingBag className='w-4.5 h-4.5 text-neutral-600' />
-                            {cartItemCount > 0 && <span className='absolute top-1 right-1 w-4 h-4 bg-neutral-900 text-white text-[10px] font-medium rounded-full flex items-center justify-center'>{cartItemCount}</span>}
+                            {cartItemCount > 0 && <span className='absolute top-1 right-1 w-4 h-4 bg-blue-600 text-white text-[10px] font-medium rounded-full flex items-center justify-center'>{cartItemCount}</span>}
                         </button>
 
                         <div className='hidden sm:flex items-center ml-1 pl-3 border-l border-neutral-100'>
@@ -229,8 +229,8 @@ export default function Navbar() {
                                     <Link href='/orders' className='p-2.5 hover:bg-neutral-50 rounded-full transition-colors' title='Orders'>
                                         <Package className='w-4.5 h-4.5 text-neutral-600' />
                                     </Link>
-                                    <Link href='/profile' className='flex items-center gap-2 px-2.5 py-1.5 hover:bg-neutral-50 rounded-full transition-colors'>
-                                        <div className='w-7 h-7 rounded-full bg-neutral-900 flex items-center justify-center text-white text-xs font-medium'>{session.user?.name?.[0]?.toUpperCase() || 'U'}</div>
+                                    <Link href='/profile' className='flex items-center gap-2 px-2.5 py-1.5 hover:bg-blue-50 rounded-full transition-colors'>
+                                        <div className='w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-medium'>{session.user?.name?.[0]?.toUpperCase() || 'U'}</div>
                                         <span className='text-sm font-medium text-neutral-700 hidden lg:block'>{session.user?.name?.split(' ')[0]}</span>
                                     </Link>
                                     <button onClick={() => signOut({ redirect: false }).then(() => router.push('/'))} className='p-2.5 hover:bg-red-50 rounded-full transition-colors text-neutral-400 hover:text-red-500' title='Logout'>
@@ -238,7 +238,7 @@ export default function Navbar() {
                                     </button>
                                 </div>
                             ) : (
-                                <Link href='/login' className='text-sm font-medium bg-neutral-900 text-white px-5 py-2 rounded-full hover:bg-neutral-800 transition-colors'>Sign In</Link>
+                                <Link href='/login' className='text-sm font-medium bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition-colors'>Sign In</Link>
                             )}
                         </div>
 
@@ -255,7 +255,7 @@ export default function Navbar() {
                         <Link href='/about' onClick={() => setIsMenuOpen(false)} className='block px-3 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg'>About</Link>
                         <Link href='/orders' onClick={() => setIsMenuOpen(false)} className='block px-3 py-2.5 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 rounded-lg'>Orders</Link>
 
-                        <div ref={mobileSearchRef} className='mx-3 mb-2 mt-2 relative' style={{ width: 'calc(100% - 24px)' }}>
+                        <div ref={mobileSearchRef} className='mx-3 mb-2 mt-2 relative' style={{ width: 'calc(100% - 24px)', maxWidth: '100%' }}>
                             <form onSubmit={handleSearch} className='flex items-center bg-neutral-50 border border-neutral-300 rounded-full px-3.5 py-2 w-full focus-within:bg-white focus-within:border-neutral-300 transition-all'>
                                 <Search className='w-4 h-4 text-neutral-400' />
                                 <input

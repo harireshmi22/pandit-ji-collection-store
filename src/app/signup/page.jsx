@@ -48,7 +48,7 @@ export default function SignupPage() {
 
                             <div className='bg-card border border-border rounded-lg p-6 sm:p-8 shadow-sm'>
                                 {error && <div className='mb-4 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive'>{error}</div>}
-                                {success && <div className='mb-4 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-700'>Account created! Redirecting to login...</div>}
+                                {success && <div className='mb-4 rounded-md border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-sm text-blue-700'>Account created! Redirecting to login...</div>}
 
                                 <form onSubmit={handleSubmit} className='space-y-6'>
                                     <div className='space-y-2'>

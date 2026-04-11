@@ -69,7 +69,7 @@ const ShopPageContent = () => {
     const pageNumbers = Array.from({ length: pagination.pages || 0 }, (_, index) => index + 1)
 
     return (
-        <div className='min-h-screen bg-white'>
+        <div className='min-h-screen'>
             <Navbar />
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20'>
                 {/* Header */}
@@ -93,7 +93,7 @@ const ShopPageContent = () => {
                         <button
                             key={cat}
                             onClick={() => setCategory(cat)}
-                            className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${activeCategory === cat ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
+                            className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${activeCategory === cat ? 'bg-blue-600 text-white shadow-[0_8px_18px_-10px_rgba(37,99,235,0.5)]' : 'bg-white border border-neutral-200 text-neutral-600 hover:border-blue-200 hover:text-blue-700'}`}
                         >
                             {cat}
                         </button>
@@ -123,9 +123,9 @@ const ShopPageContent = () => {
                             {products.map(product => {
                                 const productId = product._id || product.id
                                 return (
-                                    <div key={productId} className='group relative'>
+                                    <div key={productId} className='group relative rounded-2xl p-2 bg-white/80 border border-neutral-200/80 shadow-sm hover:shadow-[0_14px_30px_-18px_rgba(15,118,110,0.35)] transition-all'>
                                         <Link href={`/shop/${productId}`} className='block'>
-                                            <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100'>
+                                            <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100'>
                                                 {product.image ? (
                                                     <Image
                                                         src={product.image}
@@ -140,13 +140,13 @@ const ShopPageContent = () => {
                                                     </div>
                                                 )}
                                                 {product.isNewArrival && (
-                                                    <span className='absolute top-3 left-3 bg-neutral-900 text-white px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider'>New</span>
+                                                    <span className='absolute top-3 left-3 bg-amber-500 text-white px-2.5 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider'>New</span>
                                                 )}
                                             </div>
                                         </Link>
                                         <button
                                             onClick={() => toggleWishlist({ id: productId, name: product.name, price: product.price, image: product.image, brand: product.brand })}
-                                            className={`absolute top-3 right-3 p-2 rounded-full transition-all z-10 ${isInWishlist(productId) ? 'bg-red-500 text-white' : 'bg-white/80 backdrop-blur-sm text-neutral-500 hover:bg-white'}`}
+                                            className={`absolute top-5 right-5 p-2 rounded-full transition-all z-10 ${isInWishlist(productId) ? 'bg-red-500 text-white' : 'bg-white/90 border border-neutral-200 text-neutral-500 hover:border-blue-200 hover:text-blue-700'}`}
                                         >
                                             <Heart className={`w-4 h-4 ${isInWishlist(productId) ? 'fill-current' : ''}`} />
                                         </button>
@@ -157,7 +157,7 @@ const ShopPageContent = () => {
                                                 <p className='text-sm font-semibold text-neutral-900'>₹{product.price?.toFixed(2)}</p>
                                             </div>
                                             {product.stock !== undefined && (
-                                                <p className={`text-[11px] mt-1 ${product.stock > 5 ? 'text-emerald-600' : product.stock > 0 ? 'text-amber-600' : 'text-red-500'}`}>
+                                                <p className={`text-[11px] mt-1 ${product.stock > 5 ? 'text-blue-600' : product.stock > 0 ? 'text-amber-600' : 'text-red-500'}`}>
                                                     {product.stock > 0 ? `${product.stock} left` : 'Sold out'}
                                                 </p>
                                             )}
@@ -180,7 +180,7 @@ const ShopPageContent = () => {
                                     <button
                                         key={num}
                                         onClick={() => setPage(num)}
-                                        className={`min-w-10 px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer ${num === currentPage ? 'bg-neutral-900 text-white border-neutral-900' : 'border-neutral-200 text-neutral-700 hover:bg-neutral-100'}`}
+                                        className={`min-w-10 px-3 py-2 text-sm rounded-lg border transition-colors cursor-pointer ${num === currentPage ? 'bg-blue-600 text-white border-blue-600' : 'border-neutral-200 text-neutral-700 hover:bg-blue-50 hover:border-blue-200'}`}
                                     >
                                         {num}
                                     </button>

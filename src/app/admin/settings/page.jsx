@@ -12,7 +12,7 @@ function InputField({ label, type = 'text', value, onChange, prefix, suffix }) {
                     type={type}
                     value={value}
                     onChange={onChange}
-                    className={`w-full ${prefix ? 'pl-8' : 'px-3'} ${suffix ? 'pr-10' : 'pr-3'} py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none transition-all`}
+                    className={`w-full ${prefix ? 'pl-8' : 'px-3'} ${suffix ? 'pr-10' : 'pr-3'} py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all`}
                 />
                 {suffix && <span className='absolute right-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400'>{suffix}</span>}
             </div>
@@ -46,7 +46,7 @@ export default function AdminSettingsPage() {
         <div className='space-y-6 max-w-3xl'>
             {/* Toast */}
             {toast && (
-                <div className='fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-neutral-900 text-white shadow-lg'>
+                <div className='fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-blue-600 text-white shadow-lg'>
                     <CheckCircle className='w-4 h-4' />
                     {toast}
                     <button onClick={() => setToast(null)}><X className='w-3.5 h-3.5' /></button>
@@ -54,14 +54,14 @@ export default function AdminSettingsPage() {
             )}
 
             <div>
-                <h1 className='text-2xl font-semibold text-neutral-900'>Settings</h1>
-                <p className='text-sm text-neutral-500 mt-0.5'>Manage your store configuration</p>
+                <h1 className='text-2xl font-semibold tracking-tight leading-tight text-neutral-900'>Settings</h1>
+                <p className='text-sm text-neutral-500 mt-1'>Manage your store configuration</p>
             </div>
 
             {/* Store Info */}
-            <div className='bg-white rounded-2xl border border-neutral-200/60 p-5'>
+            <div className='bg-white rounded-2xl border border-blue-200/60 p-5'>
                 <div className='flex items-center gap-2.5 mb-5'>
-                    <div className='w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center'>
+                    <div className='w-8 h-8 rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center'>
                         <Store className='w-4 h-4 text-white' />
                     </div>
                     <div>
@@ -92,7 +92,7 @@ export default function AdminSettingsPage() {
                         <select
                             value={settings.currency}
                             onChange={(e) => handleChange('currency', e.target.value)}
-                            className='w-full px-3 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none cursor-pointer appearance-none'
+                            className='w-full px-3 py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none cursor-pointer appearance-none'
                         >
                             <option value="INR">INR (₹)</option>
                             <option value="USD">USD (US Dollar)</option>
@@ -106,16 +106,16 @@ export default function AdminSettingsPage() {
                             value={settings.storeAddress}
                             onChange={(e) => handleChange('storeAddress', e.target.value)}
                             rows={2}
-                            className='w-full px-3 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none resize-none'
+                            className='w-full px-3 py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none'
                         />
                     </div>
                 </div>
             </div>
 
             {/* Shipping & Tax */}
-            <div className='bg-white rounded-2xl border border-neutral-200/60 p-5'>
+            <div className='bg-white rounded-2xl border border-blue-200/60 p-5'>
                 <div className='flex items-center gap-2.5 mb-5'>
-                    <div className='w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center'>
+                    <div className='w-8 h-8 rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 flex items-center justify-center'>
                         <Truck className='w-4 h-4 text-white' />
                     </div>
                     <div>
@@ -152,7 +152,7 @@ export default function AdminSettingsPage() {
             <div className='flex justify-end'>
                 <button
                     onClick={handleSave}
-                    className='flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-xl hover:bg-neutral-800 transition-colors'
+                    className='flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-colors shadow-[0_12px_22px_-14px_rgba(37,99,235,0.75)]'
                 >
                     <Save className='w-4 h-4' />
                     Save Changes

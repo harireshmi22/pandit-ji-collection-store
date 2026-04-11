@@ -166,8 +166,8 @@ const ResetPasswordContent = () => {
                         </button>
 
                         {message && (
-                            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                                <p className="text-sm text-green-700">{message}</p>
+                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                                <p className="text-sm text-blue-700">{message}</p>
                             </div>
                         )}
 

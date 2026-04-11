@@ -10,8 +10,8 @@ import { Package, Clock, CheckCircle, Truck, XCircle, Loader, ArrowRight } from 
 const statusStyles = {
     Pending: 'bg-amber-50 text-amber-700 border-amber-200',
     Processing: 'bg-blue-50 text-blue-700 border-blue-200',
-    Shipped: 'bg-purple-50 text-purple-700 border-purple-200',
-    Delivered: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    Shipped: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+    Delivered: 'bg-blue-50 text-blue-700 border-blue-200',
     Cancelled: 'bg-red-50 text-red-700 border-red-200',
 }
 
@@ -55,9 +55,9 @@ export default function OrdersPage() {
                         <XCircle className='w-10 h-10 text-neutral-200 mx-auto mb-4' />
                         <p className='text-neutral-600 mb-4'>{error}</p>
                         {error.includes('login') ? (
-                            <Link href='/login' className='inline-flex items-center gap-2 bg-neutral-900 text-white px-6 py-2.5 rounded-full text-sm font-medium'>Login</Link>
+                            <Link href='/login' className='inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold'>Login</Link>
                         ) : (
-                            <button onClick={() => window.location.reload()} className='bg-neutral-900 text-white px-6 py-2.5 rounded-full text-sm font-medium cursor-pointer'>Retry</button>
+                            <button onClick={() => window.location.reload()} className='bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold cursor-pointer'>Retry</button>
                         )}
                     </div>
                 ) : orders.length === 0 ? (
@@ -65,7 +65,7 @@ export default function OrdersPage() {
                         <Package className='w-10 h-10 text-neutral-200 mx-auto mb-4' />
                         <p className='text-neutral-900 font-medium mb-1'>No orders yet</p>
                         <p className='text-sm text-neutral-500 mb-6'>Start shopping to see your orders here</p>
-                        <Link href='/shop' className='inline-flex items-center gap-2 bg-neutral-900 text-white px-6 py-2.5 rounded-full text-sm font-medium'>
+                        <Link href='/shop' className='inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold'>
                             Browse Shop <ArrowRight className='w-4 h-4' />
                         </Link>
                     </div>
@@ -75,7 +75,7 @@ export default function OrdersPage() {
                             const StatusIcon = statusIcons[order.status] || Clock
                             return (
                                 <Link key={order._id} href={`/order/${order._id}`} className='block group'>
-                                    <div className='border border-neutral-100 rounded-2xl p-5 hover:border-neutral-300 hover:shadow-sm transition-all'>
+                                    <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 hover:border-blue-200 hover:shadow-[0_14px_28px_-20px_rgba(37,99,235,0.45)] transition-all'>
                                         <div className='flex flex-wrap items-start justify-between gap-3 mb-4'>
                                             <div>
                                                 <p className='text-xs text-neutral-400 mb-0.5'>Order #{order._id.slice(-8).toUpperCase()}</p>
@@ -85,7 +85,7 @@ export default function OrdersPage() {
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${statusStyles[order.status] || statusStyles.Pending}`}>
                                                     <StatusIcon className='w-3 h-3' /> {order.status}
                                                 </span>
-                                                {order.isPaid && <span className='text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full'>Paid</span>}
+                                                {order.isPaid && <span className='text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full'>Paid</span>}
                                             </div>
                                         </div>
                                         <div className='flex items-center gap-3 mb-4'>
@@ -107,7 +107,7 @@ export default function OrdersPage() {
                                         </div>
                                         <div className='flex items-center justify-between'>
                                             <p className='text-lg font-semibold text-neutral-900'>₹{order.totalPrice?.toFixed(2)}</p>
-                                            <span className='text-xs text-neutral-400 group-hover:text-neutral-600 transition-colors flex items-center gap-1'>
+                                            <span className='text-xs text-neutral-500 group-hover:text-blue-700 transition-colors flex items-center gap-1'>
                                                 View details <ArrowRight className='w-3 h-3' />
                                             </span>
                                         </div>

@@ -107,7 +107,7 @@ export default function AdminProductsPage() {
         <div className='space-y-5'>
             {/* Toast */}
             {toast && (
-                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg transition-all ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-neutral-900 text-white'}`}>
+                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg transition-all ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`}>
                     {toast.message}
                     <button onClick={() => setToast(null)}><X className="w-3.5 h-3.5" /></button>
                 </div>
@@ -116,12 +116,12 @@ export default function AdminProductsPage() {
             {/* Header */}
             <div className='flex items-center justify-between'>
                 <div>
-                    <h1 className='text-2xl font-semibold text-neutral-900'>Products</h1>
-                    <p className='text-sm text-neutral-500 mt-0.5'>{products.length} total products</p>
+                    <h1 className='text-2xl font-semibold tracking-tight leading-tight text-neutral-900'>Products</h1>
+                    <p className='text-sm text-neutral-500 mt-1'>{products.length} total products</p>
                 </div>
                 <button
                     onClick={() => { setEditProduct(null); setIsModalOpen(true) }}
-                    className='flex items-center gap-2 px-4 py-2.5 bg-neutral-900 text-white text-sm font-medium rounded-xl hover:bg-neutral-800 transition-colors'
+                    className='flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-colors shadow-[0_12px_22px_-14px_rgba(37,99,235,0.8)]'
                 >
                     <Plus className='w-4 h-4' />
                     Add Product
@@ -137,7 +137,7 @@ export default function AdminProductsPage() {
                         placeholder="Search products..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className='w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none transition-all'
+                        className='w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all'
                     />
                 </div>
                 <div className='relative'>
@@ -145,7 +145,7 @@ export default function AdminProductsPage() {
                     <select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
-                        className='pl-10 pr-8 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent appearance-none outline-none cursor-pointer'
+                        className='pl-10 pr-8 py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none outline-none cursor-pointer'
                     >
                         {categories.map(cat => (
                             <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>
@@ -164,7 +164,7 @@ export default function AdminProductsPage() {
             ) : (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
                     {filtered.map(product => (
-                        <div key={product._id} className='bg-white rounded-2xl border border-neutral-200/60 overflow-hidden group hover:shadow-md transition-all'>
+                        <div key={product._id} className='bg-white rounded-2xl border border-blue-200/60 overflow-hidden group hover:shadow-[0_16px_30px_-18px_rgba(37,99,235,0.42)] transition-all'>
                             {/* Image */}
                             <div className='relative aspect-square bg-neutral-100 overflow-hidden'>
                                 {product.image ? (
@@ -188,7 +188,7 @@ export default function AdminProductsPage() {
                                         </span>
                                     )}
                                     {product.isNewArrival && (
-                                        <span className='px-2 py-0.5 bg-neutral-900 text-white text-[10px] font-semibold rounded-md'>
+                                        <span className='px-2 py-0.5 bg-blue-600 text-white text-[10px] font-semibold rounded-md'>
                                             New
                                         </span>
                                     )}
@@ -198,9 +198,9 @@ export default function AdminProductsPage() {
                                 <div className='absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100'>
                                     <button
                                         onClick={() => { setEditProduct(product); setIsModalOpen(true) }}
-                                        className='p-2 bg-white rounded-xl shadow-md hover:bg-neutral-50 transition-colors'
+                                        className='p-2 bg-white rounded-xl shadow-md hover:bg-blue-50 transition-colors'
                                     >
-                                        <Edit2 className='w-4 h-4 text-neutral-700' />
+                                        <Edit2 className='w-4 h-4 text-blue-700' />
                                     </button>
                                     <button
                                         onClick={() => setDeleteId(product._id)}
@@ -221,7 +221,7 @@ export default function AdminProductsPage() {
                                     <p className='text-sm font-bold text-neutral-900 shrink-0'>₹{product.price}</p>
                                 </div>
                                 <div className='flex items-center justify-between mt-3 pt-3 border-t border-neutral-100'>
-                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${product.stock > 10 ? 'bg-emerald-50 text-emerald-700' : product.stock > 0 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>
+                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${product.stock > 10 ? 'bg-blue-50 text-blue-700' : product.stock > 0 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700'}`}>
                                         {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                                     </span>
                                     {product.rating > 0 && (

@@ -66,10 +66,10 @@ export default function AdminOrdersPage() {
     })
 
     const statusConfig = {
-        Pending: { color: 'bg-neutral-100 text-neutral-700 border-neutral-200', icon: Clock },
+        Pending: { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: Clock },
         Processing: { color: 'bg-amber-50 text-amber-700 border-amber-200', icon: AlertCircle },
-        Shipped: { color: 'bg-blue-50 text-blue-700 border-blue-200', icon: Truck },
-        Delivered: { color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
+        Shipped: { color: 'bg-cyan-50 text-cyan-700 border-cyan-200', icon: Truck },
+        Delivered: { color: 'bg-blue-50 text-blue-700 border-blue-200', icon: CheckCircle2 },
         Cancelled: { color: 'bg-red-50 text-red-700 border-red-200', icon: XCircle },
     }
 
@@ -94,7 +94,7 @@ export default function AdminOrdersPage() {
         <div className='space-y-5'>
             {/* Toast */}
             {toast && (
-                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-neutral-900 text-white'}`}>
+                <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-lg ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-blue-600 text-white'}`}>
                     {toast.message}
                     <button onClick={() => setToast(null)}><X className="w-3.5 h-3.5" /></button>
                 </div>
@@ -103,12 +103,12 @@ export default function AdminOrdersPage() {
             {/* Header */}
             <div className='flex items-center justify-between'>
                 <div>
-                    <h1 className='text-2xl font-semibold text-neutral-900'>Orders</h1>
-                    <p className='text-sm text-neutral-500 mt-0.5'>{orders.length} total orders</p>
+                    <h1 className='text-2xl font-semibold tracking-tight leading-tight text-neutral-900'>Orders</h1>
+                    <p className='text-sm text-neutral-500 mt-1'>{orders.length} total orders</p>
                 </div>
                 <button
                     onClick={fetchOrders}
-                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-neutral-600 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-200 rounded-xl hover:bg-blue-50 transition-colors"
                 >
                     <RefreshCw className="w-3.5 h-3.5" />
                     Refresh
@@ -122,8 +122,8 @@ export default function AdminOrdersPage() {
                         key={s}
                         onClick={() => setStatusFilter(s)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${statusFilter === s
-                                ? 'bg-neutral-900 text-white'
-                                : 'bg-white text-neutral-600 border border-neutral-200 hover:bg-neutral-50'
+                            ? 'bg-linear-to-r from-blue-600 to-indigo-600 text-white'
+                            : 'bg-white text-neutral-600 border border-blue-200/70 hover:bg-blue-50'
                             }`}
                     >
                         {s === 'all' ? 'All' : s}
@@ -143,22 +143,22 @@ export default function AdminOrdersPage() {
                     placeholder="Search by order ID, customer name..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className='w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-neutral-200 rounded-xl focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none'
+                    className='w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none'
                 />
             </div>
 
             {/* Orders Table */}
-            <div className='bg-white rounded-2xl border border-neutral-200/60 overflow-hidden'>
+            <div className='bg-white rounded-2xl border border-blue-200/60 overflow-hidden'>
                 <div className='overflow-x-auto'>
-                    <table className='w-full min-w-[900px]'>
+                    <table className='w-full min-w-225'>
                         <thead>
                             <tr className='border-b border-neutral-100'>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Order</th>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Customer</th>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Items</th>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Total</th>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Status</th>
-                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider'>Date</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Order</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Customer</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Items</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Total</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Status</th>
+                                <th className='px-5 py-3 text-left text-[11px] font-semibold text-neutral-500 uppercase tracking-[0.08em]'>Date</th>
                                 <th className='px-5 py-3'></th>
                             </tr>
                         </thead>
@@ -175,7 +175,7 @@ export default function AdminOrdersPage() {
                                     const cfg = statusConfig[order.status] || statusConfig.Pending
                                     const StatusIcon = cfg.icon
                                     return (
-                                        <tr key={order._id} className='border-b border-neutral-50 hover:bg-neutral-50/50 transition-colors'>
+                                        <tr key={order._id} className='border-b border-neutral-50 hover:bg-blue-50/40 transition-colors'>
                                             <td className='px-5 py-3.5'>
                                                 <span className='text-sm font-medium text-neutral-900'>#{order._id.slice(-6)}</span>
                                             </td>
@@ -208,9 +208,9 @@ export default function AdminOrdersPage() {
                                             <td className='px-5 py-3.5'>
                                                 <Link
                                                     href={`/order/${order._id}`}
-                                                    className='p-1.5 hover:bg-neutral-100 rounded-lg transition-colors inline-flex'
+                                                    className='p-1.5 hover:bg-blue-50 rounded-lg transition-colors inline-flex'
                                                 >
-                                                    <Eye className='w-4 h-4 text-neutral-400' />
+                                                    <Eye className='w-4 h-4 text-blue-500' />
                                                 </Link>
                                             </td>
                                         </tr>

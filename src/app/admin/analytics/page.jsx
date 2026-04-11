@@ -66,10 +66,10 @@ export default function AdminAnalyticsPage() {
     }, {})
 
     const statusColors = {
-        Delivered: 'bg-emerald-500',
-        Shipped: 'bg-blue-500',
+        Delivered: 'bg-blue-500',
+        Shipped: 'bg-cyan-500',
         Processing: 'bg-amber-500',
-        Pending: 'bg-neutral-400',
+        Pending: 'bg-blue-400',
         Cancelled: 'bg-red-500',
     }
 
@@ -78,21 +78,21 @@ export default function AdminAnalyticsPage() {
             label: 'Total Revenue',
             value: `₹${totalRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
             icon: DollarSign,
-            color: 'bg-emerald-50 text-emerald-600',
+            color: 'bg-blue-50 text-blue-700',
             sub: `From ${orders.length} orders`,
         },
         {
             label: 'Avg Order Value',
             value: `₹${avgOrderValue.toFixed(2)}`,
             icon: TrendingUp,
-            color: 'bg-blue-50 text-blue-600',
+            color: 'bg-indigo-50 text-indigo-700',
             sub: 'Per order average',
         },
         {
             label: 'Delivery Rate',
             value: `${deliveryRate}%`,
             icon: Activity,
-            color: 'bg-violet-50 text-violet-600',
+            color: 'bg-cyan-50 text-cyan-700',
             sub: `${deliveredOrders} delivered`,
         },
         {
@@ -107,8 +107,8 @@ export default function AdminAnalyticsPage() {
     return (
         <div className='space-y-6'>
             <div>
-                <h1 className='text-2xl font-semibold text-neutral-900'>Analytics</h1>
-                <p className='text-sm text-neutral-500 mt-0.5'>Track store performance and insights</p>
+                <h1 className='text-2xl font-semibold tracking-tight leading-tight text-neutral-900'>Analytics</h1>
+                <p className='text-sm text-neutral-500 mt-1'>Track store performance and insights</p>
             </div>
 
             {/* Metric Cards */}
@@ -116,7 +116,7 @@ export default function AdminAnalyticsPage() {
                 {metrics.map((m, i) => {
                     const Icon = m.icon
                     return (
-                        <div key={i} className='bg-white rounded-2xl border border-neutral-200/60 p-5'>
+                        <div key={i} className='bg-white rounded-2xl border border-blue-200/60 p-5'>
                             <div className='flex items-center justify-between mb-4'>
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${m.color}`}>
                                     <Icon className='w-5 h-5' />
@@ -132,7 +132,7 @@ export default function AdminAnalyticsPage() {
 
             <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
                 {/* Revenue by Month */}
-                <div className='bg-white rounded-2xl border border-neutral-200/60 p-5'>
+                <div className='bg-white rounded-2xl border border-blue-200/60 p-5'>
                     <div className='flex items-center justify-between mb-6'>
                         <div className='flex items-center gap-2'>
                             <BarChart3 className='w-4 h-4 text-neutral-400' />
@@ -150,7 +150,7 @@ export default function AdminAnalyticsPage() {
                                     <span className='text-xs font-medium text-neutral-500 w-8'>{month}</span>
                                     <div className='flex-1 h-8 bg-neutral-50 rounded-lg overflow-hidden'>
                                         <div
-                                            className='h-full bg-neutral-900 rounded-lg flex items-center justify-end pr-2 transition-all duration-500'
+                                            className='h-full bg-linear-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-end pr-2 transition-all duration-500'
                                             style={{ width: `${Math.max((value / maxMonthly) * 100, 8)}%` }}
                                         >
                                             <span className='text-[10px] font-semibold text-white'>₹{value.toFixed(0)}</span>
@@ -163,7 +163,7 @@ export default function AdminAnalyticsPage() {
                 </div>
 
                 {/* Order Status Breakdown */}
-                <div className='bg-white rounded-2xl border border-neutral-200/60 p-5'>
+                <div className='bg-white rounded-2xl border border-blue-200/60 p-5'>
                     <div className='flex items-center justify-between mb-6'>
                         <div className='flex items-center gap-2'>
                             <PieChart className='w-4 h-4 text-neutral-400' />
@@ -193,13 +193,13 @@ export default function AdminAnalyticsPage() {
 
                     {/* Summary Cards */}
                     <div className='grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-neutral-100'>
-                        <div className='bg-emerald-50 rounded-xl p-3 text-center'>
-                            <p className='text-lg font-bold text-emerald-700'>{deliveryRate}%</p>
-                            <p className='text-[10px] text-emerald-600 font-medium'>Success Rate</p>
+                        <div className='bg-blue-50 rounded-xl p-3 text-center'>
+                            <p className='text-lg font-bold text-blue-700'>{deliveryRate}%</p>
+                            <p className='text-[10px] text-blue-600 font-medium'>Success Rate</p>
                         </div>
-                        <div className='bg-neutral-50 rounded-xl p-3 text-center'>
-                            <p className='text-lg font-bold text-neutral-700'>{stats?.totalUsers || 0}</p>
-                            <p className='text-[10px] text-neutral-500 font-medium'>Total Customers</p>
+                        <div className='bg-blue-50 rounded-xl p-3 text-center'>
+                            <p className='text-lg font-bold text-blue-700'>{stats?.totalUsers || 0}</p>
+                            <p className='text-[10px] text-blue-600 font-medium'>Total Customers</p>
                         </div>
                     </div>
                 </div>

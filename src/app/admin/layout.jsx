@@ -29,8 +29,8 @@ export default function AdminLayout({ children }) {
 
     if (status === 'loading') {
         return (
-            <div className='min-h-screen bg-neutral-50 flex flex-col items-center justify-center gap-3'>
-                <Loader2 className='w-8 h-8 text-neutral-900 animate-spin' />
+            <div className='min-h-screen bg-[linear-gradient(180deg,#f8fbff,#eef4ff)] flex flex-col items-center justify-center gap-3'>
+                <Loader2 className='w-8 h-8 text-blue-700 animate-spin' />
                 <p className='text-sm text-neutral-500 font-medium'>Loading admin panel...</p>
             </div>
         )
@@ -38,10 +38,10 @@ export default function AdminLayout({ children }) {
 
     if (status === 'authenticated' && session?.user?.role === 'admin') {
         return (
-            <div className="flex h-screen overflow-hidden bg-neutral-50/80">
+            <div className="flex h-screen overflow-hidden bg-[linear-gradient(180deg,rgba(248,251,255,0.9),rgba(238,246,255,0.92),rgba(239,252,255,0.82))]">
                 {sidebarOpen && (
                     <div
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                        className="fixed inset-0 bg-blue-900/20 backdrop-blur-sm z-40 lg:hidden"
                         onClick={() => setSidebarOpen(false)}
                     />
                 )}

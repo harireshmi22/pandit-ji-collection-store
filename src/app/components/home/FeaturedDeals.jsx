@@ -36,7 +36,7 @@ export default function FeaturedDeals() {
 
     if (loading) {
         return (
-            <section className='py-16 md:py-20 bg-neutral-50'>
+            <section className='py-16 md:py-20 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(239,246,255,0.55))]'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                     <h2 className='text-2xl md:text-3xl font-bold text-neutral-900 mb-10'>Featured</h2>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -56,11 +56,11 @@ export default function FeaturedDeals() {
     if (products.length === 0) return null;
 
     return (
-        <section className='py-16 md:py-20 bg-neutral-50'>
+        <section className='py-16 md:py-20 bg-[linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,251,235,0.5))]'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 <div className='flex justify-between items-end mb-10'>
                     <h2 className='text-2xl md:text-3xl font-bold text-neutral-900'>Featured</h2>
-                    <Link href='/shop?featured=true' className='text-sm font-medium text-neutral-500 hover:text-neutral-900 inline-flex items-center gap-1 transition-colors'>
+                    <Link href='/shop?featured=true' className='text-sm font-medium text-blue-700 hover:text-blue-800 inline-flex items-center gap-1 transition-colors'>
                         View All <ArrowRight className='w-3.5 h-3.5' />
                     </Link>
                 </div>
@@ -69,7 +69,7 @@ export default function FeaturedDeals() {
                         const productId = product._id || product.id;
                         const productImage = getProductImage(product);
                         return (
-                            <Link key={productId} href={`/shop/${productId}`} className='group block'>
+                            <Link key={productId} href={`/shop/${productId}`} className='group block rounded-2xl p-2.5 bg-white border border-neutral-200 shadow-sm hover:shadow-[0_16px_30px_-18px_rgba(37,99,235,0.42)] transition-all'>
                                 <div className='relative aspect-4/3 overflow-hidden rounded-2xl bg-neutral-100'>
                                     <Image
                                         src={productImage}
@@ -78,15 +78,15 @@ export default function FeaturedDeals() {
                                         className='object-cover transition-transform duration-500 group-hover:scale-105'
                                         sizes='(max-width: 768px) 100vw, 50vw'
                                     />
-                                    <div className='absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300' />
+                                    <div className='absolute inset-0 bg-black/0 group-hover:bg-black/3 transition-colors duration-300' />
                                 </div>
                                 <div className='mt-4'>
                                     <div className='flex justify-between items-start'>
                                         <div>
-                                            <h3 className='text-lg font-semibold text-neutral-900 group-hover:text-neutral-600 transition-colors'>{product.name}</h3>
-                                            <p className='text-sm text-neutral-400 mt-0.5 line-clamp-1'>{product.description}</p>
+                                            <h3 className='text-lg font-semibold text-neutral-900 group-hover:text-blue-700 transition-colors'>{product.name}</h3>
+                                            <p className='text-sm text-neutral-600 mt-0.5 line-clamp-1'>{product.description}</p>
                                         </div>
-                                        <p className='text-lg font-semibold text-neutral-900'>₹{product.price}</p>
+                                        <p className='text-lg font-bold text-neutral-900'>₹{product.price}</p>
                                     </div>
                                 </div>
                             </Link>

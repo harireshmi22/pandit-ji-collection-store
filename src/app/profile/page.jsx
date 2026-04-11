@@ -51,7 +51,7 @@ export default function ProfilePage() {
         { id: 'settings', label: 'Settings', icon: Settings },
     ]
 
-    const inputClass = 'w-full px-4 py-3 border border-neutral-200 rounded-xl text-sm focus:ring-2 focus:ring-neutral-900 focus:border-transparent outline-none transition-all'
+    const inputClass = 'w-full px-4 py-3 border border-neutral-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all'
 
     return (
         <div className='min-h-screen bg-white'>
@@ -67,7 +67,7 @@ export default function ProfilePage() {
                                 const Icon = tab.icon
                                 return (
                                     <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === tab.id ? 'bg-neutral-900 text-white' : 'text-neutral-600 hover:bg-neutral-50'}`}>
+                                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${activeTab === tab.id ? 'bg-blue-600 text-white shadow-[0_10px_22px_-14px_rgba(37,99,235,0.62)]' : 'text-neutral-600 hover:bg-blue-50 hover:text-blue-700'}`}>
                                         <Icon className='w-4 h-4' /> {tab.label}
                                     </button>
                                 )
@@ -83,7 +83,7 @@ export default function ProfilePage() {
                         {activeTab === 'overview' && (
                             <div className='space-y-6'>
                                 {/* Profile */}
-                                <div className='border border-neutral-100 rounded-2xl p-5'>
+                                <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                     <div className='flex items-center justify-between mb-5'>
                                         <h2 className='text-sm font-semibold text-neutral-900'>Profile</h2>
                                         <button onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
@@ -91,7 +91,7 @@ export default function ProfilePage() {
                                             <Edit2 className='w-3.5 h-3.5' /> {isEditing ? 'Save' : 'Edit'}
                                         </button>
                                     </div>
-                                    {message.text && <div className={`p-3 mb-4 rounded-xl text-sm ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>{message.text}</div>}
+                                    {message.text && <div className={`p-3 mb-4 rounded-xl text-sm ${message.type === 'success' ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'}`}>{message.text}</div>}
                                     <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                                         {['firstName', 'lastName', 'email', 'phone'].map(field => (
                                             <div key={field}>
@@ -107,15 +107,15 @@ export default function ProfilePage() {
                                 </div>
                                 {/* Stats */}
                                 <div className='grid grid-cols-3 gap-4'>
-                                    <div className='border border-neutral-100 rounded-2xl p-5 text-center'>
+                                    <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 text-center shadow-sm'>
                                         <p className='text-2xl font-bold text-neutral-900'>{orders.length}</p>
                                         <p className='text-xs text-neutral-400 mt-1'>Orders</p>
                                     </div>
-                                    <div className='border border-neutral-100 rounded-2xl p-5 text-center'>
+                                    <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 text-center shadow-sm'>
                                         <p className='text-2xl font-bold text-neutral-900'>{wishlistItems.length}</p>
                                         <p className='text-xs text-neutral-400 mt-1'>Wishlist</p>
                                     </div>
-                                    <div className='border border-neutral-100 rounded-2xl p-5 text-center'>
+                                    <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 text-center shadow-sm'>
                                         <p className='text-2xl font-bold text-neutral-900'>₹{orders.reduce((a, o) => a + (o.totalPrice || 0), 0).toFixed(0)}</p>
                                         <p className='text-xs text-neutral-400 mt-1'>Total Spent</p>
                                     </div>
@@ -131,12 +131,12 @@ export default function ProfilePage() {
                                         <div className='text-center py-16'>
                                             <Package className='w-10 h-10 text-neutral-200 mx-auto mb-3' />
                                             <p className='text-sm text-neutral-500 mb-4'>No orders yet</p>
-                                            <Link href='/shop' className='inline-flex items-center gap-2 bg-neutral-900 text-white px-5 py-2 rounded-full text-sm font-medium'>Shop Now <ArrowRight className='w-4 h-4' /></Link>
+                                            <Link href='/shop' className='inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold'>Shop Now <ArrowRight className='w-4 h-4' /></Link>
                                         </div>
                                     ) : (
                                         <div className='space-y-3'>
                                             {orders.map(order => (
-                                                <Link key={order._id} href={`/order/${order._id}`} className='block border border-neutral-100 rounded-2xl p-4 hover:border-neutral-300 transition-all'>
+                                                <Link key={order._id} href={`/order/${order._id}`} className='block border border-neutral-200 bg-white/95 rounded-2xl p-4 hover:border-blue-200 transition-all'>
                                                     <div className='flex justify-between items-start mb-2'>
                                                         <div>
                                                             <p className='text-xs text-neutral-400'>#{order._id.slice(-8).toUpperCase()}</p>
@@ -163,7 +163,7 @@ export default function ProfilePage() {
                                     <div className='text-center py-16'>
                                         <Heart className='w-10 h-10 text-neutral-200 mx-auto mb-3' />
                                         <p className='text-sm text-neutral-500 mb-4'>No saved items</p>
-                                        <Link href='/shop' className='inline-flex items-center gap-2 bg-neutral-900 text-white px-5 py-2 rounded-full text-sm font-medium'>Browse <ArrowRight className='w-4 h-4' /></Link>
+                                        <Link href='/shop' className='inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold'>Browse <ArrowRight className='w-4 h-4' /></Link>
                                     </div>
                                 ) : (
                                     <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
@@ -185,7 +185,7 @@ export default function ProfilePage() {
                             <div>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Saved Addresses</h2>
                                 {savedShippingDetails ? (
-                                    <div className='border border-neutral-100 rounded-2xl p-5'>
+                                    <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                         <p className='text-sm font-medium text-neutral-900'>{savedShippingDetails.firstName} {savedShippingDetails.lastName}</p>
                                         <p className='text-sm text-neutral-600 mt-0.5'>{savedShippingDetails.address}</p>
                                         <p className='text-sm text-neutral-600'>{savedShippingDetails.city}, {savedShippingDetails.zipCode}</p>
@@ -203,7 +203,7 @@ export default function ProfilePage() {
                         {activeTab === 'settings' && (
                             <div className='space-y-4'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Settings</h2>
-                                <div className='border border-neutral-100 rounded-2xl p-5'>
+                                <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
                                     <h3 className='text-xs font-medium text-neutral-900 mb-4 uppercase tracking-wider'>Notifications</h3>
                                     {['Email notifications', 'Order updates', 'Promotions'].map((label, i) => (
                                         <label key={label} className='flex items-center justify-between py-2.5 cursor-pointer'>

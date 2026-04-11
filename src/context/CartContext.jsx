@@ -130,7 +130,7 @@ export function CartProvider({ children }) {
     const cartItemCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems])
 
     // Process order with saved details using the backend API
-    const createOrderWithSavedDetails = useCallback(async () => {
+    const createOrderWithSavedDetails = useCallback(async (paymentMethod = 'Cash on Delivery') => {
         if (!canUseSavedDetails() || cartItems.length === 0) {
             return null
         }
@@ -161,7 +161,7 @@ export function CartProvider({ children }) {
                     country: savedShippingDetails.country,
                     phone: 'Not provided'
                 },
-                paymentMethod: 'Credit Card',
+                paymentMethod,
                 itemsPrice: cartTotal,
                 taxPrice: tax,
                 shippingPrice: shipping,

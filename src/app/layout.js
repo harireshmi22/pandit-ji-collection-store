@@ -16,18 +16,18 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang='en'>
-            <body className={`${inter.variable} font-sans antialiased bg-white text-neutral-900`}>
-            <ErrorBoundary>
-                <AuthProvider>
-                    <CartProvider>
-                        <WishlistProvider>
-                            {children}
-                            <CartSidebar />
-                        </WishlistProvider>
-                    </CartProvider>
-                </AuthProvider>
-            </ErrorBoundary>
-        </body>
+            <body className={`${inter.variable} font-sans antialiased text-neutral-900`}>
+                <ErrorBoundary>
+                    <AuthProvider>
+                        <CartProvider>
+                            <WishlistProvider>
+                                {children}
+                                <CartSidebar />
+                            </WishlistProvider>
+                        </CartProvider>
+                    </AuthProvider>
+                </ErrorBoundary>
+            </body>
         </html >
     );
 }

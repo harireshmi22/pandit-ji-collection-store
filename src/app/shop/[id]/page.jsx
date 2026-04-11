@@ -26,7 +26,7 @@ export default function ProductDetailPage() {
     const [quantity, setQuantity] = useState(1)
     const [addedToCart, setAddedToCart] = useState(false)
     const [isProcessing, setIsProcessing] = useState(false)
-    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+    const [showPaymentDialog, setShowPaymentDialog] = useState(false)
 
     useEffect(() => {
         if (!productId) return
@@ -97,19 +97,31 @@ export default function ProductDetailPage() {
 
     const handleBuyNow = () => {
         addToCart({ id: product._id, name: product.name, price: product.price, image: product.image, brand: product.brand }, selectedSize, quantity)
-        if (canUseSavedDetails()) setShowConfirmDialog(true)
-        else router.push('/checkout')
+        setShowPaymentDialog(true)
     }
 
-    const handleConfirmOrder = async () => {
+    const handleBuyNowWithPayment = async (method) => {
         setIsProcessing(true)
-        setShowConfirmDialog(false)
+        setShowPaymentDialog(false)
+
+        if (method === 'online') {
+            router.push('/checkout?payment=online')
+            setIsProcessing(false)
+            return
+        }
+
+        if (!canUseSavedDetails()) {
+            router.push('/checkout?payment=cod')
+            setIsProcessing(false)
+            return
+        }
+
         try {
-            const order = await createOrderWithSavedDetails()
-            if (order?._id) router.push(`/order/${order._id}`)
-            else router.push('/checkout')
+            const order = await createOrderWithSavedDetails('Cash on Delivery')
+            if (order?._id) router.push(`/order/${order._id}?success=1&payment=cod`)
+            else router.push('/checkout?payment=cod')
         } catch {
-            router.push('/checkout')
+            router.push('/checkout?payment=cod')
         } finally {
             setIsProcessing(false)
         }
@@ -139,7 +151,7 @@ export default function ProductDetailPage() {
                         <h1 className='text-2xl lg:text-3xl font-bold text-neutral-900 mb-3'>{product.name}</h1>
                         <div className='flex items-baseline gap-3 mb-6'>
                             <p className='text-2xl font-bold text-neutral-900'>₹{product.price?.toFixed(2)}</p>
-                            <p className={`text-xs font-medium ${product.stock > 5 ? 'text-emerald-600' : product.stock > 0 ? 'text-amber-600' : 'text-red-500'}`}>
+                            <p className={`text-xs font-medium ${product.stock > 5 ? 'text-blue-600' : product.stock > 0 ? 'text-amber-600' : 'text-red-500'}`}>
                                 {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                             </p>
                         </div>
@@ -196,7 +208,7 @@ export default function ProductDetailPage() {
                         {/* Actions */}
                         <div className='flex gap-3 mb-8'>
                             <button onClick={handleAddToCart} disabled={product.stock === 0}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full text-sm font-medium transition-all cursor-pointer ${addedToCart ? 'bg-emerald-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800 disabled:opacity-40'}`}>
+                                className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full text-sm font-medium transition-all cursor-pointer ${addedToCart ? 'bg-blue-600 text-white' : 'bg-neutral-900 text-white hover:bg-neutral-800 disabled:opacity-40'}`}>
                                 {addedToCart ? <><Check className='w-4 h-4' /> Added</> : <><ShoppingBag className='w-4 h-4' /> Add to Cart</>}
                             </button>
                             <button onClick={handleBuyNow} disabled={isProcessing || product.stock === 0}
@@ -225,17 +237,17 @@ export default function ProductDetailPage() {
             <ProductSwiper title='You May Also Like' category={product.category} excludeId={product._id} limit={8} />
             <Footer />
 
-            {/* Quick Order Confirm Dialog */}
-            {showConfirmDialog && (
+            {/* Buy Now Payment Dialog */}
+            {showPaymentDialog && (
                 <>
-                    <div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-[200]' onClick={() => setShowConfirmDialog(false)} />
-                    <div className='fixed inset-0 z-[201] flex items-center justify-center p-4'>
+                    <div className='fixed inset-0 bg-black/40 backdrop-blur-sm z-200' onClick={() => setShowPaymentDialog(false)} />
+                    <div className='fixed inset-0 z-201 flex items-center justify-center p-4'>
                         <div className='bg-white rounded-2xl shadow-2xl max-w-md w-full p-6'>
                             <div className='flex items-center justify-between mb-5'>
-                                <h3 className='text-lg font-bold text-neutral-900'>Confirm Order</h3>
-                                <button onClick={() => setShowConfirmDialog(false)} className='p-1.5 hover:bg-neutral-100 rounded-full transition-colors cursor-pointer'><X className='w-4 h-4' /></button>
+                                <h3 className='text-lg font-bold text-neutral-900'>Choose Payment Method</h3>
+                                <button onClick={() => setShowPaymentDialog(false)} className='p-1.5 hover:bg-neutral-100 rounded-full transition-colors cursor-pointer'><X className='w-4 h-4' /></button>
                             </div>
-                            <p className='text-sm text-neutral-600 mb-4'>Use your saved shipping details?</p>
+                            <p className='text-sm text-neutral-600 mb-4'>Select how you want to pay for this order.</p>
                             {savedShippingDetails && (
                                 <div className='bg-neutral-50 rounded-xl p-4 mb-4 text-sm text-neutral-700'>
                                     <p className='font-medium'>{savedShippingDetails.firstName} {savedShippingDetails.lastName}</p>
@@ -243,14 +255,24 @@ export default function ProductDetailPage() {
                                     <p>{savedShippingDetails.city}, {savedShippingDetails.zipCode}</p>
                                 </div>
                             )}
+                            {!savedShippingDetails && (
+                                <div className='bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 text-xs text-amber-800'>
+                                    Shipping details are not saved yet. You will continue to checkout to fill address before placing the order.
+                                </div>
+                            )}
                             <div className='bg-neutral-50 rounded-xl p-4 mb-6 text-sm'>
                                 <p className='text-neutral-600'>{product.name} &middot; {selectedSize} &middot; Qty {quantity}</p>
                                 <p className='font-semibold text-neutral-900 mt-1'>₹{(product.price * quantity).toFixed(2)}</p>
                             </div>
-                            <div className='flex gap-3'>
-                                <button onClick={() => setShowConfirmDialog(false)} className='flex-1 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors cursor-pointer'>Cancel</button>
-                                <button onClick={handleConfirmOrder} disabled={isProcessing} className='flex-1 py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer disabled:opacity-40'>
-                                    {isProcessing ? 'Processing...' : 'Confirm'}
+                            <div className='space-y-3'>
+                                <button onClick={() => handleBuyNowWithPayment('online')} disabled={isProcessing} className='w-full py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors cursor-pointer disabled:opacity-40'>
+                                    {isProcessing ? 'Processing...' : 'Pay Online'}
+                                </button>
+                                <button onClick={() => handleBuyNowWithPayment('cod')} disabled={isProcessing} className='w-full py-3 border border-neutral-300 text-neutral-900 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors cursor-pointer disabled:opacity-40'>
+                                    {isProcessing ? 'Processing...' : 'Cash on Delivery'}
+                                </button>
+                                <button onClick={() => setShowPaymentDialog(false)} className='w-full py-2 text-xs text-neutral-500 hover:text-neutral-700 transition-colors cursor-pointer'>
+                                    Cancel
                                 </button>
                             </div>
                         </div>

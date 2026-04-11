@@ -126,5 +126,5 @@ export const isInStock = (stock) => {
 export const getStockStatusColor = (stock) => {
     if (!stock) return 'text-red-600';
     if (stock < 10) return 'text-yellow-600';
-    return 'text-green-600';
+    return 'text-blue-600';
 };
