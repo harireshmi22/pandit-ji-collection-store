@@ -1,6 +1,6 @@
 'use client'
 export const dynamic = 'force-dynamic'
-import React, { useState } from 'react'
+import React, { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -10,7 +10,19 @@ import { useCart } from '@/context/CartContext'
 import { useSession } from 'next-auth/react'
 import { ArrowLeft, Lock, Loader } from 'lucide-react'
 
-export default function CheckoutPage() {
+function CheckoutFallback() {
+    return (
+        <div className='min-h-screen bg-white'>
+            <Navbar />
+            <div className='flex items-center justify-center py-32'>
+                <Loader className='w-6 h-6 text-neutral-300 animate-spin' />
+            </div>
+            <Footer />
+        </div>
+    )
+}
+
+function CheckoutContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const paymentParam = searchParams.get('payment')
@@ -274,5 +286,13 @@ export default function CheckoutPage() {
             </div>
             <Footer />
         </div>
+    )
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={<CheckoutFallback />}>
+            <CheckoutContent />
+        </Suspense>
     )
 }
