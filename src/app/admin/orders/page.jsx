@@ -49,11 +49,16 @@ export default function AdminOrdersPage() {
                 body: JSON.stringify({ status: newStatus })
             })
             if (!res.ok) throw new Error('Failed to update status')
-            setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o))
+            const updatedOrder = await res.json()
+            setOrders(prev => prev.map(o => o._id === orderId ? { ...o, ...updatedOrder } : o))
             showToast(`Order #${orderId.slice(-6)} updated to ${newStatus}`)
         } catch (err) {
             showToast(err.message, 'error')
         }
+    }
+
+    const isAutoPaidOnDelivery = (order) => {
+        return order?.status === 'Delivered' && order?.paymentMethod === 'Cash on Delivery' && order?.isPaid
     }
 
     const filtered = orders.filter(order => {
@@ -187,7 +192,14 @@ export default function AdminOrdersPage() {
                                                 {order.orderItems?.length || 0} items
                                             </td>
                                             <td className='px-5 py-3.5 text-sm font-semibold text-neutral-900'>
-                                                ₹{order.totalPrice?.toFixed(2)}
+                                                <div>
+                                                    <p>₹{order.totalPrice?.toFixed(2)}</p>
+                                                    {isAutoPaidOnDelivery(order) && (
+                                                        <span className='inline-flex mt-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200'>
+                                                            Auto-paid on delivery
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className='px-5 py-3.5'>
                                                 <select

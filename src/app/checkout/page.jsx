@@ -8,14 +8,24 @@ import Navbar from '../components/home/Navbar'
 import Footer from '../components/home/Footer'
 import { useCart } from '@/context/CartContext'
 import { useSession } from 'next-auth/react'
-import { ArrowLeft, Lock, Loader } from 'lucide-react'
+import { ArrowLeft, Lock, Loader, Sparkles, ShieldCheck, CreditCard, Truck } from 'lucide-react'
 
 function CheckoutFallback() {
     return (
         <div className='min-h-screen bg-white'>
             <Navbar />
-            <div className='flex items-center justify-center py-32'>
-                <Loader className='w-6 h-6 text-neutral-300 animate-spin' />
+            <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12'>
+                <div className='rounded-3xl border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(239,246,255,0.9),rgba(224,242,254,0.78))] p-6 mb-6 animate-pulse'>
+                    <div className='h-8 w-52 bg-blue-100/70 rounded-lg mb-3' />
+                    <div className='h-4 w-72 bg-blue-100/60 rounded' />
+                </div>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
+                    <div className='lg:col-span-2 space-y-6'>
+                        <div className='h-72 rounded-2xl border border-neutral-200 bg-white animate-pulse' />
+                        <div className='h-44 rounded-2xl border border-neutral-200 bg-white animate-pulse' />
+                    </div>
+                    <div className='h-96 rounded-2xl border border-neutral-200 bg-white animate-pulse' />
+                </div>
             </div>
             <Footer />
         </div>
@@ -184,14 +194,36 @@ function CheckoutContent() {
                 <Link href='/cart' className='inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 mb-8 transition-colors'>
                     <ArrowLeft className='w-4 h-4' /> Back to Cart
                 </Link>
-                <h1 className='text-2xl md:text-3xl font-bold text-neutral-900 mb-8'>Checkout</h1>
+
+                <div className='relative overflow-hidden rounded-3xl border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(239,246,255,0.9),rgba(224,242,254,0.78))] px-5 sm:px-7 py-7 sm:py-8 mb-6 animate-fade-up'>
+                    <div className='absolute -top-10 -right-8 w-40 h-40 rounded-full bg-blue-300/20 blur-2xl pointer-events-none' />
+                    <div className='absolute -bottom-10 -left-8 w-40 h-40 rounded-full bg-cyan-300/20 blur-2xl pointer-events-none' />
+
+                    <div className='relative flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5'>
+                        <div>
+                            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 border border-blue-100 text-[11px] text-blue-700 font-semibold uppercase tracking-[0.14em] mb-3'>
+                                <Sparkles className='w-3.5 h-3.5' /> Secure Checkout
+                            </div>
+                            <h1 className='text-3xl sm:text-4xl font-bold text-neutral-900 leading-tight'>Complete your order</h1>
+                            <p className='text-sm text-neutral-600 mt-2'>Fast checkout, secure payment, and live order confirmation.</p>
+                        </div>
+
+                        <div className='grid grid-cols-3 gap-2 text-[10px] uppercase tracking-[0.12em] font-semibold text-neutral-500 w-full sm:w-auto'>
+                            <div className='px-3 py-2 rounded-lg bg-neutral-900 text-white text-center'>Cart</div>
+                            <div className='px-3 py-2 rounded-lg bg-blue-600 text-white text-center'>Checkout</div>
+                            <div className='px-3 py-2 rounded-lg bg-white border border-blue-100 text-center'>Confirm</div>
+                        </div>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
                         <div className='lg:col-span-2 space-y-6'>
                             {/* Shipping */}
-                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
-                                <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Shipping Information</h2>
+                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm animate-fade-up delay-100'>
+                                <h2 className='text-sm font-semibold text-neutral-900 mb-5 inline-flex items-center gap-2'>
+                                    <Truck className='w-4 h-4 text-blue-600' /> Shipping Information
+                                </h2>
                                 <div className='space-y-4'>
                                     <input type='email' name='email' value={formData.email} onChange={handleInputChange} required className={inputClass} placeholder='Email address' />
                                     <div className='grid grid-cols-2 gap-4'>
@@ -208,10 +240,12 @@ function CheckoutContent() {
                                 </div>
                             </div>
                             {/* Payment */}
-                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
-                                <h2 className='text-sm font-semibold text-neutral-900 mb-5'>Payment</h2>
+                            <div className='border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm animate-fade-up delay-200'>
+                                <h2 className='text-sm font-semibold text-neutral-900 mb-5 inline-flex items-center gap-2'>
+                                    <CreditCard className='w-4 h-4 text-blue-600' /> Payment
+                                </h2>
                                 <div className='space-y-4'>
-                                    <label className='flex items-start gap-3 p-3 border border-neutral-300 rounded-xl bg-white cursor-pointer'>
+                                    <label className={`flex items-start gap-3 p-3 border rounded-xl bg-white cursor-pointer transition-colors ${paymentMethod === 'Razorpay' ? 'border-blue-300 bg-blue-50/40' : 'border-neutral-300'}`}>
                                         <input
                                             type='radio'
                                             name='paymentMethod'
@@ -225,7 +259,7 @@ function CheckoutContent() {
                                             <p className='text-xs text-neutral-500'>UPI, cards, netbanking, and wallets.</p>
                                         </div>
                                     </label>
-                                    <label className='flex items-start gap-3 p-3 border border-neutral-300 rounded-xl bg-white cursor-pointer'>
+                                    <label className={`flex items-start gap-3 p-3 border rounded-xl bg-white cursor-pointer transition-colors ${paymentMethod === 'Cash on Delivery' ? 'border-blue-300 bg-blue-50/40' : 'border-neutral-300'}`}>
                                         <input
                                             type='radio'
                                             name='paymentMethod'
@@ -240,14 +274,16 @@ function CheckoutContent() {
                                         </div>
                                     </label>
                                     {paymentMethod === 'Razorpay' && (
-                                        <p className='text-xs text-neutral-500'>Card details are never collected or stored by this website.</p>
+                                        <p className='text-xs text-neutral-500 inline-flex items-center gap-1.5'>
+                                            <ShieldCheck className='w-3.5 h-3.5 text-emerald-600' /> Card details are never collected or stored by this website.
+                                        </p>
                                     )}
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <div className='sticky top-24 border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm'>
+                            <div className='sticky top-24 border border-neutral-200 bg-white/95 rounded-2xl p-5 shadow-sm animate-fade-up delay-200'>
                                 <h2 className='text-sm font-semibold text-neutral-900 mb-5 pb-4 border-b border-neutral-100'>Summary</h2>
                                 <div className='space-y-3 mb-4 max-h-48 overflow-y-auto no-scrollbar'>
                                     {cartItems.map(item => (

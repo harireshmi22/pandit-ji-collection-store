@@ -108,12 +108,33 @@ export async function PATCH(req, { params }) {
                 return NextResponse.json({ message: 'Admin access required' }, { status: 403 });
             }
 
-            if (status) order.status = status;
+            if (status) {
+                order.status = status;
+                if (status === 'Delivered') {
+                    order.isDelivered = true;
+                    order.deliveredAt = order.deliveredAt || Date.now();
+                }
+            }
             if (trackingNumber) order.trackingNumber = trackingNumber;
 
             if (isDelivered !== undefined) {
                 order.isDelivered = isDelivered;
                 order.deliveredAt = isDelivered ? Date.now() : undefined;
+                if (isDelivered && order.status !== 'Delivered') {
+                    order.status = 'Delivered';
+                }
+            }
+
+            const deliveredNow = order.status === 'Delivered' || order.isDelivered;
+            const isCashOnDelivery = order.paymentMethod === 'Cash on Delivery';
+
+            // COD payment is collected at delivery time.
+            if (deliveredNow && isCashOnDelivery && !order.isPaid) {
+                order.isPaid = true;
+                order.paidAt = order.paidAt || Date.now();
+                if (order.paymentStatus === 'pending') {
+                    order.paymentStatus = 'captured';
+                }
             }
         }
 
