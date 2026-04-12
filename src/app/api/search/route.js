@@ -129,7 +129,7 @@ export const GET = async (req) => {
             return NextResponse.json(cachedPayload, {
                 status: 200,
                 headers: {
-                    "Cache-Control": "no-store",
+                    "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
                     "X-Cache": "HIT",
                 },
             });
@@ -195,7 +195,7 @@ export const GET = async (req) => {
 
             return NextResponse.json(payload, {
                 headers: {
-                    "Cache-Control": "no-store",
+                    "Cache-Control": "public, max-age=30, stale-while-revalidate=90",
                     "X-Cache": "MISS",
                 },
             });
@@ -330,7 +330,7 @@ export const GET = async (req) => {
 
         return NextResponse.json(payload, {
             headers: {
-                "Cache-Control": "no-store",
+                "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
                 "X-Cache": "MISS",
             },
         });

@@ -2,7 +2,6 @@
 import React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { Loader2 } from 'lucide-react'
 import SideBar from './components/SideBar'
 import NavBar from './components/NavBar'
 
@@ -29,9 +28,19 @@ export default function AdminLayout({ children }) {
 
     if (status === 'loading') {
         return (
-            <div className='min-h-screen bg-[linear-gradient(180deg,#f8fbff,#eef4ff)] flex flex-col items-center justify-center gap-3'>
-                <Loader2 className='w-8 h-8 text-blue-700 animate-spin' />
-                <p className='text-sm text-neutral-500 font-medium'>Loading admin panel...</p>
+            <div className="flex h-screen overflow-hidden bg-[linear-gradient(180deg,rgba(248,251,255,0.9),rgba(238,246,255,0.92),rgba(239,252,255,0.82))]">
+                <aside className="hidden lg:block w-65 border-r border-blue-200/60 bg-white/70" />
+                <main className="flex-1 overflow-y-auto w-full relative">
+                    <div className="h-16 border-b border-blue-200/70 bg-white/88" />
+                    <div className="p-4 sm:p-6 space-y-4">
+                        <div className="h-8 w-48 rounded-xl bg-blue-100/70 animate-pulse" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                            {Array.from({ length: 4 }).map((_, i) => (
+                                <div key={i} className="h-36 rounded-2xl border border-blue-200/60 bg-white animate-pulse" />
+                            ))}
+                        </div>
+                    </div>
+                </main>
             </div>
         )
     }

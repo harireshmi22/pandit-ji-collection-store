@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
 
 const FALLBACK_HERO_IMAGE = 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&h=1800&fit=crop'
@@ -86,11 +87,13 @@ export default function HeroBanner() {
                     <div className='relative rounded-3xl border border-blue-100 bg-white/85 backdrop-blur-sm p-4 md:p-5 shadow-[0_24px_44px_-26px_rgba(37,99,235,0.4)] animate-fade-up delay-200'>
                         <div className='grid grid-cols-5 gap-3'>
                             <div className='col-span-3 relative rounded-2xl overflow-hidden min-h-72 md:min-h-96 ring-1 ring-blue-100/70 group'>
-                                <img
+                                <Image
                                     src={heroImage}
                                     alt={heroProduct?.name || 'Featured fashion product'}
+                                    fill
+                                    priority
+                                    sizes='(max-width: 1024px) 100vw, 60vw'
                                     className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
-                                    loading='eager'
                                 />
                                 <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
                                 <div className='absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent' />
@@ -104,11 +107,13 @@ export default function HeroBanner() {
 
                             <div className='col-span-2 flex flex-col gap-3'>
                                 <div className='relative rounded-2xl overflow-hidden min-h-36 md:min-h-48 ring-1 ring-blue-100/70 group animate-fade-up' style={{ animationDelay: '0.24s' }}>
-                                    <img
+                                    <Image
                                         src={sideImage}
                                         alt={sideProduct?.name || 'New arrival fashion product'}
-                                        className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
+                                        fill
                                         loading='lazy'
+                                        sizes='(max-width: 1024px) 40vw, 24vw'
+                                        className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
                                     />
                                     <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
                                     <div className='absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent' />
@@ -120,11 +125,13 @@ export default function HeroBanner() {
                                 </div>
 
                                 <div className='relative rounded-2xl overflow-hidden min-h-36 md:min-h-45 ring-1 ring-blue-100/70 group animate-fade-up' style={{ animationDelay: '0.34s' }}>
-                                    <img
+                                    <Image
                                         src={thirdImage}
                                         alt={thirdProduct?.name || 'Modern fashion style'}
-                                        className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
+                                        fill
                                         loading='lazy'
+                                        sizes='(max-width: 1024px) 40vw, 24vw'
+                                        className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
                                     />
                                     <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
                                     <div className='absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent' />

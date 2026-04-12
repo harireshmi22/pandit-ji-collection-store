@@ -10,6 +10,7 @@ import { ArrowLeft, ShoppingBag, Heart, Minus, Plus, Check, X, Loader, Package }
 import ProductSwiper from '@/app/components/home/ProductSwiper'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
+import { getOptimizedProductImage, isCloudinaryUrl } from '@/lib/image-utils'
 
 export default function ProductDetailPage() {
     const params = useParams()
@@ -33,7 +34,7 @@ export default function ProductDetailPage() {
             ; (async () => {
                 try {
                     setLoading(true)
-                    const res = await fetch(`/api/products/${productId}`)
+                    const res = await fetch(`/api/products/${productId}?view=storefront`)
                     const data = await res.json()
                     if (data.success) setProduct(data.data)
                     else setError(data.message || 'Product not found')
@@ -66,8 +67,18 @@ export default function ProductDetailPage() {
         return (
             <div className='min-h-screen bg-white'>
                 <Navbar />
-                <div className='flex items-center justify-center py-32'>
-                    <Loader className='w-6 h-6 text-neutral-300 animate-spin' />
+                <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12'>
+                    <div className='h-4 w-32 rounded bg-neutral-100 mb-8 animate-pulse' />
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16'>
+                        <div className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />
+                        <div className='space-y-4'>
+                            <div className='h-3 w-24 rounded bg-neutral-100 animate-pulse' />
+                            <div className='h-8 w-3/4 rounded bg-neutral-100 animate-pulse' />
+                            <div className='h-7 w-40 rounded bg-neutral-100 animate-pulse' />
+                            <div className='h-20 w-full rounded bg-neutral-100 animate-pulse' />
+                            <div className='h-12 w-full rounded-full bg-neutral-100 animate-pulse' />
+                        </div>
+                    </div>
                 </div>
                 <Footer />
             </div>
@@ -88,6 +99,8 @@ export default function ProductDetailPage() {
             </div>
         )
     }
+
+    const productImage = getOptimizedProductImage(product, 900)
 
     const handleAddToCart = () => {
         addToCart({ id: product._id, name: product.name, price: product.price, image: product.image, brand: product.brand }, selectedSize, quantity, true)
@@ -138,8 +151,16 @@ export default function ProductDetailPage() {
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16'>
                     {/* Image */}
                     <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100'>
-                        {product.image ? (
-                            <Image src={product.image} alt={product.name} fill className='object-cover' priority sizes='(max-width: 1024px) 100vw, 50vw' />
+                        {productImage ? (
+                            <Image
+                                src={productImage}
+                                alt={product.name}
+                                fill
+                                className='object-cover'
+                                priority
+                                unoptimized={isCloudinaryUrl(productImage)}
+                                sizes='(max-width: 1024px) 100vw, 50vw'
+                            />
                         ) : (
                             <div className='w-full h-full flex items-center justify-center'><Package className='w-12 h-12 text-neutral-300' /></div>
                         )}

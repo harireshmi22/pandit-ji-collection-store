@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import {
-    Search, Filter, Loader2, Eye, RefreshCw, X,
+    Search, Eye, RefreshCw, X,
     Package, Clock, CheckCircle2, Truck, XCircle, AlertCircle
 } from 'lucide-react'
 
@@ -82,14 +82,6 @@ export default function AdminOrdersPage() {
         Cancelled: orders.filter(o => o.status === 'Cancelled').length,
     }
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
-
     return (
         <div className='space-y-5'>
             {/* Toast */}
@@ -163,7 +155,15 @@ export default function AdminOrdersPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filtered.length === 0 ? (
+                            {loading ? (
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i} className='border-b border-neutral-50'>
+                                        <td colSpan={7} className='px-5 py-4'>
+                                            <div className='h-6 rounded-lg bg-blue-100/60 animate-pulse' />
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : filtered.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className='px-5 py-12 text-center'>
                                         <Package className='w-10 h-10 text-neutral-300 mx-auto mb-2' />

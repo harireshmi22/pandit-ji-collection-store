@@ -195,8 +195,8 @@ export default function Navbar() {
                     </div>
 
                     <div className='flex items-center gap-1'>
-                        <div ref={desktopSearchRef} className='hidden lg:block relative'>
-                            <form onSubmit={handleSearch} className='flex items-center bg-white border border-neutral-200 rounded-full px-3.5 py-2 w-72 xl:w-80 focus-within:bg-white focus-within:border-blue-300 transition-all shadow-sm'>
+                        <div ref={desktopSearchRef} className='hidden md:block relative'>
+                            <form onSubmit={handleSearch} className='flex items-center bg-white border border-neutral-200 rounded-full px-3.5 py-2 w-44 lg:w-72 xl:w-80 focus-within:bg-white focus-within:border-blue-300 transition-all shadow-sm'>
                                 <Search className='w-3.5 h-3.5 text-neutral-400' />
                                 <input
                                     type='text'

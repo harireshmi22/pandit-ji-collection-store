@@ -1,8 +1,7 @@
 'use client'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { Plus, Shield, Mail, Edit2, Trash2, Search, X, Loader2, UserPlus } from 'lucide-react'
-import { userService } from '@/service/userService'
+import { Plus, Shield, Mail, Search, X, UserPlus } from 'lucide-react'
 
 export default function AdminAdminsPage() {
     const { data: session, status } = useSession()
@@ -12,7 +11,6 @@ export default function AdminAdminsPage() {
     const [showAddModal, setShowAddModal] = useState(false)
     const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Manager', password: '' })
     const [toast, setToast] = useState(null)
-    const [deleteId, setDeleteId] = useState(null)
 
     const showToast = (message, type = 'success') => {
         setToast({ message, type })
@@ -75,14 +73,6 @@ export default function AdminAdminsPage() {
         admin.email?.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
-
     return (
         <div className='space-y-5'>
             {/* Toast */}
@@ -121,7 +111,17 @@ export default function AdminAdminsPage() {
             </div>
 
             {/* Team Grid */}
-            {filtered.length === 0 ? (
+            {loading ? (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                    {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className='bg-white rounded-2xl border border-blue-200/60 p-5 animate-pulse'>
+                            <div className='h-10 w-10 rounded-xl bg-blue-100/60 mb-4' />
+                            <div className='h-4 w-1/2 rounded bg-blue-100/60 mb-2' />
+                            <div className='h-3 w-2/3 rounded bg-blue-100/60' />
+                        </div>
+                    ))}
+                </div>
+            ) : filtered.length === 0 ? (
                 <div className='bg-white rounded-2xl border border-blue-200/60 p-12 text-center'>
                     <UserPlus className='w-10 h-10 text-neutral-300 mx-auto mb-2' />
                     <p className='text-sm text-neutral-400'>No team members found</p>

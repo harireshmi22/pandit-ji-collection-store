@@ -32,6 +32,7 @@ export async function GET(req) {
         const featured = searchParams.get('featured') || '';
         const isNewArrival = searchParams.get('isNewArrival') || '';
         const sortBy = searchParams.get('sort') || '';
+        const fields = searchParams.get('fields') || '';
         const page = Math.max(1, parseInt(searchParams.get('page')) || 1);
         const limit = Math.max(1, parseInt(searchParams.get('limit')) || 20);
 
@@ -76,7 +77,7 @@ export async function GET(req) {
                 return NextResponse.json(payload, {
                     status: 200,
                     headers: {
-                        'Cache-Control': 'no-store',
+                        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
                         'X-Cache': 'HIT',
                         'X-Cache-Layer': cacheLayer,
                         'X-Redis-Enabled': String(Boolean(redis)),
@@ -114,6 +115,9 @@ export async function GET(req) {
             if (materials) filter.materials = { $in: materials.split(',') };
 
             const skip = (page - 1) * limit;
+            const projection = fields === 'card'
+                ? 'name price image images brand category stock isNewArrival createdAt'
+                : '';
 
             // Determine sort order
             let sortOption = { createdAt: -1 }; // default: newest first
@@ -125,7 +129,7 @@ export async function GET(req) {
 
             // Execute Count and Data in parallel for speed
             const [dbProducts, dbTotal] = await Promise.all([
-                Product.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
+                Product.find(filter).select(projection).sort(sortOption).skip(skip).limit(limit).lean(),
                 Product.countDocuments(filter)
             ]);
 
@@ -172,7 +176,7 @@ export async function GET(req) {
         return NextResponse.json(responseData, {
             status: 200,
             headers: {
-                'Cache-Control': 'no-store',
+                'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
                 'X-Cache': 'MISS',
                 'X-Cache-Layer': 'none',
                 'X-Redis-Enabled': String(Boolean(redis)),

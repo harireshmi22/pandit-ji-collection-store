@@ -11,7 +11,7 @@ export default function NewArrival() {
                         <div className='absolute top-0 right-0 w-96 h-96 bg-blue-200/55 rounded-full -translate-y-1/2 translate-x-1/2' />
                         <div className='absolute bottom-0 left-0 w-64 h-64 bg-cyan-200/55 rounded-full translate-y-1/2 -translate-x-1/2' />
                     </div>
-                    <div className='relative px-8 py-16 md:px-16 md:py-20 flex flex-col md:flex-row items-center justify-between gap-8'>
+                    <div className='relative px-6 py-12 sm:px-8 sm:py-16 md:px-16 md:py-20 flex flex-col md:flex-row items-center justify-between gap-8'>
                         <div className='max-w-lg'>
                             <p className='inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold text-blue-800 bg-blue-100 tracking-widest uppercase mb-4'>Just Dropped</p>
                             <h2 className='text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-neutral-900'>
@@ -24,7 +24,7 @@ export default function NewArrival() {
                                 Shop New Arrivals <ArrowRight className='w-4 h-4' />
                             </Link>
                         </div>
-                        <div className='text-8xl md:text-9xl font-bold text-blue-700/20 select-none'>NEW</div>
+                        <div className='text-6xl sm:text-7xl md:text-9xl font-bold text-blue-700/20 select-none'>NEW</div>
                     </div>
                 </div>
             </div>

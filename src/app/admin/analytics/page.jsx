@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import {
-    TrendingUp, DollarSign, ShoppingBag, Users, Loader2,
-    ArrowUpRight, ArrowDownRight, BarChart3, PieChart, Activity
+    TrendingUp, DollarSign, ShoppingBag,
+    BarChart3, PieChart, Activity
 } from 'lucide-react'
 
 export default function AdminAnalyticsPage() {
@@ -17,7 +17,7 @@ export default function AdminAnalyticsPage() {
             setLoading(true)
             const [statsRes, ordersRes] = await Promise.all([
                 fetch('/api/admin/stats'),
-                fetch('/api/orders')
+                fetch('/api/orders?summary=true&limit=120&hydrateImages=false')
             ])
             if (statsRes.ok) setStats(await statsRes.json())
             if (ordersRes.ok) {
@@ -35,14 +35,6 @@ export default function AdminAnalyticsPage() {
         if (status === 'authenticated' && session?.user?.role === 'admin') fetchData()
     }, [status, session, fetchData])
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
-
     const totalRevenue = orders.reduce((acc, o) => acc + (o.totalPrice || 0), 0)
     const avgOrderValue = orders.length > 0 ? totalRevenue / orders.length : 0
     const deliveredOrders = orders.filter(o => o.status === 'Delivered').length
@@ -56,6 +48,7 @@ export default function AdminAnalyticsPage() {
         acc[month] = (acc[month] || 0) + (order.totalPrice || 0)
         return acc
     }, {})
+
     const monthEntries = Object.entries(monthlyData)
     const maxMonthly = Math.max(...monthEntries.map(([, v]) => v), 1)
 
@@ -113,7 +106,13 @@ export default function AdminAnalyticsPage() {
 
             {/* Metric Cards */}
             <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
-                {metrics.map((m, i) => {
+                {loading ? Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className='h-40 bg-white rounded-2xl border border-blue-200/60 p-5 animate-pulse'>
+                        <div className='w-10 h-10 rounded-xl bg-blue-100/70 mb-4' />
+                        <div className='h-8 w-28 bg-blue-100/60 rounded mb-2' />
+                        <div className='h-3 w-20 bg-blue-100/60 rounded' />
+                    </div>
+                )) : metrics.map((m, i) => {
                     const Icon = m.icon
                     return (
                         <div key={i} className='bg-white rounded-2xl border border-blue-200/60 p-5'>
@@ -139,7 +138,16 @@ export default function AdminAnalyticsPage() {
                             <h2 className='text-[15px] font-semibold text-neutral-900'>Monthly Revenue</h2>
                         </div>
                     </div>
-                    {monthEntries.length === 0 ? (
+                    {loading ? (
+                        <div className='space-y-3'>
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className='flex items-center gap-3 animate-pulse'>
+                                    <div className='h-3 w-8 rounded bg-blue-100/70' />
+                                    <div className='flex-1 h-8 bg-blue-100/60 rounded-lg' />
+                                </div>
+                            ))}
+                        </div>
+                    ) : monthEntries.length === 0 ? (
                         <div className='h-48 flex items-center justify-center text-sm text-neutral-400'>
                             No data available yet
                         </div>
@@ -172,7 +180,9 @@ export default function AdminAnalyticsPage() {
                         <span className='text-xs text-neutral-400 font-medium'>{orders.length} total</span>
                     </div>
                     <div className='space-y-3'>
-                        {Object.entries(statusBreakdown).map(([status, count]) => (
+                        {loading ? Array.from({ length: 5 }).map((_, i) => (
+                            <div key={i} className='h-7 rounded-lg bg-blue-100/60 animate-pulse' />
+                        )) : Object.entries(statusBreakdown).map(([status, count]) => (
                             <div key={status} className='flex items-center justify-between'>
                                 <div className='flex items-center gap-2.5'>
                                     <div className={`w-2.5 h-2.5 rounded-full ${statusColors[status] || 'bg-neutral-400'}`} />
@@ -182,7 +192,7 @@ export default function AdminAnalyticsPage() {
                                     <div className='w-24 h-2 bg-neutral-100 rounded-full overflow-hidden'>
                                         <div
                                             className={`h-full rounded-full ${statusColors[status] || 'bg-neutral-400'}`}
-                                            style={{ width: `${(count / orders.length) * 100}%` }}
+                                            style={{ width: `${(count / Math.max(orders.length, 1)) * 100}%` }}
                                         />
                                     </div>
                                     <span className='text-sm font-semibold text-neutral-900 w-8 text-right'>{count}</span>

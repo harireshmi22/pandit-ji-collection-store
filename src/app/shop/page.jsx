@@ -8,6 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useWishlist } from '@/context/WishlistContext'
 import { Heart, Loader, Search, SlidersHorizontal, X, Package } from 'lucide-react'
+import { getOptimizedProductImage, isCloudinaryUrl } from '@/lib/image-utils'
 
 const categories = ['All', 'New in', 'Top Wear', 'Bottom Wear', 'T-shirt', 'Formal']
 
@@ -35,6 +36,7 @@ const ShopPageContent = () => {
             if (activeCategory && activeCategory !== 'All') params.append('category', activeCategory)
             params.append('page', String(currentPage))
             params.append('limit', String(pageLimit))
+            params.append('fields', 'card')
             const res = await fetch(`/api/products${params.toString() ? '?' + params.toString() : ''}`)
             const data = await res.json()
             if (data.success) {
@@ -102,9 +104,16 @@ const ShopPageContent = () => {
 
                 {/* Content */}
                 {loading ? (
-                    <div className='flex flex-col items-center justify-center py-32'>
-                        <Loader className='w-6 h-6 text-neutral-300 animate-spin mb-3' />
-                        <p className='text-sm text-neutral-400'>Loading products...</p>
+                    <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className='rounded-2xl p-2 bg-white/80 border border-neutral-200/80'>
+                                <div className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />
+                                <div className='mt-3 px-0.5 space-y-2'>
+                                    <div className='h-4 w-3/4 bg-neutral-100 rounded animate-pulse' />
+                                    <div className='h-3 w-1/2 bg-neutral-100 rounded animate-pulse' />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ) : error ? (
                     <div className='bg-red-50 border border-red-100 rounded-2xl p-6 text-center'>
@@ -120,18 +129,21 @@ const ShopPageContent = () => {
                 ) : (
                     <div>
                         <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
-                            {products.map(product => {
+                            {products.map((product, index) => {
                                 const productId = product._id || product.id
+                                const cardImage = getOptimizedProductImage(product, 640)
                                 return (
                                     <div key={productId} className='group relative rounded-2xl p-2 bg-white/80 border border-neutral-200/80 shadow-sm hover:shadow-[0_14px_30px_-18px_rgba(15,118,110,0.35)] transition-all'>
                                         <Link href={`/shop/${productId}`} className='block'>
                                             <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100'>
-                                                {product.image ? (
+                                                {cardImage ? (
                                                     <Image
-                                                        src={product.image}
+                                                        src={cardImage}
                                                         fill
                                                         alt={product.name}
                                                         className='object-cover transition-transform duration-500 group-hover:scale-105'
+                                                        priority={index < 2}
+                                                        unoptimized={isCloudinaryUrl(cardImage)}
                                                         sizes='(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw'
                                                     />
                                                 ) : (
@@ -204,7 +216,7 @@ const ShopPageContent = () => {
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={<div className='min-h-screen flex items-center justify-center'><Loader className='w-6 h-6 animate-spin text-neutral-300' /></div>}>
+        <Suspense fallback={<div className='min-h-screen bg-white'><div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20'><div className='h-8 w-32 rounded bg-neutral-100 animate-pulse mb-8' /><div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>{Array.from({ length: 8 }).map((_, i) => <div key={i} className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />)}</div></div></div>}>
             <ShopPageContent />
         </Suspense>
     )

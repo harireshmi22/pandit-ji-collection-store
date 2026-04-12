@@ -108,7 +108,7 @@ export default function ProductSwiper({ title = 'Trending Now', category, sort, 
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 <div className='flex justify-between items-end mb-10'>
                     <h2 className='text-2xl md:text-3xl font-bold text-neutral-900'>{title}</h2>
-                    <div className='flex gap-2'>
+                    <div className='hidden sm:flex gap-2'>
                         <button ref={node => setPrevEl(node)} className='p-2.5 rounded-full border border-neutral-200 hover:border-blue-600 hover:bg-blue-600 hover:text-white transition-all cursor-pointer text-neutral-600'>
                             <ArrowRight className='w-4 h-4 rotate-180' />
                         </button>

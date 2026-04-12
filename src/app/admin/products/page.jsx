@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import {
-    Plus, Search, Filter, Loader2, Package,
-    Edit2, Trash2, Star, Eye, MoreHorizontal, X
+    Plus, Search, Filter, Package,
+    Edit2, Trash2, Star, X
 } from 'lucide-react'
 import ProductModal from '../components/ProductModal'
 import Image from 'next/image'
@@ -95,14 +95,6 @@ export default function AdminProductsPage() {
         return matchSearch && matchCat
     })
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
-
     return (
         <div className='space-y-5'>
             {/* Toast */}
@@ -155,7 +147,20 @@ export default function AdminProductsPage() {
             </div>
 
             {/* Product Grid */}
-            {filtered.length === 0 ? (
+            {loading ? (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+                    {Array.from({ length: 8 }).map((_, i) => (
+                        <div key={i} className='bg-white rounded-2xl border border-blue-200/60 overflow-hidden animate-pulse'>
+                            <div className='aspect-square bg-blue-100/60' />
+                            <div className='p-3.5 space-y-2'>
+                                <div className='h-4 w-3/4 rounded bg-blue-100/60' />
+                                <div className='h-3 w-1/2 rounded bg-blue-100/60' />
+                                <div className='h-3 w-full rounded bg-blue-100/60 mt-3' />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : filtered.length === 0 ? (
                 <div className='bg-white rounded-2xl border border-neutral-200/60 p-12 text-center'>
                     <Package className='w-12 h-12 text-neutral-300 mx-auto mb-3' />
                     <p className='text-neutral-500 font-medium'>No products found</p>

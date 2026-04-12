@@ -44,6 +44,10 @@ export async function GET(req) {
         // For now, let's assume session.user.role === 'admin' check
         const { searchParams } = new URL(req.url);
         const userId = searchParams.get('userId');
+        const summaryOnly = searchParams.get('summary') === 'true';
+        const hydrateImages = searchParams.get('hydrateImages') !== 'false';
+        const limitRaw = Number(searchParams.get('limit') || 0);
+        const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? Math.min(limitRaw, 500) : 0;
 
         let query = {};
         if (session.user.role !== 'admin') {
@@ -54,10 +58,19 @@ export async function GET(req) {
             query.user = userId;
         }
 
-        const orders = await Order.find(query)
+        let ordersQuery = Order.find(query)
             .populate('user', 'name email')
-            .sort({ createdAt: -1 })
-            .lean();
+            .sort({ createdAt: -1 });
+
+        if (summaryOnly) {
+            ordersQuery = ordersQuery.select('_id totalPrice status createdAt user shippingAddress');
+        }
+
+        if (limit > 0) {
+            ordersQuery = ordersQuery.limit(limit);
+        }
+
+        const orders = await ordersQuery.lean();
 
         // Enrich order items with current product images from DB
         const productIds = orders
@@ -65,7 +78,7 @@ export async function GET(req) {
             .map(item => item.product)
             .filter(id => mongoose.Types.ObjectId.isValid(id));
 
-        if (productIds.length > 0) {
+        if (hydrateImages && productIds.length > 0) {
             const products = await Product.find(
                 { _id: { $in: productIds } },
                 { _id: 1, image: 1, images: 1 }

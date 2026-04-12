@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { Search, Mail, Phone, Loader2, Users } from 'lucide-react'
+import { Search, Mail, Phone, Users } from 'lucide-react'
 import { userService } from '@/service/userService'
 import { formatINRCurrency } from '@/lib/currency'
 
@@ -36,14 +36,6 @@ export default function AdminUsersPage() {
         user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchQuery.toLowerCase())
     )
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
 
     return (
         <div className='space-y-5'>
@@ -93,7 +85,15 @@ export default function AdminUsersPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filtered.length === 0 ? (
+                            {loading ? (
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i} className='border-b border-neutral-50'>
+                                        <td colSpan={6} className='px-5 py-4'>
+                                            <div className='h-6 rounded-lg bg-blue-100/60 animate-pulse' />
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : filtered.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className='px-5 py-12 text-center'>
                                         <Users className='w-10 h-10 text-neutral-300 mx-auto mb-2' />

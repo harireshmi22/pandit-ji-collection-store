@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
     DollarSign, ShoppingBag, Users, Package,
     TrendingUp, TrendingDown, ArrowRight, Eye,
-    Loader2, RefreshCw, Clock, CheckCircle2
+    RefreshCw, Clock, CheckCircle2
 } from 'lucide-react'
 
 export default function AdminDashboardPage() {
@@ -33,14 +33,6 @@ export default function AdminDashboardPage() {
             fetchStats()
         }
     }, [status, session, fetchStats])
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center p-20">
-                <Loader2 className="w-8 h-8 text-neutral-400 animate-spin" />
-            </div>
-        )
-    }
 
     const statCards = [
         {
@@ -113,7 +105,13 @@ export default function AdminDashboardPage() {
 
             {/* Stat Cards */}
             <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
-                {statCards.map((card, i) => {
+                {loading ? Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className='bg-white rounded-2xl border border-blue-200/60 p-5 animate-pulse'>
+                        <div className='w-10 h-10 rounded-xl bg-blue-100/70 mb-4' />
+                        <div className='h-8 w-28 bg-blue-100/60 rounded mb-2' />
+                        <div className='h-3 w-20 bg-blue-100/60 rounded' />
+                    </div>
+                )) : statCards.map((card, i) => {
                     const Icon = card.icon
                     return (
                         <div key={i} className='bg-white rounded-2xl border border-blue-200/60 p-5 hover:shadow-[0_14px_26px_-18px_rgba(37,99,235,0.4)] transition-shadow'>
@@ -160,7 +158,15 @@ export default function AdminDashboardPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {(stats?.recentOrders?.length === 0) ? (
+                            {loading ? (
+                                Array.from({ length: 4 }).map((_, i) => (
+                                    <tr key={i} className='border-b border-neutral-50'>
+                                        <td colSpan={6} className='px-5 py-4'>
+                                            <div className='h-6 rounded-lg bg-blue-100/60 animate-pulse' />
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (stats?.recentOrders?.length === 0) ? (
                                 <tr>
                                     <td colSpan={6} className='px-5 py-12 text-center text-sm text-neutral-400'>
                                         No orders yet

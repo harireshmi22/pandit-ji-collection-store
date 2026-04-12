@@ -20,6 +20,12 @@ const isAllowedProductImage = (value) => {
 
 export async function GET(request, { params }) {
 	try {
+		const { searchParams } = new URL(request.url);
+		const view = searchParams.get("view") || "";
+		const isStorefrontView = view === "storefront";
+		const storefrontProjection =
+			"name price image images brand stock description category sizes size colors color material";
+
 		// Handle async params for Next.js 16
 		if (params instanceof Promise) {
 			params = await params;
@@ -98,7 +104,7 @@ export async function GET(request, { params }) {
 					{
 						status: 200,
 						headers: {
-							"Cache-Control": "no-store",
+								"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
 							"X-Cache": "HIT",
 							"X-Cache-Layer": cacheLayer,
 							"X-Redis-Enabled": String(Boolean(redis)),
@@ -122,7 +128,9 @@ export async function GET(request, { params }) {
 				);
 			}
 
-			const product = await Product.findById(trimmedId).lean();
+			const product = await Product.findById(trimmedId)
+				.select(isStorefrontView ? storefrontProjection : "")
+				.lean();
 
 			if (!product) {
 				return NextResponse.json(
@@ -158,7 +166,7 @@ export async function GET(request, { params }) {
 				{
 					status: 200,
 					headers: {
-						"Cache-Control": "no-store",
+							"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
 						"X-Cache": "MISS",
 						"X-Cache-Layer": "none",
 						"X-Redis-Enabled": String(Boolean(redis)),

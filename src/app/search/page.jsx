@@ -8,6 +8,7 @@ import Footer from '../components/home/Footer'
 import Link from 'next/link'
 import { useWishlist } from '@/context/WishlistContext'
 import { Heart, Loader, Search, ArrowRight, SlidersHorizontal } from 'lucide-react'
+import { getOptimizedProductImage, isCloudinaryUrl } from '@/lib/image-utils'
 
 function useDebouncedValue(value, delay = 350) {
     const [debounced, setDebounced] = useState(value)
@@ -28,13 +29,6 @@ const SORT_OPTIONS = [
     { value: 'rating', label: 'Top Rated' },
     { value: 'popular', label: 'Most Popular' },
 ]
-
-const getProductImage = (product) => {
-    if (typeof product.image === 'string') return product.image
-    if (Array.isArray(product.image) && product.image.length > 0) return product.image[0]
-    if (Array.isArray(product.images) && product.images.length > 0) return product.images[0]
-    return ''
-}
 
 function SearchContent() {
     const router = useRouter()
@@ -159,7 +153,7 @@ function SearchContent() {
                                         <div className='flex items-center gap-3'>
                                             <div className='relative w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden shrink-0'>
                                                 {item.image ? (
-                                                    <Image src={item.image} fill alt={item.name} className='object-cover' sizes='40px' />
+                                                    <Image src={item.image} fill alt={item.name} className='object-cover' unoptimized={isCloudinaryUrl(item.image)} sizes='40px' />
                                                 ) : (
                                                     <div className='w-full h-full flex items-center justify-center text-[10px] text-neutral-400'>No image</div>
                                                 )}
@@ -218,7 +212,15 @@ function SearchContent() {
                 {searchQuery && <p className='text-sm text-neutral-500 mb-6'>{loading ? 'Searching...' : `${pagination.total} result${pagination.total !== 1 ? 's' : ''} for "${searchQuery}"`}</p>}
 
                 {loading ? (
-                    <div className='flex justify-center py-20'><Loader className='w-6 h-6 text-neutral-300 animate-spin' /></div>
+                    <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
+                        {Array.from({ length: 8 }).map((_, i) => (
+                            <div key={i} className='space-y-2'>
+                                <div className='aspect-3/4 bg-neutral-100 rounded-2xl animate-pulse' />
+                                <div className='h-3 w-3/4 bg-neutral-100 rounded animate-pulse' />
+                                <div className='h-3 w-1/2 bg-neutral-100 rounded animate-pulse' />
+                            </div>
+                        ))}
+                    </div>
                 ) : error ? (
                     <div className='text-center py-20'>
                         <p className='text-sm text-red-600 mb-4'>{error}</p>
@@ -237,20 +239,23 @@ function SearchContent() {
                     </div>
                 ) : (
                     <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
-                        {products.map(p => (
+                        {products.map((p, index) => {
+                            const listingImage = getOptimizedProductImage(p, 640)
+                            return (
                             <div key={p._id} className='group relative'>
                                 <Link href={`/shop/${p._id}`} className='block'>
                                     <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
-                                        {getProductImage(p) ? <Image src={getProductImage(p)} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
+                                        {listingImage ? <Image src={listingImage} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' priority={index < 2} unoptimized={isCloudinaryUrl(listingImage)} sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
                                     </div>
                                     <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
                                     <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
                                 </Link>
-                                <button onClick={() => toggleWishlist({ id: p._id, name: p.name, price: p.price, image: getProductImage(p) })} className='absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all z-10 cursor-pointer'>
+                                <button onClick={() => toggleWishlist({ id: p._id, name: p.name, price: p.price, image: listingImage })} className='absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all z-10 cursor-pointer'>
                                     <Heart className={`w-4 h-4 ${isInWishlist(p._id) ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />
                                 </button>
                             </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
             </div>
@@ -261,7 +266,7 @@ function SearchContent() {
 
 export default function SearchPage() {
     return (
-        <Suspense fallback={<div className='min-h-screen bg-white flex items-center justify-center'><Loader className='w-6 h-6 text-neutral-300 animate-spin' /></div>}>
+        <Suspense fallback={<div className='min-h-screen bg-white'><div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12'><div className='h-12 rounded-full bg-neutral-100 animate-pulse mb-6' /><div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>{Array.from({ length: 8 }).map((_, i) => <div key={i} className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />)}</div></div></div>}>
             <SearchContent />
         </Suspense>
     )
