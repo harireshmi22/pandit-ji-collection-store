@@ -8,7 +8,7 @@ import Navbar from '../../components/home/Navbar'
 import Footer from '../../components/home/Footer'
 import {
     CheckCircle, Package, Truck, CreditCard, Loader, ArrowLeft,
-    Volume2, VolumeX, Sparkles, CircleDot, ShieldCheck, CalendarClock
+    Volume2, VolumeX, Sparkles, CircleDot, ShieldCheck, CalendarClock, XCircle
 } from 'lucide-react'
 
 export default function OrderDetailPage() {
@@ -156,49 +156,120 @@ export default function OrderDetailPage() {
     )
 
     const statusSequence = ['Pending', 'Processing', 'Shipped', 'Delivered']
+
     const normalizedStatus = order.status === 'Cancelled' ? 'Pending' : (order.status || 'Pending')
     const statusIndex = Math.max(statusSequence.indexOf(normalizedStatus), 0)
     const progressPercent = order.status === 'Cancelled' ? 0 : Math.max(((statusIndex + 1) / statusSequence.length) * 100, 15)
+
+    const isCancelled = order.status === 'Cancelled'
     const isDelivered = order.status === 'Delivered'
+    const isCod = order.paymentMethod === 'Cash on Delivery'
+    const isPrepaid = !isCod
+    const isRefunded = order.paymentStatus === 'refunded'
+    const isOnlinePaid = isPrepaid && Boolean(order.isPaid || ['authorized', 'captured', 'refunded'].includes(order.paymentStatus || ''))
+    const isRefundFlow = isCancelled && isOnlinePaid
     const isPaymentPaid = Boolean(order.isPaid || isDelivered)
-    const paymentBadgeLabel = isPaymentPaid ? 'Paid' : 'Pending'
-    const paymentStatusText = isPaymentPaid
-        ? (order.paymentMethod === 'Cash on Delivery' && !order.isPaid ? 'Paid on delivery' : 'Paid')
-        : 'Pending'
-    const heroTitle = isDelivered ? 'Your order is delivered' : 'Your order is on the way'
-    const heroSubtitle = isDelivered
-        ? 'Delivered successfully. Payment received and order completed.'
-        : 'We are preparing your package and will notify you at each step.'
+    const isCodPending = isCod && !isPaymentPaid && !isCancelled
+    const isCodCancelled = isCancelled && isCod
+    const paymentStatusText = isRefundFlow
+        ? (isRefunded ? 'Refunded' : 'Refund Initiated')
+        : (isCodPending
+            ? 'Pay on Delivery'
+            : (isCodCancelled
+                ? 'No payment required'
+                : (isPaymentPaid
+                    ? (order.paymentMethod === 'Cash on Delivery' && !order.isPaid ? 'Paid on delivery' : 'Paid')
+                    : 'Pending')))
+    const paymentBadgeLabel = isRefundFlow
+        ? paymentStatusText
+        : (isCodPending
+            ? 'Pay on Delivery'
+            : (isCodCancelled
+                ? 'COD Cancelled'
+                : (isPaymentPaid ? 'Paid' : 'Pending')))
+    const paymentBadgeToneClass = isRefundFlow
+        ? (isRefunded ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700')
+        : (isCodPending
+            ? 'bg-sky-50 text-sky-700'
+            : (isCodCancelled
+                ? 'bg-red-50 text-red-700'
+                : (isPaymentPaid ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700')))
+    const paymentStatusTextClass = isRefundFlow
+        ? (isRefunded ? 'text-emerald-700' : 'text-rose-700')
+        : (isCodPending
+            ? 'text-sky-700'
+            : (isCodCancelled
+                ? 'text-red-700'
+                : 'text-neutral-900'))
+    const paymentHelperText = isRefundFlow
+        ? (isRefunded
+            ? 'Refund has been processed to your original payment method.'
+            : 'Refund is being processed and will reflect shortly.')
+        : (isCodPending
+            ? 'Amount will be collected at delivery.'
+            : (isCodCancelled
+                ? 'Order was cancelled before COD collection.'
+                : 'Secure transaction recorded'))
+    const itemStatusLabel = isCancelled ? 'Cancelled' : order.status
+    const itemStatusToneClass = isCancelled
+        ? 'bg-red-50 text-red-700 border-red-100'
+        : (isDelivered ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-blue-50 text-blue-700 border-blue-100')
+    const itemPaymentInfo = isCancelled
+        ? (isRefundFlow
+            ? (isRefunded ? 'Refund completed for this item' : 'Refund in progress for this item')
+            : (isCod ? 'COD was not charged for this item' : 'Payment not captured for this item'))
+        : (isCodPending
+            ? 'Pay on delivery'
+            : (isPaymentPaid ? 'Payment received' : 'Awaiting payment'))
+    const heroTitle = isCancelled ? 'Your order is cancelled' : (isDelivered ? 'Your order is delivered' : 'Your order is on the way')
+    const heroSubtitle = isCancelled
+        ? 'This order has been cancelled. If money was deducted, it will be refunded as per payment method.'
+        : (isDelivered
+            ? 'Delivered successfully. Payment received and order completed.'
+            : 'We are preparing your package and will notify you at each step.')
+    const cancelQuickMessage = 'Yeah, your order is cancelled.'
 
     return (
-        <div className='min-h-screen bg-white'>
+        <div className='min-h-screen bg-white page-shell'>
             <Navbar />
             <div className='max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12'>
                 <Link href='/orders' className='inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 mb-8 transition-colors'>
                     <ArrowLeft className='w-4 h-4' /> All Orders
                 </Link>
 
-                <div className='relative overflow-hidden rounded-3xl border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(239,246,255,0.92),rgba(224,242,254,0.8))] px-5 sm:px-7 py-7 sm:py-8 mb-6 animate-fade-up'>
-                    <div className='absolute -top-10 -right-10 w-44 h-44 rounded-full bg-blue-300/20 blur-2xl pointer-events-none' />
-                    <div className='absolute -bottom-12 -left-10 w-48 h-48 rounded-full bg-cyan-300/20 blur-2xl pointer-events-none' />
+                <div className={`relative overflow-hidden rounded-3xl px-5 sm:px-7 py-7 sm:py-8 mb-6 animate-fade-up hero-card-entrance ${isCancelled
+                    ? 'border border-red-100/90 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(254,242,242,0.93),rgba(255,228,230,0.84))]'
+                    : 'border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(239,246,255,0.92),rgba(224,242,254,0.8))]'
+                    }`}>
+                    <div className={`absolute -top-10 -right-10 w-44 h-44 rounded-full blur-2xl pointer-events-none hero-orb-drift ${isCancelled ? 'bg-red-300/20' : 'bg-blue-300/20'}`} />
+                    <div className={`absolute -bottom-12 -left-10 w-48 h-48 rounded-full blur-2xl pointer-events-none hero-orb-drift-soft ${isCancelled ? 'bg-rose-300/20' : 'bg-cyan-300/20'}`} />
 
                     <div className='relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6'>
                         <div>
-                            <div className='inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 border border-blue-100 text-[11px] text-blue-700 font-semibold uppercase tracking-[0.14em] mb-3'>
-                                <Sparkles className='w-3.5 h-3.5' /> Order Confirmed
+                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 text-[11px] font-semibold uppercase tracking-[0.14em] mb-3 ${isCancelled ? 'border border-red-100 text-red-700' : 'border border-blue-100 text-blue-700'
+                                }`}>
+                                {isCancelled ? <XCircle className='w-3.5 h-3.5' /> : <Sparkles className='w-3.5 h-3.5' />} {isCancelled ? 'Order Cancelled' : 'Order Confirmed'}
                             </div>
                             <h1 className='text-3xl sm:text-4xl font-bold text-neutral-900 leading-tight'>{heroTitle}</h1>
                             <p className='text-sm text-neutral-600 mt-2'>
                                 Order #{order._id.slice(-8).toUpperCase()} &middot; {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </p>
+                            {isCancelled && (
+                                <p className='text-sm font-semibold text-red-600 mt-1.5 inline-flex items-center gap-1.5'>
+                                    <XCircle className='w-4 h-4' /> {cancelQuickMessage}
+                                </p>
+                            )}
                             <p className='text-xs text-neutral-500 mt-1'>{heroSubtitle}</p>
                         </div>
 
-                        <div className='relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 mx-auto sm:mx-0'>
-                            <div className='absolute inset-0 rounded-full bg-blue-200/50 animate-ping' />
-                            <div className='absolute inset-2 rounded-full bg-cyan-200/40 animate-pulse' />
-                            <div className='relative w-full h-full rounded-full bg-blue-600 text-white flex items-center justify-center shadow-[0_18px_34px_-16px_rgba(37,99,235,0.75)]'>
-                                <CheckCircle className='w-10 h-10' />
+                        <div className='relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 mx-auto sm:mx-0 hero-icon-float'>
+                            <div className={`absolute inset-0 rounded-full ${isCancelled ? 'bg-red-200/60 cancel-pulse' : 'bg-blue-200/50 animate-ping'}`} />
+                            <div className={`absolute inset-2 rounded-full ${isCancelled ? 'bg-rose-200/45 cancel-pulse-soft' : 'bg-cyan-200/40 animate-pulse'}`} />
+                            <div className={`relative w-full h-full rounded-full text-white flex items-center justify-center ${isCancelled
+                                ? 'bg-red-600 shadow-[0_18px_34px_-16px_rgba(220,38,38,0.75)]'
+                                : 'bg-blue-600 shadow-[0_18px_34px_-16px_rgba(37,99,235,0.75)]'
+                                }`}>
+                                {isCancelled ? <XCircle className='w-10 h-10' /> : <CheckCircle className='w-10 h-10' />}
                             </div>
                         </div>
                     </div>
@@ -210,7 +281,7 @@ export default function OrderDetailPage() {
                         </div>
                         <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
                             <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Payment</p>
-                            <p className='text-sm font-semibold text-neutral-900 mt-0.5'>{paymentStatusText}</p>
+                            <p className={`text-sm font-semibold mt-0.5 ${paymentStatusTextClass}`}>{paymentStatusText}</p>
                         </div>
                         <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
                             <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Method</p>
@@ -218,7 +289,7 @@ export default function OrderDetailPage() {
                         </div>
                         <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
                             <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Status</p>
-                            <p className='text-sm font-semibold text-neutral-900 mt-0.5'>{order.status}</p>
+                            <p className={`text-sm font-semibold mt-0.5 ${isCancelled ? 'text-red-600' : 'text-neutral-900'}`}>{order.status}</p>
                         </div>
                     </div>
                 </div>
@@ -228,27 +299,38 @@ export default function OrderDetailPage() {
                         <h2 className='text-sm font-semibold text-neutral-900 inline-flex items-center gap-2'>
                             <CalendarClock className='w-4 h-4 text-blue-600' /> Delivery Timeline
                         </h2>
-                        <span className='text-xs text-neutral-500'>Live progress</span>
+                        <span className={`text-xs ${isCancelled ? 'text-red-600 font-medium' : 'text-neutral-500'}`}>
+                            {isCancelled ? 'Order cancelled' : 'Live progress'}
+                        </span>
                     </div>
 
-                    <div className='relative h-2 rounded-full bg-neutral-100 overflow-hidden mb-3'>
-                        <div className='h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-all duration-700' style={{ width: `${progressPercent}%` }} />
-                    </div>
+                    {!isCancelled ? (
+                        <div className='relative h-2 rounded-full bg-neutral-100 overflow-hidden mb-3'>
+                            <div className='h-full rounded-full bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-500 transition-all duration-700' style={{ width: `${progressPercent}%` }} />
+                            <div className='absolute inset-0 timeline-sheen' />
+                        </div>
+                    ) : (
+                        <div className='relative h-2 rounded-full bg-red-100 overflow-hidden mb-3'>
+                            <div className='h-full w-full rounded-full bg-linear-to-r from-red-500 via-rose-500 to-red-500 cancel-bar-glow' />
+                            <div className='absolute inset-0 cancel-stripes' />
+                        </div>
+                    )}
 
                     <div className='grid grid-cols-4 gap-2'>
-                        {statusSequence.map((step, idx) => {
-                            const reached = idx <= statusIndex && order.status !== 'Cancelled'
+                        {(isCancelled ? ['Pending', 'Processing', 'Shipped', 'Cancelled'] : statusSequence).map((step, idx) => {
+                            const reached = idx <= statusIndex && !isCancelled
+                            const isCancelledStep = isCancelled && step === 'Cancelled'
                             return (
                                 <div key={step} className='flex items-center gap-1.5'>
-                                    <CircleDot className={`w-3.5 h-3.5 ${reached ? 'text-blue-600' : 'text-neutral-300'}`} />
-                                    <span className={`text-[11px] ${reached ? 'text-neutral-700 font-medium' : 'text-neutral-400'}`}>{step}</span>
+                                    <CircleDot className={`w-3.5 h-3.5 ${isCancelledStep ? 'text-red-600 cancel-step-dot' : (reached ? 'text-blue-600' : 'text-neutral-300')}`} />
+                                    <span className={`text-[11px] ${isCancelledStep ? 'text-red-600 font-semibold' : (reached ? 'text-neutral-700 font-medium' : 'text-neutral-400')}`}>{step}</span>
                                 </div>
                             )
                         })}
                     </div>
                 </div>
 
-                <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 border border-gray-200 rounded-2xl'>
                     <div className='lg:col-span-2 space-y-6'>
                         {/* Items */}
                         <div className='border border-neutral-100 rounded-2xl overflow-hidden bg-white animate-fade-up delay-200'>
@@ -256,9 +338,21 @@ export default function OrderDetailPage() {
                                 <Package className='w-4 h-4 text-neutral-400' />
                                 <h2 className='text-sm font-semibold text-neutral-900'>Items ({order.orderItems?.length})</h2>
                             </div>
+                            {isCancelled && (
+                                <div className='mx-5 mt-4 rounded-xl border border-red-100 bg-red-50/80 px-3 py-2.5'>
+                                    <p className='text-sm font-semibold text-red-700 inline-flex items-center gap-1.5'>
+                                        <XCircle className='w-4 h-4' /> Order is cancelled
+                                    </p>
+                                    <p className='text-xs text-red-600 mt-1'>
+                                        {isRefundFlow
+                                            ? (isRefunded ? 'Payment refunded for cancelled items.' : 'Refund is in progress for cancelled items.')
+                                            : 'No charge was applied to cancelled items.'}
+                                    </p>
+                                </div>
+                            )}
                             <div className='divide-y divide-neutral-50'>
                                 {order.orderItems?.map((item, i) => (
-                                    <div key={i} className='p-5 flex gap-4 group hover:bg-blue-50/25 transition-colors'>
+                                    <div key={i} className='p-5 flex gap-4 group hover:bg-blue-50/25 transition-colors item-row-enter' style={{ animationDelay: `${0.06 * (i + 1)}s` }}>
                                         <div className='relative w-16 h-20 rounded-xl bg-neutral-100 overflow-hidden shrink-0'>
                                             {item.image && !item.image.includes('placehold.co') ? (
                                                 <Image src={item.image} alt={item.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' />
@@ -268,9 +362,15 @@ export default function OrderDetailPage() {
                                             </div>
                                         </div>
                                         <div className='flex-1 min-w-0'>
-                                            <h3 className='text-sm font-medium text-neutral-900 truncate'>{item.name}</h3>
+                                            <div className='flex items-start justify-between gap-2'>
+                                                <h3 className='text-sm font-medium text-neutral-900 truncate'>{item.name}</h3>
+                                                <span className={`shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${itemStatusToneClass}`}>
+                                                    {itemStatusLabel}
+                                                </span>
+                                            </div>
                                             <p className='text-xs text-neutral-400 mt-0.5'>Size: {item.size || 'M'} &middot; Qty: {item.quantity}</p>
                                             <p className='text-sm font-semibold text-neutral-900 mt-1'>₹{item.price?.toFixed(2)}</p>
+                                            <p className={`text-[11px] mt-1 ${isCancelled ? 'text-red-600' : 'text-neutral-500'}`}>{itemPaymentInfo}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -298,11 +398,11 @@ export default function OrderDetailPage() {
                                 </div>
                                 <div className='text-sm text-neutral-600 space-y-1'>
                                     <p>{order.paymentMethod}</p>
-                                    <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${isPaymentPaid ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700'}`}>
+                                    <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${paymentBadgeToneClass}`}>
                                         {paymentBadgeLabel}
                                     </span>
-                                    <div className='pt-3 mt-3 border-t border-neutral-100 text-xs text-neutral-500 inline-flex items-center gap-1.5'>
-                                        <ShieldCheck className='w-3.5 h-3.5 text-emerald-600' /> Secure transaction recorded
+                                    <div className='pt-3 mt-3 border-t border-neutral-100 text-xs inline-flex items-center gap-1.5 text-neutral-500'>
+                                        <ShieldCheck className={`w-3.5 h-3.5 ${isCancelled ? 'text-red-600' : 'text-emerald-600'}`} /> {paymentHelperText}
                                     </div>
                                 </div>
                             </div>
@@ -333,9 +433,9 @@ export default function OrderDetailPage() {
 
             {showCelebration && (
                 <>
-                    <div className='fixed inset-0 bg-black/45 backdrop-blur-sm z-200' onClick={() => setShowCelebration(false)} />
+                    <div className='fixed inset-0 bg-black/45 backdrop-blur-sm z-200 modal-overlay-enter' onClick={() => setShowCelebration(false)} />
                     <div className='fixed inset-0 z-201 flex items-center justify-center p-4'>
-                        <div className='relative bg-[linear-gradient(145deg,#ffffff,#f8fbff,#eef8ff)] rounded-3xl shadow-2xl max-w-md w-full overflow-hidden celebration-enter'>
+                        <div className='relative bg-[linear-gradient(145deg,#ffffff,#f8fbff,#eef8ff)] rounded-3xl shadow-2xl max-w-md w-full overflow-hidden celebration-enter celebration-card-float'>
                             <div className='absolute top-0 left-0 right-0 h-1.5 bg-linear-to-r from-blue-500 via-indigo-500 to-cyan-500' />
                             <div className='absolute inset-0 pointer-events-none'>
                                 {Array.from({ length: 16 }).map((_, index) => (
@@ -426,6 +526,47 @@ export default function OrderDetailPage() {
             )}
 
             <style jsx>{`
+                .page-shell {
+                    animation: pageSettle 0.5s ease-out;
+                }
+
+                .hero-card-entrance {
+                    animation: heroRise 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .hero-orb-drift {
+                    animation: orbDrift 6.5s ease-in-out infinite;
+                }
+
+                .hero-orb-drift-soft {
+                    animation: orbDriftSoft 7.2s ease-in-out infinite;
+                }
+
+                .hero-icon-float {
+                    animation: heroIconFloat 3.2s ease-in-out infinite;
+                }
+
+                .timeline-sheen {
+                    background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.45) 50%, rgba(255, 255, 255, 0) 100%);
+                    transform: translateX(-120%);
+                    animation: timelineSweep 2.4s ease-in-out infinite;
+                    pointer-events: none;
+                }
+
+                .item-row-enter {
+                    opacity: 0;
+                    transform: translate3d(0, 10px, 0);
+                    animation: itemFadeIn 0.46s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+
+                .modal-overlay-enter {
+                    animation: overlayFade 0.32s ease-out;
+                }
+
+                .celebration-card-float {
+                    animation: modalRise 0.45s cubic-bezier(0.16, 1, 0.3, 1), cardFloat 4.8s ease-in-out infinite 0.52s;
+                }
+
                 .celebration-enter {
                     animation: modalRise 0.45s cubic-bezier(0.16, 1, 0.3, 1);
                 }
@@ -488,6 +629,188 @@ export default function OrderDetailPage() {
                     100% {
                         opacity: 0;
                         transform: translate3d(var(--burst-x), var(--burst-y), 0) scale(1.25);
+                    }
+                }
+
+                .cancel-bar-glow {
+                    animation: cancelGlow 1.6s ease-in-out infinite;
+                }
+
+                .cancel-stripes {
+                    background-image: repeating-linear-gradient(
+                        -45deg,
+                        rgba(255, 255, 255, 0.2) 0,
+                        rgba(255, 255, 255, 0.2) 10px,
+                        rgba(255, 255, 255, 0) 10px,
+                        rgba(255, 255, 255, 0) 20px
+                    );
+                    animation: cancelStripeSlide 1s linear infinite;
+                }
+
+                .cancel-step-dot {
+                    animation: cancelDotPulse 1.2s ease-in-out infinite;
+                }
+
+                .cancel-pulse {
+                    animation: cancelPulse 1.4s ease-in-out infinite;
+                }
+
+                .cancel-pulse-soft {
+                    animation: cancelPulse 1.4s ease-in-out infinite 0.12s;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .page-shell,
+                    .hero-card-entrance,
+                    .hero-orb-drift,
+                    .hero-orb-drift-soft,
+                    .hero-icon-float,
+                    .timeline-sheen,
+                    .item-row-enter,
+                    .modal-overlay-enter,
+                    .celebration-card-float,
+                    .celebration-enter,
+                    .celebration-bubble,
+                    .celebration-burst,
+                    .cancel-bar-glow,
+                    .cancel-stripes,
+                    .cancel-step-dot,
+                    .cancel-pulse,
+                    .cancel-pulse-soft {
+                        animation: none !important;
+                        transform: none !important;
+                    }
+                }
+
+                @keyframes pageSettle {
+                    0% {
+                        opacity: 0;
+                    }
+                    100% {
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes heroRise {
+                    0% {
+                        opacity: 0;
+                        transform: translate3d(0, 14px, 0) scale(0.992);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate3d(0, 0, 0) scale(1);
+                    }
+                }
+
+                @keyframes orbDrift {
+                    0%,
+                    100% {
+                        transform: translate3d(0, 0, 0);
+                    }
+                    50% {
+                        transform: translate3d(-7px, 8px, 0);
+                    }
+                }
+
+                @keyframes orbDriftSoft {
+                    0%,
+                    100% {
+                        transform: translate3d(0, 0, 0);
+                    }
+                    50% {
+                        transform: translate3d(6px, -8px, 0);
+                    }
+                }
+
+                @keyframes heroIconFloat {
+                    0%,
+                    100% {
+                        transform: translate3d(0, 0, 0);
+                    }
+                    50% {
+                        transform: translate3d(0, -4px, 0);
+                    }
+                }
+
+                @keyframes timelineSweep {
+                    0% {
+                        transform: translateX(-120%);
+                    }
+                    100% {
+                        transform: translateX(120%);
+                    }
+                }
+
+                @keyframes itemFadeIn {
+                    0% {
+                        opacity: 0;
+                        transform: translate3d(0, 10px, 0);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translate3d(0, 0, 0);
+                    }
+                }
+
+                @keyframes overlayFade {
+                    0% {
+                        opacity: 0;
+                    }
+                    100% {
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes cardFloat {
+                    0%,
+                    100% {
+                        transform: translate3d(0, 0, 0);
+                    }
+                    50% {
+                        transform: translate3d(0, -4px, 0);
+                    }
+                }
+
+                @keyframes cancelGlow {
+                    0%,
+                    100% {
+                        filter: brightness(1);
+                    }
+                    50% {
+                        filter: brightness(1.15);
+                    }
+                }
+
+                @keyframes cancelStripeSlide {
+                    0% {
+                        background-position: 0 0;
+                    }
+                    100% {
+                        background-position: 40px 0;
+                    }
+                }
+
+                @keyframes cancelDotPulse {
+                    0%,
+                    100% {
+                        transform: scale(1);
+                        opacity: 1;
+                    }
+                    50% {
+                        transform: scale(1.18);
+                        opacity: 0.72;
+                    }
+                }
+
+                @keyframes cancelPulse {
+                    0%,
+                    100% {
+                        transform: scale(1);
+                        opacity: 0.95;
+                    }
+                    50% {
+                        transform: scale(1.12);
+                        opacity: 0.72;
                     }
                 }
             `}</style>
