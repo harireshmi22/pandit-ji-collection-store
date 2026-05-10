@@ -18,7 +18,35 @@ const nextConfig = {
         pathname: '**',
       },
     ],
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  env: {
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  },
+  compress: true,
+  productionBrowserSourceMaps: false,
+  experimental: {
+    optimizeCss: true,
+  },
+  headers: async () => [
+    {
+      source: '/(.*)',
+      headers: [
+        {
+          key: 'X-DNS-Prefetch-Control',
+          value: 'on'
+        },
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff'
+        }
+      ]
+    }
+  ]
 };
 
 export default nextConfig;
