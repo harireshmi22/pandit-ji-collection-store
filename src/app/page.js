@@ -1,9 +1,23 @@
 import Navbar from './components/home/Navbar';
 import HeroBanner from './components/home/HeroBanner';
 import ProductSwiper from './components/home/ProductSwiper';
-import NewArrival from './components/NewArrival';
-import FeaturedDeals from './components/home/FeaturedDeals';
-import Footer from './components/home/Footer';
+import { Suspense } from 'react';
+import dynamic from 'next/dynamic';
+
+const NewArrival = dynamic(() => import('./components/NewArrival'), {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: true
+});
+
+const FeaturedDeals = dynamic(() => import('./components/home/FeaturedDeals'), {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: true
+});
+
+const Footer = dynamic(() => import('./components/home/Footer'), {
+    loading: () => <div className="h-64 bg-gray-100 animate-pulse" />,
+    ssr: true
+});
 
 export default function Home() {
     return (
@@ -11,10 +25,16 @@ export default function Home() {
             <Navbar />
             <HeroBanner />
             <ProductSwiper title='Trending Now' />
-            <FeaturedDeals />
-            <NewArrival />
+            <Suspense fallback={<div className="h-96 bg-gray-100 animate-pulse" />}>
+                <FeaturedDeals />
+            </Suspense>
+            <Suspense fallback={<div className="h-96 bg-gray-100 animate-pulse" />}>
+                <NewArrival />
+            </Suspense>
             <ProductSwiper title='Best Sellers' sort='popular' />
-            <Footer />
+            <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse" />}>
+                <Footer />
+            </Suspense>
         </div>
     );
 }
