@@ -6,7 +6,12 @@ import AuthProvider from '@/context/AuthProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CartSidebar from '@/components/cart/CartSidebar';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({
+    subsets: ['latin'],
+    variable: '--font-inter',
+    display: 'swap',
+    preload: true
+});
 
 export const metadata = {
     title: 'Pandit Ji Collection',
