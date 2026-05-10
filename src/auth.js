@@ -1,6 +1,7 @@
 
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
 import { dbConnect } from "@/lib/dbConnect"
 import User from "@/models/User"
 import { authConfig } from "./auth.config"
@@ -10,13 +11,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     trustHost: true,
     providers: [
 
+        Google({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+
         // Credentials Provider what does mean 
         Credentials({
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
             },
-
 
             // authorize: async (credentials) => {
             //     return null
@@ -37,7 +42,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     // 2. Find user by email
                     const user = await User.findOne({ email }).select("+password")
 
-                    // 3. If no user found, return null 
+                    // 3. If no User found, return null 
                     if (!user) {
                         console.log("User not found:", credentials.email)
                         return null
