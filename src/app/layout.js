@@ -7,6 +7,8 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import CartSidebar from '@/components/cart/CartSidebar';
 import ErrorHandler from '@/components/ErrorHandler';
 import PerformanceOptimizer from '@/components/PerformanceOptimizer';
+import CLSOptimizer from '@/components/CLSOptimizer';
+import AggressiveCLSOptimizer from '@/components/AggressiveCLSOptimizer';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -26,6 +28,8 @@ export default function RootLayout({ children }) {
             <body className={`${inter.variable} font-sans antialiased text-neutral-900`}>
                 <ErrorBoundary>
                     <PerformanceOptimizer />
+                    <CLSOptimizer />
+                    <AggressiveCLSOptimizer />
                     <ErrorHandler />
                     <AuthProvider>
                         <CartProvider>

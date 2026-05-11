@@ -67,15 +67,16 @@ export default function CollectionsClient({ products }) {
                             >
                                 <div className='p-4'>
                                     <p className='text-sm text-gray-600 mb-4'>{product.category || 'essential round knit'}</p>
-                                    <div className='relative w-full h-80 bg-gray-100 rounded mb-4 aspect-3-4'>
+                                    <div className='relative w-full bg-gray-100 rounded mb-4' style={{ aspectRatio: '4/5', height: '320px' }}>
                                         {productImage ? (
                                             <Image
-                                                src={productImage}
+                                                src={`${productImage}?w=320&h=400&fit=crop&q=85&auto=format`}
                                                 alt={product.name}
                                                 fill
                                                 className="object-cover rounded"
                                                 sizes="320px"
                                                 quality={85}
+                                                loading="lazy"
                                             />
                                         ) : (
                                             <div className='absolute inset-0 flex items-center justify-center'>

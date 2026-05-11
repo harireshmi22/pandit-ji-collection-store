@@ -58,7 +58,7 @@ export default function Navbar() {
             try {
                 setSuggestionsLoading(true)
                 const params = new URLSearchParams({ q, suggest: 'true' })
-                const res = await fetch(`/api/search?${params.toString()}`, { signal: controller.signal })
+                const res = await fetch(`/api/search?${String(params)}`, { signal: controller.signal })
                 const data = await res.json()
                 if (data.success) {
                     setSuggestions(data.data || [])

@@ -24,7 +24,13 @@ export default function NewArrival() {
                                 Shop New Arrivals <ArrowRight className='w-4 h-4' />
                             </Link>
                         </div>
-                        <div className='text-6xl sm:text-7xl md:text-9xl font-bold text-blue-700/20 select-none'>NEW</div>
+                        <div className='text-6xl sm:text-7xl md:text-9xl font-bold text-blue-700/20 select-none' style={{
+                            contain: 'layout',
+                            width: 'fit-content',
+                            height: 'fit-content',
+                            minWidth: '120px',
+                            minHeight: '80px'
+                        }}>NEW</div>
                     </div>
                 </div>
             </div>

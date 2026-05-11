@@ -70,7 +70,7 @@ function SearchContent() {
             if (maxPrice) params.set('maxPrice', maxPrice)
             if (minRating) params.set('minRating', minRating)
 
-            const res = await fetch(`/api/search?${params.toString()}`)
+            const res = await fetch(`/api/search?${String(params)}`)
             const data = await res.json()
             if (data.success) {
                 setProducts(data.data || [])
@@ -120,7 +120,7 @@ function SearchContent() {
         })
 
         if (resetPage) params.delete('page')
-        router.push(`/search${params.toString() ? `?${params.toString()}` : ''}`)
+        router.push(`/search${params ? `?${String(params)}` : ''}`)
     }
 
     const handleSearchSubmit = (e) => {

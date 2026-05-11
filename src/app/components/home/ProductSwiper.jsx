@@ -68,7 +68,7 @@ export default function ProductSwiper({ title = 'Trending Now', category, sort, 
                 params.append('limit', String(limit || 8));
                 if (category) params.append('category', category);
                 if (sort) params.append('sort', sort);
-                const res = await fetch(`/api/products?${params.toString()}`);
+                const res = await fetch(`/api/products?${String(params)}`);
                 const data = await res.json();
                 if (data.success && data.data?.length > 0) {
                     // Exclude current product for "You May Also Like"

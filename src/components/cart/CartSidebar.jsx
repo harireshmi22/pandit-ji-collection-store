@@ -34,8 +34,8 @@ export default function CartSidebar() {
                         ) : (
                             cartItems.map(item => (
                                 <div key={`${item.id}-${item.selectedSize}`} className='flex gap-3 pb-4 border-b border-neutral-50'>
-                                    <div className='w-16 h-20 bg-neutral-100 shrink-0 relative rounded-xl overflow-hidden'>
-                                        <Image src={item.image} fill className='object-cover' alt={item.name} sizes='64px' quality={85} />
+                                    <div className='w-16 h-20 bg-neutral-100 shrink-0 relative rounded-xl overflow-hidden' style={{ aspectRatio: '4/5' }}>
+                                        <Image src={`${item.image}?w=64&h=80&fit=crop&q=85&auto=format`} fill className='object-cover' alt={item.name} sizes='64px' quality={85} loading="lazy" />
                                     </div>
                                     <div className='flex-1 flex flex-col justify-between min-w-0'>
                                         <h3 className='text-xs font-medium text-neutral-900 truncate'>{item.name}</h3>

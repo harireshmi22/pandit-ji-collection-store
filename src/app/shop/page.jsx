@@ -37,7 +37,7 @@ const ShopPageContent = () => {
             params.append('page', String(currentPage))
             params.append('limit', String(pageLimit))
             params.append('fields', 'card')
-            const res = await fetch(`/api/products${params.toString() ? '?' + params.toString() : ''}`)
+            const res = await fetch(`/api/products${params ? '?' + String(params) : ''}`)
             const data = await res.json()
             if (data.success) {
                 setProducts(data.data)
@@ -58,14 +58,14 @@ const ShopPageContent = () => {
         if (cat === 'All') params.delete('category')
         else params.set('category', cat)
         params.delete('page')
-        router.push(`/shop${params.toString() ? '?' + params.toString() : ''}`)
+        router.push(`/shop${params ? '?' + String(params) : ''}`)
     }
 
     const setPage = (page) => {
         const params = new URLSearchParams(searchParams ? String(searchParams) : '')
         if (page <= 1) params.delete('page')
         else params.set('page', String(page))
-        router.push(`/shop${params.toString() ? '?' + params.toString() : ''}`)
+        router.push(`/shop${params ? '?' + String(params) : ''}`)
     }
 
     const pageNumbers = Array.from({ length: pagination.pages || 0 }, (_, index) => index + 1)

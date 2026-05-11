@@ -29,10 +29,34 @@
 }
 
 /* Font display optimization to prevent CLS */
+/* Improve LCP by preloading critical fonts */
 @font-face {
   font-family: 'Inter';
   font-display: swap;
   src: local('Inter'), url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+}
+
+/* Prevent font loading CLS */
+.font-fallback {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Reserve space for font loading */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+}
+
+/* Prevent text jumps during font loading */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+div {
+  font-family: inherit;
 }
 
 /* Prevent CLS by reserving space for images */
@@ -121,6 +145,66 @@ h6 {
 }
 
 /* Prevent layout shifts from dynamic content */
+.skeleton {
+  contain: layout;
+  overflow: hidden;
+}
+
+/* Comprehensive CLS prevention */
+[data-dynamic] {
+  contain: layout;
+}
+
+/* Reserve space for lazy loaded content */
+[loading="lazy"] {
+  contain-intrinsic-size: 400px 500px;
+}
+
+/* Prevent layout shifts in grid layouts */
+.grid>* {
+  contain: layout;
+}
+
+/* Fix aspect ratio consistency */
+.aspect-3-4,
+.aspect-4-5,
+.aspect-4-3 {
+  contain: layout;
+}
+
+/* Prevent text jumps */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  contain: layout style;
+}
+
+/* Optimize images for CLS */
+img {
+  contain: layout;
+}
+
+/* Prevent layout shifts in flex containers */
+.flex>* {
+  contain: layout;
+}
+
+/* Skeleton loading optimizations */
+.animate-pulse {
+  contain: layout;
+}
+
+/* Prevent layout shifts in buttons */
+button,
+a {
+  contain: layout style;
+}
+
+/* Skeleton loading animation */
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200% 100%;

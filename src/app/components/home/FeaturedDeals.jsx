@@ -42,7 +42,7 @@ export default function FeaturedDeals() {
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                         {[1, 2].map(i => (
                             <div key={i} className='animate-pulse'>
-                                <div className='aspect-4/3 bg-neutral-200 rounded-2xl' />
+                                <div className='bg-neutral-200 rounded-2xl' style={{ aspectRatio: '4/5' }} />
                                 <div className='h-4 bg-neutral-200 rounded w-3/4 mt-4' />
                                 <div className='h-3 bg-neutral-200 rounded w-1/2 mt-2' />
                             </div>
@@ -70,13 +70,14 @@ export default function FeaturedDeals() {
                         const productImage = getProductImage(product);
                         return (
                             <Link key={productId} href={`/shop/${productId}`} className='group block rounded-2xl p-2.5 bg-white border border-neutral-200 shadow-sm hover:shadow-[0_16px_30px_-18px_rgba(37,99,235,0.42)] transition-all'>
-                                <div className='relative aspect-4/3 overflow-hidden rounded-2xl bg-neutral-100'>
+                                <div className='relative overflow-hidden rounded-2xl bg-neutral-100' style={{ aspectRatio: '4/5' }}>
                                     <Image
-                                        src={productImage}
+                                        src={`${productImage}?w=400&h=500&fit=crop&q=85&auto=format`}
                                         alt={product.name}
                                         fill
                                         className='object-cover transition-transform duration-500 group-hover:scale-105'
                                         sizes='(max-width: 768px) 100vw, 50vw'
+                                        loading="lazy"
                                     />
                                     <div className='absolute inset-0 bg-black/0 group-hover:bg-black/3 transition-colors duration-300' />
                                 </div>
