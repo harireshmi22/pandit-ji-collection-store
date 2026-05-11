@@ -29,7 +29,7 @@ jobs:
       run: npm run build
       env:
         NEXTAUTH_SECRET: test-secret-key-for-ci
-        NEXTAUTH_URL: http://localhost:3000
+        AUTH_URL: http://localhost:3000
         MONGODB_URI: mongodb://localhost:27017/test
         RESEND_API_KEY: re_dummy_key_for_ci
 

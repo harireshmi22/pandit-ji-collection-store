@@ -2,7 +2,7 @@ import { dbConnect } from "@/lib/dbConnect";
 import Product from "@/models/Product";
 
 export default async function sitemap() {
-    const baseUrl = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://panditjicollection.com";
+    const baseUrl = process.env.AUTH_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://panditjicollection.com";
 
     // Static routes
     const routes = [

@@ -1,5 +1,5 @@
 export default function robots() {
-    const baseUrl = process.env.NEXTAUTH_URL || "https://panditjicollection.com";
+    const baseUrl = process.env.AUTH_URL || "https://panditjicollection.com";
 
     return {
         rules: {
