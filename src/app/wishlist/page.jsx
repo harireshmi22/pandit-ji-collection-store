@@ -33,7 +33,7 @@ export default function WishlistPage() {
                     <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4'>
                         {[...Array(4)].map((_, index) => (
                             <div key={index} className='animate-pulse'>
-                                <div className='aspect-3/4 bg-neutral-100 rounded-2xl mb-2' />
+                                <div className='aspect-3-4 bg-neutral-100 rounded-2xl mb-2' />
                                 <div className='h-3 bg-neutral-100 rounded w-3/4 mb-1' />
                                 <div className='h-3 bg-neutral-100 rounded w-1/2' />
                             </div>

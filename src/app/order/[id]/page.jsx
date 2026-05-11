@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -19,10 +18,16 @@ export default function OrderDetailPage() {
     const [error, setError] = useState(null)
     const [showCelebration, setShowCelebration] = useState(false)
     const [soundEnabled, setSoundEnabled] = useState(false)
+    const [mounted, setMounted] = useState(false)
     const soundPlayedRef = useRef(false)
+    const pollingRef = useRef(null)
 
     const isSuccessVisit = searchParams.get('success') === '1'
     const paymentSource = searchParams.get('payment')
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     useEffect(() => {
         if (!params.id) return
@@ -39,51 +44,52 @@ export default function OrderDetailPage() {
             })()
     }, [params.id])
 
+    // Disabled polling to prevent constant re-renders and animation interruption
+    // useEffect(() => {
+    //     if (!params.id || !order?._id) return
+    //     if (order.status === 'Delivered' || order.status === 'Cancelled') return
+
+    //     const intervalId = setInterval(async () => {
+    //         try {
+    //             const res = await fetch(`/api/orders/${params.id}`, { cache: 'no-store' })
+    //             if (!res.ok) return
+    //             const latest = await res.json()
+    //             setOrder((prev) => {
+    //                 if (!prev) return latest
+    //                 if (prev.status === latest.status && prev.updatedAt === latest.updatedAt) return prev
+    //                 return latest
+    //             })
+    //         } catch {
+    //             // Silent polling failure; next interval will retry.
+    //         }
+    //     }, 15000)
+
+    //     return () => clearInterval(intervalId)
+    // }, [params.id, order?._id, order?.status])
+
     useEffect(() => {
-        if (!params.id || !order?._id) return
-        if (order.status === 'Delivered' || order.status === 'Cancelled') return
-
-        const intervalId = setInterval(async () => {
-            try {
-                const res = await fetch(`/api/orders/${params.id}`, { cache: 'no-store' })
-                if (!res.ok) return
-                const latest = await res.json()
-                setOrder((prev) => {
-                    if (!prev) return latest
-                    if (prev.status === latest.status && prev.updatedAt === latest.updatedAt) return prev
-                    return latest
-                })
-            } catch {
-                // Silent polling failure; next interval will retry.
-            }
-        }, 15000)
-
-        return () => clearInterval(intervalId)
-    }, [params.id, order?._id, order?.status])
-
-    useEffect(() => {
-        if (!order?._id || !isSuccessVisit) return
+        if (!mounted || !order?._id || !isSuccessVisit) return
 
         const storageKey = `order-celebration-${order._id}`
-        const alreadyCelebrated = typeof window !== 'undefined' && sessionStorage.getItem(storageKey)
+        const alreadyCelebrated = localStorage.getItem(storageKey)
         if (alreadyCelebrated) return
 
         setShowCelebration(true)
-        sessionStorage.setItem(storageKey, '1')
-    }, [order?._id, isSuccessVisit])
+        localStorage.setItem(storageKey, '1')
+    }, [order?._id, isSuccessVisit, mounted])
 
     useEffect(() => {
-        if (typeof window === 'undefined') return
+        if (!mounted) return
         setSoundEnabled(localStorage.getItem('celebration-sound-enabled') === '1')
-    }, [])
+    }, [mounted])
 
     useEffect(() => {
-        if (typeof window === 'undefined') return
+        if (!mounted) return
         localStorage.setItem('celebration-sound-enabled', soundEnabled ? '1' : '0')
-    }, [soundEnabled])
+    }, [soundEnabled, mounted])
 
     const playSuccessChime = () => {
-        if (typeof window === 'undefined') return
+        if (!mounted) return
 
         const AudioContextClass = window.AudioContext || window.webkitAudioContext
         if (!AudioContextClass) return
@@ -221,12 +227,24 @@ export default function OrderDetailPage() {
         : (isCodPending
             ? 'Pay on delivery'
             : (isPaymentPaid ? 'Payment received' : 'Awaiting payment'))
-    const heroTitle = isCancelled ? 'Your order is cancelled' : (isDelivered ? 'Your order is delivered' : 'Your order is on the way')
+    const heroTitle = isCancelled
+        ? 'Your order is cancelled'
+        : (isDelivered
+            ? 'Your order is delivered'
+            : (order.status === 'Shipped'
+                ? 'Your order is on the way'
+                : (order.status === 'Processing'
+                    ? 'Your order is being prepared'
+                    : 'Your order is confirmed')))
     const heroSubtitle = isCancelled
         ? 'This order has been cancelled. If money was deducted, it will be refunded as per payment method.'
         : (isDelivered
             ? 'Delivered successfully. Payment received and order completed.'
-            : 'We are preparing your package and will notify you at each step.')
+            : (order.status === 'Shipped'
+                ? 'Your package has been dispatched and is on the way.'
+                : (order.status === 'Processing'
+                    ? 'We are preparing your package and will notify you at each step.'
+                    : 'We have received your order and it is waiting to move into processing.')))
     const cancelQuickMessage = 'Yeah, your order is cancelled.'
 
     return (
@@ -237,67 +255,67 @@ export default function OrderDetailPage() {
                     <ArrowLeft className='w-4 h-4' /> All Orders
                 </Link>
 
-                <div className={`relative overflow-hidden rounded-3xl px-5 sm:px-7 py-7 sm:py-8 mb-6 animate-fade-up hero-card-entrance ${isCancelled
-                    ? 'border border-red-100/90 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(254,242,242,0.93),rgba(255,228,230,0.84))]'
-                    : 'border border-blue-100/80 bg-[linear-gradient(145deg,rgba(255,255,255,0.94),rgba(239,246,255,0.92),rgba(224,242,254,0.8))]'
+                <div className={`relative overflow-hidden rounded-2xl sm:rounded-3xl px-4 sm:px-5 lg:px-7 py-6 sm:py-7 lg:py-8 mb-6 hero-card-entrance ${isCancelled
+                    ? 'border border-red-100/90 bg-gradient-to-br from-white via-red-50 to-red-100/70'
+                    : 'border border-blue-100/80 bg-gradient-to-br from-white via-blue-50 to-blue-100/60'
                     }`}>
-                    <div className={`absolute -top-10 -right-10 w-44 h-44 rounded-full blur-2xl pointer-events-none hero-orb-drift ${isCancelled ? 'bg-red-300/20' : 'bg-blue-300/20'}`} />
-                    <div className={`absolute -bottom-12 -left-10 w-48 h-48 rounded-full blur-2xl pointer-events-none hero-orb-drift-soft ${isCancelled ? 'bg-rose-300/20' : 'bg-cyan-300/20'}`} />
+                    <div className={`absolute -top-12 sm:-top-10 -right-12 sm:-right-10 w-40 sm:w-44 h-40 sm:h-44 rounded-full blur-2xl pointer-events-none hero-orb-drift ${isCancelled ? 'bg-red-300/20' : 'bg-blue-300/20'}`} />
+                    <div className={`absolute -bottom-16 sm:-bottom-12 -left-12 sm:-left-10 w-44 sm:w-48 h-44 sm:h-48 rounded-full blur-2xl pointer-events-none hero-orb-drift-soft ${isCancelled ? 'bg-rose-300/20' : 'bg-cyan-300/20'}`} />
 
-                    <div className='relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6'>
-                        <div>
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 text-[11px] font-semibold uppercase tracking-[0.14em] mb-3 ${isCancelled ? 'border border-red-100 text-red-700' : 'border border-blue-100 text-blue-700'
+                    <div className='relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6'>
+                        <div className='flex-1'>
+                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] mb-3 ${isCancelled ? 'border border-red-100 text-red-700' : 'border border-blue-100 text-blue-700'
                                 }`}>
-                                {isCancelled ? <XCircle className='w-3.5 h-3.5' /> : <Sparkles className='w-3.5 h-3.5' />} {isCancelled ? 'Order Cancelled' : 'Order Confirmed'}
+                                {isCancelled ? <XCircle className='w-3 sm:w-3.5 h-3 sm:h-3.5' /> : <Sparkles className='w-3 sm:w-3.5 h-3 sm:h-3.5' />} {isCancelled ? 'Order Cancelled' : 'Order Confirmed'}
                             </div>
-                            <h1 className='text-3xl sm:text-4xl font-bold text-neutral-900 leading-tight'>{heroTitle}</h1>
-                            <p className='text-sm text-neutral-600 mt-2'>
+                            <h1 className='text-2xl sm:text-3xl lg:text-4xl font-bold text-neutral-900 leading-tight'>{heroTitle}</h1>
+                            <p className='text-xs sm:text-sm text-neutral-600 mt-2'>
                                 Order #{order._id.slice(-8).toUpperCase()} &middot; {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </p>
                             {isCancelled && (
-                                <p className='text-sm font-semibold text-red-600 mt-1.5 inline-flex items-center gap-1.5'>
-                                    <XCircle className='w-4 h-4' /> {cancelQuickMessage}
+                                <p className='text-xs sm:text-sm font-semibold text-red-600 mt-1.5 inline-flex items-center gap-1.5'>
+                                    <XCircle className='w-3.5 sm:w-4 h-3.5 sm:h-4' /> {cancelQuickMessage}
                                 </p>
                             )}
                             <p className='text-xs text-neutral-500 mt-1'>{heroSubtitle}</p>
                         </div>
 
-                        <div className='relative w-20 h-20 sm:w-24 sm:h-24 shrink-0 mx-auto sm:mx-0 hero-icon-float'>
+                        <div className='relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 shrink-0 mx-auto sm:mx-0 hero-icon-float'>
                             <div className={`absolute inset-0 rounded-full ${isCancelled ? 'bg-red-200/60 cancel-pulse' : 'bg-blue-200/50 animate-ping'}`} />
                             <div className={`absolute inset-2 rounded-full ${isCancelled ? 'bg-rose-200/45 cancel-pulse-soft' : 'bg-cyan-200/40 animate-pulse'}`} />
                             <div className={`relative w-full h-full rounded-full text-white flex items-center justify-center ${isCancelled
                                 ? 'bg-red-600 shadow-[0_18px_34px_-16px_rgba(220,38,38,0.75)]'
                                 : 'bg-blue-600 shadow-[0_18px_34px_-16px_rgba(37,99,235,0.75)]'
                                 }`}>
-                                {isCancelled ? <XCircle className='w-10 h-10' /> : <CheckCircle className='w-10 h-10' />}
+                                {isCancelled ? <XCircle className='w-8 sm:w-10 h-8 sm:h-10' /> : <CheckCircle className='w-8 sm:w-10 h-8 sm:h-10' />}
                             </div>
                         </div>
                     </div>
 
-                    <div className='grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-6'>
-                        <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
-                            <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Total</p>
-                            <p className='text-sm font-semibold text-neutral-900 mt-0.5'>₹{order.totalPrice?.toFixed(2)}</p>
+                    <div className='grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mt-4 sm:mt-6'>
+                        <div className='rounded-lg sm:rounded-xl border border-blue-100 bg-white/80 px-2 sm:px-3 py-2 sm:py-2.5'>
+                            <p className='text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500'>Total</p>
+                            <p className='text-xs sm:text-sm font-semibold text-neutral-900 mt-0.5'>₹{order.totalPrice?.toFixed(2)}</p>
                         </div>
-                        <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
-                            <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Payment</p>
-                            <p className={`text-sm font-semibold mt-0.5 ${paymentStatusTextClass}`}>{paymentStatusText}</p>
+                        <div className='rounded-lg sm:rounded-xl border border-blue-100 bg-white/80 px-2 sm:px-3 py-2 sm:py-2.5'>
+                            <p className='text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500'>Payment</p>
+                            <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${paymentStatusTextClass}`}>{paymentStatusText}</p>
                         </div>
-                        <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
-                            <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Method</p>
-                            <p className='text-sm font-semibold text-neutral-900 mt-0.5 truncate'>{order.paymentMethod}</p>
+                        <div className='rounded-lg sm:rounded-xl border border-blue-100 bg-white/80 px-2 sm:px-3 py-2 sm:py-2.5'>
+                            <p className='text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500'>Method</p>
+                            <p className='text-xs sm:text-sm font-semibold text-neutral-900 mt-0.5 truncate'>{order.paymentMethod}</p>
                         </div>
-                        <div className='rounded-xl border border-blue-100 bg-white/80 px-3 py-2.5'>
-                            <p className='text-[10px] uppercase tracking-wider text-neutral-500'>Status</p>
-                            <p className={`text-sm font-semibold mt-0.5 ${isCancelled ? 'text-red-600' : 'text-neutral-900'}`}>{order.status}</p>
+                        <div className='rounded-lg sm:rounded-xl border border-blue-100 bg-white/80 px-2 sm:px-3 py-2 sm:py-2.5'>
+                            <p className='text-[8px] sm:text-[10px] uppercase tracking-wider text-neutral-500'>Status</p>
+                            <p className={`text-xs sm:text-sm font-semibold mt-0.5 ${isCancelled ? 'text-red-600' : 'text-neutral-900'}`}>{order.status}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className='rounded-2xl border border-neutral-200/90 bg-white p-4 sm:p-5 mb-6 animate-fade-up delay-100'>
-                    <div className='flex items-center justify-between mb-3'>
-                        <h2 className='text-sm font-semibold text-neutral-900 inline-flex items-center gap-2'>
-                            <CalendarClock className='w-4 h-4 text-blue-600' /> Delivery Timeline
+                <div className='rounded-xl sm:rounded-2xl border border-neutral-200/90 bg-white p-3 sm:p-4 lg:p-5 mb-6'>
+                    <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-3'>
+                        <h2 className='text-xs sm:text-sm font-semibold text-neutral-900 inline-flex items-center gap-2'>
+                            <CalendarClock className='w-3.5 sm:w-4 h-3.5 sm:h-4 text-blue-600' /> Delivery Timeline
                         </h2>
                         <span className={`text-xs ${isCancelled ? 'text-red-600 font-medium' : 'text-neutral-500'}`}>
                             {isCancelled ? 'Order cancelled' : 'Live progress'}
@@ -330,20 +348,20 @@ export default function OrderDetailPage() {
                     </div>
                 </div>
 
-                <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 border border-gray-200 rounded-2xl'>
-                    <div className='lg:col-span-2 space-y-6'>
+                <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 border border-gray-200 rounded-xl sm:rounded-2xl p-0'>
+                    <div className='lg:col-span-2 space-y-4 sm:space-y-6'>
                         {/* Items */}
-                        <div className='border border-neutral-100 rounded-2xl overflow-hidden bg-white animate-fade-up delay-200'>
-                            <div className='px-5 py-4 border-b border-neutral-100 flex items-center gap-2'>
+                        <div className='border border-neutral-100 rounded-xl sm:rounded-2xl overflow-hidden bg-white'>
+                            <div className='px-4 sm:px-5 py-3 sm:py-4 border-b border-neutral-100 flex items-center gap-2'>
                                 <Package className='w-4 h-4 text-neutral-400' />
-                                <h2 className='text-sm font-semibold text-neutral-900'>Items ({order.orderItems?.length})</h2>
+                                <h2 className='text-xs sm:text-sm font-semibold text-neutral-900'>Items ({order.orderItems?.length})</h2>
                             </div>
                             {isCancelled && (
-                                <div className='mx-5 mt-4 rounded-xl border border-red-100 bg-red-50/80 px-3 py-2.5'>
-                                    <p className='text-sm font-semibold text-red-700 inline-flex items-center gap-1.5'>
-                                        <XCircle className='w-4 h-4' /> Order is cancelled
+                                <div className='mx-3 sm:mx-5 mt-3 sm:mt-4 rounded-lg sm:rounded-xl border border-red-100 bg-red-50/80 px-3 py-2 sm:py-2.5'>
+                                    <p className='text-xs sm:text-sm font-semibold text-red-700 inline-flex items-center gap-1.5'>
+                                        <XCircle className='w-3.5 sm:w-4 h-3.5 sm:h-4' /> Order is cancelled
                                     </p>
-                                    <p className='text-xs text-red-600 mt-1'>
+                                    <p className='text-[11px] sm:text-xs text-red-600 mt-1'>
                                         {isRefundFlow
                                             ? (isRefunded ? 'Payment refunded for cancelled items.' : 'Refund is in progress for cancelled items.')
                                             : 'No charge was applied to cancelled items.'}
@@ -352,25 +370,25 @@ export default function OrderDetailPage() {
                             )}
                             <div className='divide-y divide-neutral-50'>
                                 {order.orderItems?.map((item, i) => (
-                                    <div key={i} className='p-5 flex gap-4 group hover:bg-blue-50/25 transition-colors item-row-enter' style={{ animationDelay: `${0.06 * (i + 1)}s` }}>
-                                        <div className='relative w-16 h-20 rounded-xl bg-neutral-100 overflow-hidden shrink-0'>
+                                    <div key={i} className='p-3 sm:p-5 flex gap-3 sm:gap-4 group hover:bg-blue-50/25 transition-colors item-row-enter' style={{ animationDelay: `${0.06 * (i + 1)}s` }}>
+                                        <div className='relative w-14 sm:w-16 h-16 sm:h-20 rounded-lg sm:rounded-xl bg-neutral-100 overflow-hidden shrink-0'>
                                             {item.image && !item.image.includes('placehold.co') ? (
                                                 <Image src={item.image} alt={item.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' quality={85} />
                                             ) : null}
                                             <div className={`w-full h-full items-center justify-center ${item.image && !item.image.includes('placehold.co') ? 'hidden' : 'flex'}`}>
-                                                <Package className='w-5 h-5 text-neutral-300' />
+                                                <Package className='w-4 sm:w-5 h-4 sm:h-5 text-neutral-300' />
                                             </div>
                                         </div>
                                         <div className='flex-1 min-w-0'>
                                             <div className='flex items-start justify-between gap-2'>
-                                                <h3 className='text-sm font-medium text-neutral-900 truncate'>{item.name}</h3>
-                                                <span className={`shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold ${itemStatusToneClass}`}>
+                                                <h3 className='text-xs sm:text-sm font-medium text-neutral-900 truncate'>{item.name}</h3>
+                                                <span className={`shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-[8px] sm:text-[10px] font-semibold ${itemStatusToneClass}`}>
                                                     {itemStatusLabel}
                                                 </span>
                                             </div>
-                                            <p className='text-xs text-neutral-400 mt-0.5'>Size: {item.size || 'M'} &middot; Qty: {item.quantity}</p>
-                                            <p className='text-sm font-semibold text-neutral-900 mt-1'>₹{item.price?.toFixed(2)}</p>
-                                            <p className={`text-[11px] mt-1 ${isCancelled ? 'text-red-600' : 'text-neutral-500'}`}>{itemPaymentInfo}</p>
+                                            <p className='text-[11px] sm:text-xs text-neutral-400 mt-0.5'>Size: {item.size || 'M'} &middot; Qty: {item.quantity}</p>
+                                            <p className='text-xs sm:text-sm font-semibold text-neutral-900 mt-1'>₹{item.price?.toFixed(2)}</p>
+                                            <p className={`text-[10px] sm:text-[11px] mt-1 ${isCancelled ? 'text-red-600' : 'text-neutral-500'}`}>{itemPaymentInfo}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -378,31 +396,31 @@ export default function OrderDetailPage() {
                         </div>
 
                         {/* Shipping & Payment */}
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                            <div className='border border-neutral-100 rounded-2xl p-5 bg-white animate-fade-up delay-300'>
+                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4'>
+                            <div className='border border-neutral-100 rounded-lg sm:rounded-2xl p-4 sm:p-5 bg-white'>
                                 <div className='flex items-center gap-2 mb-3'>
-                                    <Truck className='w-4 h-4 text-neutral-400' />
-                                    <h3 className='text-sm font-semibold text-neutral-900'>Shipping</h3>
+                                    <Truck className='w-3.5 sm:w-4 h-3.5 sm:h-4 text-neutral-400' />
+                                    <h3 className='text-xs sm:text-sm font-semibold text-neutral-900'>Shipping</h3>
                                 </div>
-                                <div className='text-sm text-neutral-600 space-y-0.5'>
+                                <div className='text-xs sm:text-sm text-neutral-600 space-y-0.5'>
                                     <p className='font-medium text-neutral-900'>{order.shippingAddress?.fullName}</p>
                                     <p>{order.shippingAddress?.address}</p>
                                     <p>{order.shippingAddress?.city}, {order.shippingAddress?.postalCode}</p>
                                     <p>{order.shippingAddress?.country}</p>
                                 </div>
                             </div>
-                            <div className='border border-neutral-100 rounded-2xl p-5 bg-white animate-fade-up delay-300'>
+                            <div className='border border-neutral-100 rounded-lg sm:rounded-2xl p-4 sm:p-5 bg-white'>
                                 <div className='flex items-center gap-2 mb-3'>
-                                    <CreditCard className='w-4 h-4 text-neutral-400' />
-                                    <h3 className='text-sm font-semibold text-neutral-900'>Payment</h3>
+                                    <CreditCard className='w-3.5 sm:w-4 h-3.5 sm:h-4 text-neutral-400' />
+                                    <h3 className='text-xs sm:text-sm font-semibold text-neutral-900'>Payment</h3>
                                 </div>
-                                <div className='text-sm text-neutral-600 space-y-1'>
+                                <div className='text-xs sm:text-sm text-neutral-600 space-y-1'>
                                     <p>{order.paymentMethod}</p>
-                                    <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full ${paymentBadgeToneClass}`}>
+                                    <span className={`inline-block text-[10px] sm:text-xs font-medium px-2 py-0.5 rounded-full ${paymentBadgeToneClass}`}>
                                         {paymentBadgeLabel}
                                     </span>
-                                    <div className='pt-3 mt-3 border-t border-neutral-100 text-xs inline-flex items-center gap-1.5 text-neutral-500'>
-                                        <ShieldCheck className={`w-3.5 h-3.5 ${isCancelled ? 'text-red-600' : 'text-emerald-600'}`} /> {paymentHelperText}
+                                    <div className='pt-3 mt-3 border-t border-neutral-100 text-[10px] sm:text-xs inline-flex items-center gap-1.5 text-neutral-500'>
+                                        <ShieldCheck className={`w-3 sm:w-3.5 h-3 sm:h-3.5 ${isCancelled ? 'text-red-600' : 'text-emerald-600'}`} /> {paymentHelperText}
                                     </div>
                                 </div>
                             </div>
@@ -411,19 +429,19 @@ export default function OrderDetailPage() {
 
                     {/* Summary */}
                     <div>
-                        <div className='border border-neutral-100 rounded-2xl p-5 sticky top-24 bg-white animate-fade-up delay-200'>
-                            <h2 className='text-sm font-semibold text-neutral-900 mb-5 pb-4 border-b border-neutral-100'>Order Summary</h2>
-                            <div className='space-y-3 text-sm mb-5'>
+                        <div className='border border-neutral-100 rounded-lg sm:rounded-2xl p-4 sm:p-5 sticky top-20 sm:top-24 bg-white'>
+                            <h2 className='text-xs sm:text-sm font-semibold text-neutral-900 mb-4 sm:mb-5 pb-3 sm:pb-4 border-b border-neutral-100'>Order Summary</h2>
+                            <div className='space-y-2 sm:space-y-3 text-xs sm:text-sm mb-4 sm:mb-5'>
                                 <div className='flex justify-between text-neutral-600'><span>Subtotal</span><span>₹{order.itemsPrice?.toFixed(2)}</span></div>
                                 <div className='flex justify-between text-neutral-600'><span>Shipping</span><span>{order.shippingPrice === 0 ? 'Free' : `₹${order.shippingPrice?.toFixed(2)}`}</span></div>
                                 <div className='flex justify-between text-neutral-600'><span>Tax</span><span>₹{order.taxPrice?.toFixed(2)}</span></div>
                             </div>
-                            <div className='flex justify-between text-lg font-bold text-neutral-900 pt-4 border-t border-neutral-100'>
+                            <div className='flex justify-between text-base sm:text-lg font-bold text-neutral-900 pt-3 sm:pt-4 border-t border-neutral-100'>
                                 <span>Total</span><span>₹{order.totalPrice?.toFixed(2)}</span>
                             </div>
-                            <div className='mt-6 space-y-2'>
-                                <Link href='/orders' className='block w-full text-center py-3 bg-neutral-900 text-white rounded-full text-sm font-medium hover:bg-neutral-800 transition-colors'>All Orders</Link>
-                                <Link href='/shop' className='block w-full text-center py-3 text-neutral-600 text-sm font-medium hover:text-neutral-900 transition-colors'>Continue Shopping</Link>
+                            <div className='mt-4 sm:mt-6 space-y-2'>
+                                <Link href='/orders' className='block w-full text-center py-2.5 sm:py-3 bg-neutral-900 text-white rounded-full text-xs sm:text-sm font-medium hover:bg-neutral-800 transition-colors'>All Orders</Link>
+                                <Link href='/shop' className='block w-full text-center py-2.5 sm:py-3 text-neutral-600 text-xs sm:text-sm font-medium hover:text-neutral-900 transition-colors'>Continue Shopping</Link>
                             </div>
                         </div>
                     </div>

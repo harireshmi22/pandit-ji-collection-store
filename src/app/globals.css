@@ -28,22 +28,25 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Font display optimization to prevent CLS */
-/* Improve LCP by preloading critical fonts */
-@font-face {
-  font-family: 'Inter';
-  font-display: swap;
-  src: local('Inter'), url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-}
-
 /* Prevent font loading CLS */
 .font-fallback {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", sans-serif;
 }
 
 /* Reserve space for font loading */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    sans-serif;
 }
 
 /* Prevent text jumps during font loading */
@@ -88,13 +91,6 @@ img {
 img {
   content-visibility: auto;
   contain-intrinsic-size: 400px 500px;
-}
-
-/* Improve LCP by preloading critical fonts */
-@font-face {
-  font-family: 'Inter';
-  font-display: swap;
-  src: local('Inter');
 }
 
 /* Reduce CLS by preventing text jumps */
@@ -161,7 +157,7 @@ h6 {
 }
 
 /* Prevent layout shifts in grid layouts */
-.grid>* {
+.grid > * {
   contain: layout;
 }
 
@@ -189,7 +185,7 @@ img {
 }
 
 /* Prevent layout shifts in flex containers */
-.flex>* {
+.flex > * {
   contain: layout;
 }
 
@@ -285,6 +281,135 @@ select:focus:not(.no-global-focus) {
   animation-delay: 0.3s;
 }
 
+/* Hero card animations */
+.hero-card-entrance {
+  animation: heroCardEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroCardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-icon-float {
+  animation: heroIconFloat 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes heroIconFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.hero-orb-drift {
+  animation: orbDrift 8s ease-in-out infinite;
+}
+
+@keyframes orbDrift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -20px);
+  }
+}
+
+.hero-orb-drift-soft {
+  animation: orbDriftSoft 10s ease-in-out infinite;
+}
+
+@keyframes orbDriftSoft {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-24px, 16px);
+  }
+}
+
+.cancel-pulse {
+  animation: cancelPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes cancelPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.cancel-pulse-soft {
+  animation: cancelPulseSoft 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes cancelPulseSoft {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.cancel-bar-glow {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.cancel-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 20px
+  );
+  animation: stripeAnimation 2s linear infinite;
+}
+
+@keyframes stripeAnimation {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 20px;
+  }
+}
+
+.timeline-sheen {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: sheen 2s infinite;
+}
+
+@keyframes sheen {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
@@ -306,9 +431,11 @@ select:focus:not(.no-global-focus) {
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 223 100% 58%;
-  --gradient-primary: linear-gradient(135deg,
-      hsl(223 100% 58%),
-      hsl(190 95% 44%));
+  --gradient-primary: linear-gradient(
+    135deg,
+    hsl(223 100% 58%),
+    hsl(190 95% 44%)
+  );
   --gradient-surface: linear-gradient(180deg, #ffffff, #f8fafc);
   --shadow-glow: 0 20px 40px -12px hsl(223 100% 58% / 0.27);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.1);
@@ -337,17 +464,23 @@ body::before {
   pointer-events: none;
   background-image:
     radial-gradient(circle at 8% 12%, rgba(41, 98, 255, 0.14), transparent 34%),
-    radial-gradient(circle at 90% 14%,
+    radial-gradient(
+      circle at 90% 14%,
       rgba(79, 70, 229, 0.12),
-      transparent 32%),
+      transparent 32%
+    ),
     radial-gradient(circle at 52% 88%, rgba(6, 182, 212, 0.1), transparent 36%),
-    radial-gradient(circle at 14% 86%,
+    radial-gradient(
+      circle at 14% 86%,
       rgba(245, 158, 11, 0.09),
-      transparent 26%),
-    linear-gradient(180deg,
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
       var(--bg-base) 0%,
       var(--bg-soft) 58%,
-      var(--bg-warm) 100%),
+      var(--bg-warm) 100%
+    ),
     linear-gradient(90deg, var(--bg-line) 1px, transparent 1px),
     linear-gradient(0deg, var(--bg-line) 1px, transparent 1px);
   background-size:
@@ -384,12 +517,16 @@ body::before {
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 263 70% 56%;
-  --gradient-primary: linear-gradient(135deg,
-      hsl(263 70% 56%),
-      hsl(195 100% 59%));
-  --gradient-surface: linear-gradient(180deg,
-      hsl(222.2 84% 4.9%),
-      hsl(217.2 32.6% 17.5%));
+  --gradient-primary: linear-gradient(
+    135deg,
+    hsl(263 70% 56%),
+    hsl(195 100% 59%)
+  );
+  --gradient-surface: linear-gradient(
+    180deg,
+    hsl(222.2 84% 4.9%),
+    hsl(217.2 32.6% 17.5%)
+  );
   --shadow-glow: 0 20px 40px -12px hsl(263 70% 56% / 0.4);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
   --sidebar-background: 240 5.9% 10%;

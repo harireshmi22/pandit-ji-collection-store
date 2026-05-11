@@ -107,7 +107,7 @@ const ShopPageContent = () => {
                     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>
                         {Array.from({ length: 8 }).map((_, i) => (
                             <div key={i} className='rounded-2xl p-2 bg-white/80 border border-neutral-200/80'>
-                                <div className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />
+                                <div className='aspect-3-4 rounded-2xl bg-neutral-100 animate-pulse' />
                                 <div className='mt-3 px-0.5 space-y-2'>
                                     <div className='h-4 w-3/4 bg-neutral-100 rounded animate-pulse' />
                                     <div className='h-3 w-1/2 bg-neutral-100 rounded animate-pulse' />
@@ -217,7 +217,7 @@ const ShopPageContent = () => {
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={<div className='min-h-screen bg-white'><div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20'><div className='h-8 w-32 rounded bg-neutral-100 animate-pulse mb-8' /><div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>{Array.from({ length: 8 }).map((_, i) => <div key={i} className='aspect-3/4 rounded-2xl bg-neutral-100 animate-pulse' />)}</div></div></div>}>
+        <Suspense fallback={<div className='min-h-screen bg-white'><div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-20'><div className='h-8 w-32 rounded bg-neutral-100 animate-pulse mb-8' /><div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6'>{Array.from({ length: 8 }).map((_, i) => <div key={i} className='aspect-3-4 rounded-2xl bg-neutral-100 animate-pulse' />)}</div></div></div>}>
             <ShopPageContent />
         </Suspense>
     )
