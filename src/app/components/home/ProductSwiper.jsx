@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -18,7 +18,7 @@ const getProductImage = (product) => {
 };
 
 const ProductCard = ({ product }) => {
-    const [imageSrc, setImageSrc] = useState(() => getProductImage(product));
+    const [imageSrc, setImageSrc] = React.useState(() => getProductImage(product));
     const productId = product._id || product.id;
 
     return (

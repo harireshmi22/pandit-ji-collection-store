@@ -1,5 +1,4 @@
-'use client'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, ShieldCheck, Truck, RotateCcw } from 'lucide-react'
@@ -15,30 +14,25 @@ const getProductImage = (product) => {
     return null
 }
 
-export default function HeroBanner() {
-    const [heroProduct, setHeroProduct] = useState(null)
-    const [sideProduct, setSideProduct] = useState(null)
-    const [thirdProduct, setThirdProduct] = useState(null)
+export default async function HeroBanner() {
+    // Fetch data server-side with caching
+    let heroProduct = null
+    let sideProduct = null
+    let thirdProduct = null
 
-    useEffect(() => {
-        const loadHeroProducts = async () => {
-            try {
-                const res = await fetch('/api/products?limit=6&sort=popular')
-                const data = await res.json()
-                if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-                    setHeroProduct(data.data[0])
-                    setSideProduct(data.data[1] || data.data[0])
-                    setThirdProduct(data.data[2] || data.data[1] || data.data[0])
-                }
-            } catch {
-                setHeroProduct(null)
-                setSideProduct(null)
-                setThirdProduct(null)
-            }
+    try {
+        const res = await fetch('http://localhost:3000/api/products?limit=6&sort=popular', {
+            next: { revalidate: 300 } // Cache for 5 minutes
+        })
+        const data = await res.json()
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+            heroProduct = data.data[0]
+            sideProduct = data.data[1] || data.data[0]
+            thirdProduct = data.data[2] || data.data[1] || data.data[0]
         }
-
-        loadHeroProducts()
-    }, [])
+    } catch (error) {
+        console.error('Failed to fetch hero products:', error)
+    }
 
     const heroImage = getProductImage(heroProduct) || FALLBACK_HERO_IMAGE
     const sideImage = getProductImage(sideProduct) || FALLBACK_SIDE_IMAGE
