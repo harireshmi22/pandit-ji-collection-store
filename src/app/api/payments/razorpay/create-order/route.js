@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { dbConnect } from '@/lib/dbConnect';
 import Order from '@/models/Order';
 import Product from '@/models/Product';
+import User from '@/models/User';
 import { getRazorpayClient, getRazorpayPublicConfig, toPaise } from '@/lib/razorpay';
 
 function normalizeShippingAddress(shippingAddress = {}) {
@@ -103,8 +104,26 @@ export async function POST(req) {
       },
     });
 
+    // Convert UUID to MongoDB ObjectId for Google OAuth users
+    let mongoUserId;
+    if (mongoose.Types.ObjectId.isValid(session.user.id)) {
+      mongoUserId = session.user.id;
+    } else {
+      const dbUser = await User.findOne({
+        $or: [
+          { email: session.user.email },
+          { googleId: session.user.id },
+          { authId: session.user.id },
+        ],
+      });
+      if (!dbUser) {
+        return NextResponse.json({ message: 'User not found in database' }, { status: 404 });
+      }
+      mongoUserId = dbUser._id;
+    }
+
     const internalOrder = await Order.create({
-      user: session.user.id,
+      user: mongoUserId,
       orderItems: normalizedOrderItems,
       shippingAddress,
       paymentMethod: 'Razorpay',

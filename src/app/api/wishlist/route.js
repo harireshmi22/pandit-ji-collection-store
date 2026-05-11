@@ -3,8 +3,24 @@ import { auth } from '@/auth'
 import { dbConnect } from '@/lib/dbConnect'
 import Wishlist from '@/models/Wishlist'
 import mongoose from 'mongoose'
+import User from '@/models/User'
 
 const PRODUCT_FIELDS = 'name price image images brand'
+
+// Helper function to convert UUID to ObjectId for Google OAuth users
+async function getMongoUserId(sessionUserId, userEmail) {
+    if (mongoose.Types.ObjectId.isValid(sessionUserId)) {
+        return sessionUserId;
+    }
+    const dbUser = await User.findOne({
+        $or: [
+            { email: userEmail },
+            { googleId: sessionUserId },
+            { authId: sessionUserId },
+        ],
+    });
+    return dbUser?._id || null;
+}
 
 const mapProductToWishlistItem = (product) => ({
     id: product._id.toString(),
@@ -25,14 +41,19 @@ export async function GET() {
 
         await dbConnect()
 
-        const wishlist = await Wishlist.findOne({ user: session.user.id })
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        if (!mongoUserId) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 })
+        }
+
+        const wishlist = await Wishlist.findOne({ user: mongoUserId })
             .populate('products', PRODUCT_FIELDS)
             .lean()
 
         const items = (wishlist?.products || [])
             .filter(Boolean)
             .map(mapProductToWishlistItem)
-            
+
         return NextResponse.json({ success: true, data: items })
     } catch (error) {
         console.error('GET /api/wishlist error:', error)
@@ -65,13 +86,18 @@ export async function POST(req) {
 
         await dbConnect()
 
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        if (!mongoUserId) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 })
+        }
+
         await Wishlist.findOneAndUpdate(
-            { user: session.user.id },
+            { user: mongoUserId },
             { $addToSet: { products: { $each: ids } } },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         )
 
-        const wishlist = await Wishlist.findOne({ user: session.user.id })
+        const wishlist = await Wishlist.findOne({ user: mongoUserId })
             .populate('products', PRODUCT_FIELDS)
             .lean()
 
@@ -100,15 +126,20 @@ export async function DELETE(req) {
 
         await dbConnect()
 
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        if (!mongoUserId) {
+            return NextResponse.json({ message: 'User not found' }, { status: 404 })
+        }
+
         if (productId && mongoose.Types.ObjectId.isValid(productId)) {
             await Wishlist.findOneAndUpdate(
-                { user: session.user.id },
+                { user: mongoUserId },
                 { $pull: { products: productId } },
                 { new: true }
             )
         } else {
             await Wishlist.findOneAndUpdate(
-                { user: session.user.id },
+                { user: mongoUserId },
                 { $set: { products: [] } },
                 { new: true }
             )
