@@ -19,13 +19,22 @@ if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) 
             url: process.env.UPSTASH_REDIS_REST_URL,
             token: process.env.UPSTASH_REDIS_REST_TOKEN,
         });
-        console.log('[REDIS] Upstash client initialized');
+        // Only log in development, not during build
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('[REDIS] Upstash client initialized');
+        }
     } catch (err) {
-        console.warn('[REDIS] Failed to initialize Upstash client:', err.message);
+        // Only log in development, not during build
+        if (process.env.NODE_ENV !== 'production') {
+            console.warn('[REDIS] Failed to initialize Upstash client:', err.message);
+        }
         redis = null;
     }
 } else {
-    console.warn('[REDIS] UPSTASH env vars not set — Redis disabled');
+    // Only log in development, not during build
+    if (process.env.NODE_ENV !== 'production') {
+        console.warn('[REDIS] UPSTASH env vars not set — Redis disabled');
+    }
 }
 
 export default redis;

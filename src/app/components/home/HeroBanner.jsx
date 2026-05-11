@@ -21,7 +21,7 @@ export default async function HeroBanner() {
     let thirdProduct = null
 
     try {
-        const res = await fetch('http://localhost:3000/api/products?limit=6&sort=popular', {
+        const res = await fetch('/api/products?limit=6&sort=popular', {
             next: { revalidate: 300 } // Cache for 5 minutes
         })
         const data = await res.json()
@@ -31,7 +31,10 @@ export default async function HeroBanner() {
             thirdProduct = data.data[2] || data.data[1] || data.data[0]
         }
     } catch (error) {
-        console.error('Failed to fetch hero products:', error)
+        // Silent error handling - use fallback images
+        heroProduct = null
+        sideProduct = null
+        thirdProduct = null
     }
 
     const heroImage = getProductImage(heroProduct) || FALLBACK_HERO_IMAGE
