@@ -109,17 +109,32 @@ export async function POST(req) {
     if (mongoose.Types.ObjectId.isValid(session.user.id)) {
       mongoUserId = session.user.id;
     } else {
-      const dbUser = await User.findOne({
-        $or: [
-          { email: session.user.email },
-          { googleId: session.user.id },
-          { authId: session.user.id },
-        ],
-      });
-      if (!dbUser) {
-        return NextResponse.json({ message: 'User not found in database' }, { status: 404 });
+      // Try to find user by email first (most reliable)
+      const dbUser = await User.findOne({ email: session.user.email });
+      if (dbUser) {
+        mongoUserId = dbUser._id;
+        // Update user with googleId if missing
+        if (!dbUser.googleId) {
+          await User.findByIdAndUpdate(dbUser._id, { googleId: session.user.id });
+        }
+      } else {
+        // Create user if not found (fallback for Google OAuth users)
+        console.log('Creating new user for:', session.user.email);
+        try {
+          const newUser = await User.create({
+            name: session.user.name,
+            email: session.user.email,
+            googleId: session.user.id,
+            avatar: session.user.image,
+          });
+          mongoUserId = newUser._id;
+        } catch (createError) {
+          console.error('Failed to create user:', createError);
+          return NextResponse.json({
+            message: 'Failed to create user account. Please sign out and sign in again.'
+          }, { status: 500 });
+        }
       }
-      mongoUserId = dbUser._id;
     }
 
     const internalOrder = await Order.create({

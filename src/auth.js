@@ -23,10 +23,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
 
-            // authorize: async (credentials) => {
-            //     return null
-            // },
-
             authorize: async (credentials) => {
                 try {
                     const email = credentials?.email?.toString().trim().toLowerCase()
@@ -73,6 +69,56 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
         }),
     ],
+
+    callbacks: {
+        async signIn({ user, account, profile }) {
+            if (account?.provider === 'google') {
+                try {
+                    await dbConnect()
+
+                    // Check if user exists by email
+                    const existingUser = await User.findOne({ email: user.email })
+
+                    if (existingUser) {
+                        // Update user with googleId if not set
+                        if (!existingUser.googleId && profile?.sub) {
+                            await User.findByIdAndUpdate(existingUser._id, {
+                                googleId: profile.sub,
+                                avatar: user.image || existingUser.avatar
+                            })
+                        }
+                        // Return the MongoDB ObjectId
+                        user.id = existingUser._id.toString()
+                    } else {
+                        // Create new user with googleId
+                        const newUser = await User.create({
+                            name: user.name,
+                            email: user.email,
+                            googleId: profile?.sub,
+                            avatar: user.image,
+                        })
+                        user.id = newUser._id.toString()
+                    }
+                } catch (error) {
+                    console.error("Google sign-in error:", error)
+                    return false
+                }
+            }
+            return true
+        },
+        async jwt({ token, user }) {
+            if (user) {
+                token.id = user.id
+            }
+            return token
+        },
+        async session({ session, token }) {
+            if (token) {
+                session.user.id = token.id
+            }
+            return session
+        }
+    },
 
     session: {
         strategy: "jwt",

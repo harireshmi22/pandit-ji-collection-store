@@ -8,18 +8,33 @@ import User from '@/models/User'
 const PRODUCT_FIELDS = 'name price image images brand'
 
 // Helper function to convert UUID to ObjectId for Google OAuth users
-async function getMongoUserId(sessionUserId, userEmail) {
+async function getMongoUserId(sessionUserId, userEmail, userName, userImage) {
     if (mongoose.Types.ObjectId.isValid(sessionUserId)) {
         return sessionUserId;
     }
-    const dbUser = await User.findOne({
-        $or: [
-            { email: userEmail },
-            { googleId: sessionUserId },
-            { authId: sessionUserId },
-        ],
-    });
-    return dbUser?._id || null;
+    // Try to find user by email first (most reliable)
+    const dbUser = await User.findOne({ email: userEmail });
+    if (dbUser) {
+        // Update user with googleId if missing
+        if (!dbUser.googleId) {
+            await User.findByIdAndUpdate(dbUser._id, { googleId: sessionUserId });
+        }
+        return dbUser._id;
+    }
+    // Create user if not found (fallback for Google OAuth users)
+    console.log('Creating new user for:', userEmail);
+    try {
+        const newUser = await User.create({
+            name: userName,
+            email: userEmail,
+            googleId: sessionUserId,
+            avatar: userImage,
+        });
+        return newUser._id;
+    } catch (createError) {
+        console.error('Failed to create user:', createError);
+        return null;
+    }
 }
 
 const mapProductToWishlistItem = (product) => ({
@@ -41,7 +56,7 @@ export async function GET() {
 
         await dbConnect()
 
-        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email, session.user.name, session.user.image)
         if (!mongoUserId) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 })
         }
@@ -86,7 +101,7 @@ export async function POST(req) {
 
         await dbConnect()
 
-        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email, session.user.name, session.user.image)
         if (!mongoUserId) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 })
         }
@@ -126,7 +141,7 @@ export async function DELETE(req) {
 
         await dbConnect()
 
-        const mongoUserId = await getMongoUserId(session.user.id, session.user.email)
+        const mongoUserId = await getMongoUserId(session.user.id, session.user.email, session.user.name, session.user.image)
         if (!mongoUserId) {
             return NextResponse.json({ message: 'User not found' }, { status: 404 })
         }

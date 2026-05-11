@@ -5,31 +5,5 @@ export const authConfig = {
         signIn: "/login",
         error: '/login',
     },
-    session: {
-        strategy: "jwt",
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-    },
-    callbacks: {
-        async jwt({ token, user, trigger, session }) {
-            if (user) {
-                token.id = user.id
-                token.role = user.role
-                token.picture = user.image
-            }
-            if (trigger === "update" && session) {
-                token = { ...token, ...session }
-            }
-            return token
-        },
-
-        async session({ session, token }) {
-            if (token) {
-                session.user.id = token.id
-                session.user.role = token.role
-                session.user.image = token.picture
-            }
-            return session
-        }
-    },
     providers: [], // Providers are added in auth.js
 }
