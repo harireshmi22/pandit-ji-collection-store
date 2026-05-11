@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16'>
                     {/* Image */}
-                    <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100'>
+                    <div className='relative aspect-3-4 overflow-hidden rounded-2xl bg-neutral-100'>
                         {productImage ? (
                             <Image
                                 src={productImage}
@@ -160,6 +160,7 @@ export default function ProductDetailPage() {
                                 priority
                                 unoptimized={isCloudinaryUrl(productImage)}
                                 sizes='(max-width: 1024px) 100vw, 50vw'
+                                quality={90}
                             />
                         ) : (
                             <div className='w-full h-full flex items-center justify-center'><Package className='w-12 h-12 text-neutral-300' /></div>

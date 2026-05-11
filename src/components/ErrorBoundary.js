@@ -55,7 +55,7 @@ export default class ErrorBoundary extends Component {
               <details className="mt-4 p-4 bg-gray-100 rounded">
                 <summary className="cursor-pointer font-semibold">Error Details</summary>
                 <pre className="mt-2 text-sm text-red-600 overflow-auto">
-                  {this.state.error && this.state.error.toString()}
+                  {this.state.error && typeof this.state.error === 'object' ? this.state.error.toString() : String(this.state.error || 'Unknown error')}
                   {this.state.errorInfo && (
                     <div className="mt-2">
                       <strong>Component Stack:</strong>

@@ -38,7 +38,7 @@ async function getMongoUserId(sessionUserId, userEmail, userName, userImage) {
 }
 
 const mapProductToWishlistItem = (product) => ({
-    id: product._id.toString(),
+    id: product._id ? String(product._id) : '',
     name: product.name,
     price: product.price,
     image: (Array.isArray(product.images) && product.images.length > 0)
@@ -89,7 +89,7 @@ export async function POST(req) {
         const body = await req.json()
         const ids = [body?.productId, ...(body?.productIds || [])]
             .filter(Boolean)
-            .map((id) => id.toString())
+            .map((id) => String(id))
             .filter((id) => mongoose.Types.ObjectId.isValid(id))
 
         if (ids.length === 0) {
@@ -137,7 +137,7 @@ export async function DELETE(req) {
         }
 
         const body = await req.json().catch(() => ({}))
-        const productId = body?.productId?.toString()
+        const productId = body?.productId ? String(body.productId) : null
 
         await dbConnect()
 

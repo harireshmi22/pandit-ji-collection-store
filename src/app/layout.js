@@ -5,6 +5,8 @@ import { WishlistProvider } from '@/context/WishlistContext';
 import AuthProvider from '@/context/AuthProvider';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CartSidebar from '@/components/cart/CartSidebar';
+import ErrorHandler from '@/components/ErrorHandler';
+import PerformanceOptimizer from '@/components/PerformanceOptimizer';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -23,6 +25,8 @@ export default function RootLayout({ children }) {
         <html lang='en'>
             <body className={`${inter.variable} font-sans antialiased text-neutral-900`}>
                 <ErrorBoundary>
+                    <PerformanceOptimizer />
+                    <ErrorHandler />
                     <AuthProvider>
                         <CartProvider>
                             <WishlistProvider>

@@ -52,8 +52,8 @@ export default function WishlistPage() {
                         {wishlistItems.map(p => (
                             <div key={p.id} className='group relative'>
                                 <Link href={`/shop/${p.id}`} className='block'>
-                                    <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
-                                        <Image src={p.image} alt={p.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 25vw' />
+                                    <div className='relative aspect-3-4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
+                                        <Image src={p.image} alt={p.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 25vw' quality={85} />
                                     </div>
                                     <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
                                     {p.brand && <p className='text-[10px] text-neutral-400'>{p.brand}</p>}

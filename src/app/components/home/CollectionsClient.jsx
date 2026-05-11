@@ -67,7 +67,7 @@ export default function CollectionsClient({ products }) {
                             >
                                 <div className='p-4'>
                                     <p className='text-sm text-gray-600 mb-4'>{product.category || 'essential round knit'}</p>
-                                    <div className='relative w-full h-80 bg-gray-100 rounded mb-4'>
+                                    <div className='relative w-full h-80 bg-gray-100 rounded mb-4 aspect-3-4'>
                                         {productImage ? (
                                             <Image
                                                 src={productImage}
@@ -75,6 +75,7 @@ export default function CollectionsClient({ products }) {
                                                 fill
                                                 className="object-cover rounded"
                                                 sizes="320px"
+                                                quality={85}
                                             />
                                         ) : (
                                             <div className='absolute inset-0 flex items-center justify-center'>

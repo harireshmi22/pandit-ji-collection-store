@@ -1,8 +1,12 @@
 import Navbar from './components/home/Navbar';
 import HeroBanner from './components/home/HeroBanner';
-import ProductSwiper from './components/home/ProductSwiper';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+
+const ProductSwiper = dynamic(() => import('./components/home/ProductSwiper'), {
+    loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
+    ssr: true
+});
 
 const NewArrival = dynamic(() => import('./components/NewArrival'), {
     loading: () => <div className="h-96 bg-gray-100 animate-pulse" />,
@@ -19,9 +23,20 @@ const Footer = dynamic(() => import('./components/home/Footer'), {
     ssr: true
 });
 
+export const metadata = {
+    title: 'Pandit Ji Collection Store - Premium Fashion',
+    description: 'Discover premium styles for everyday wear with fast delivery, easy returns, and secure checkout.',
+}
+
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    themeColor: '#f7fafc',
+}
+
 export default function Home() {
     return (
-        <div className='min-h-screen bg-white no-scrollbar'>
+        <main className="min-h-screen bg-white no-scrollbar">
             <Navbar />
             <HeroBanner />
             <ProductSwiper title='Trending Now' />
@@ -35,6 +50,6 @@ export default function Home() {
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse" />}>
                 <Footer />
             </Suspense>
-        </div>
+        </main>
     );
 }

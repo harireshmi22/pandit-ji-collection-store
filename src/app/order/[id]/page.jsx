@@ -355,7 +355,7 @@ export default function OrderDetailPage() {
                                     <div key={i} className='p-5 flex gap-4 group hover:bg-blue-50/25 transition-colors item-row-enter' style={{ animationDelay: `${0.06 * (i + 1)}s` }}>
                                         <div className='relative w-16 h-20 rounded-xl bg-neutral-100 overflow-hidden shrink-0'>
                                             {item.image && !item.image.includes('placehold.co') ? (
-                                                <Image src={item.image} alt={item.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' />
+                                                <Image src={item.image} alt={item.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' quality={85} />
                                             ) : null}
                                             <div className={`w-full h-full items-center justify-center ${item.image && !item.image.includes('placehold.co') ? 'hidden' : 'flex'}`}>
                                                 <Package className='w-5 h-5 text-neutral-300' />

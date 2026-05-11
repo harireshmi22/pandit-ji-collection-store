@@ -261,7 +261,7 @@ export default function OrdersPage() {
                                                         {(order.orderItems || []).slice(0, 4).map((item, idx) => (
                                                             <div key={idx} className='relative w-13 h-13 rounded-xl bg-neutral-100 overflow-hidden shrink-0 border border-neutral-100'>
                                                                 {item.image && !item.image.includes('placehold.co') ? (
-                                                                    <Image src={item.image} alt={item.name} fill sizes='52px' className='object-cover' />
+                                                                    <Image src={item.image} alt={item.name} fill sizes='52px' className='object-cover' quality={85} />
                                                                 ) : null}
                                                                 <div className={`w-full h-full items-center justify-center ${item.image && !item.image.includes('placehold.co') ? 'hidden' : 'flex'}`}>
                                                                     <Package className='w-4 h-4 text-neutral-300' />

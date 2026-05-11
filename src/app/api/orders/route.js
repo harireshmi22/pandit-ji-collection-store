@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/dbConnect';
 import mongoose from 'mongoose';
 import Order from '@/models/Order';
+import User from '@/models/User';
 import Product from '@/models/Product';
 import { auth } from '@/auth';
 import redis, { memCache } from '@/lib/redis';
@@ -89,12 +90,12 @@ export async function GET(req) {
                 const img = (Array.isArray(p.images) && p.images.length > 0)
                     ? p.images[0]
                     : p.image || null;
-                productMap[p._id.toString()] = img;
+                productMap[p._id ? String(p._id) : 'unknown'] = img;
             }
 
             for (const order of orders) {
                 for (const item of (order.orderItems || [])) {
-                    const pid = item.product?.toString();
+                    const pid = item.product ? String(item.product) : null;
                     if (pid && productMap[pid]) {
                         item.image = productMap[pid];
                     }
@@ -144,24 +145,24 @@ export async function POST(req) {
         const isValidObjectId = (id) => {
             try {
                 return mongoose.Types.ObjectId.isValid(id) &&
-                    new mongoose.Types.ObjectId(id).toString() === id;
+                    String(new mongoose.Types.ObjectId(id)) === id;
             } catch {
                 return false;
             }
         };
 
-        const productIds = [...new Set(orderItems.map((item) => item.product?.toString()))];
+        const productIds = [...new Set(orderItems.map((item) => item.product ? String(item.product) : '').filter(Boolean))];
         const invalidProductId = productIds.find((id) => !isValidObjectId(id));
         if (invalidProductId) {
             return NextResponse.json({ message: 'One or more products are invalid.' }, { status: 400 });
         }
 
         const dbProducts = await Product.find({ _id: { $in: productIds } }).lean();
-        const productMap = new Map(dbProducts.map((product) => [product._id.toString(), product]));
+        const productMap = new Map(dbProducts.map((product) => [product._id ? String(product._id) : 'unknown', product]));
 
         const normalizedOrderItems = [];
         for (const item of orderItems) {
-            const dbProduct = productMap.get(item.product.toString());
+            const dbProduct = productMap.get(String(item.product));
             if (!dbProduct) {
                 return NextResponse.json({ message: `Product not found: ${item.product}` }, { status: 404 });
             }
@@ -233,9 +234,31 @@ export async function POST(req) {
             }
         }
 
+        const sessionUserId = session.user.id;
+
+        let mongoUserId;
+
+        if (mongoose.Types.ObjectId.isValid(sessionUserId)) {
+            // already mongodb object id 
+            mongoUserId = sessionUserId;
+        } else {
+            // UUID / Google id / custom string case 
+            const dbUser = await User.findOne({
+                $or: [
+                    { email: session.user.email },
+                    { googleId: sessionUserId },
+                    { authId: sessionUserId },
+                ],
+            })
+            if (!dbUser) {
+                return NextResponse.json({ message: 'User not found in database' }, { status: 404 });
+            }
+            mongoUserId = dbUser._id ? String(dbUser._id) : '';
+        }
+
         // 2. Create Order in DB
         const order = new Order({
-            user: session.user.id,
+            user: mongoUserId,
             orderItems: normalizedOrderItems,
             shippingAddress: normalizedShippingAddress,
             paymentMethod: paymentMethod || 'Cash on Delivery',

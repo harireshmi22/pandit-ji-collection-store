@@ -48,11 +48,11 @@ export async function GET(req, { params }) {
                 const img = (Array.isArray(p.images) && p.images.length > 0)
                     ? p.images[0]
                     : p.image || null;
-                productMap[p._id.toString()] = img;
+                productMap[p._id ? String(p._id) : 'unknown'] = img;
             }
 
             for (const item of (order.orderItems || [])) {
-                const pid = item.product?.toString();
+                const pid = item.product ? String(item.product) : null;
                 if (pid && productMap[pid]) {
                     item.image = productMap[pid];
                 }
@@ -60,13 +60,13 @@ export async function GET(req, { params }) {
         }
 
         console.log('DEBUG: Order found:', {
-            orderId: order._id.toString(),
-            orderUserId: order.user?._id?.toString() || order.user?.toString(),
+            orderId: order._id ? String(order._id) : 'unknown',
+            orderUserId: order.user?._id ? String(order.user._id) : (order.user ? String(order.user) : 'unknown'),
             sessionUserId: session.user.id
         });
 
         // Check if user is authorized to view this order
-        const orderUserId = order.user?._id?.toString() || order.user?.toString();
+        const orderUserId = order.user?._id ? String(order.user._id) : (order.user ? String(order.user) : '');
         if (session.user.role !== 'admin' && orderUserId !== session.user.id) {
             console.log('DEBUG: Unauthorized view attempt', { orderUserId, sessionUserId: session.user.id });
             return NextResponse.json({ message: 'Not authorized to view this order' }, { status: 403 });
@@ -141,7 +141,7 @@ export async function PATCH(req, { params }) {
         // Payment update (can be called by user system after successful payment)
         if (isPaid !== undefined || paymentResult) {
             // Authorization for payment update: either admin or the order owner
-            if (session.user.role !== 'admin' && order.user.toString() !== session.user.id) {
+            if (session.user.role !== 'admin' && String(order.user || '') !== session.user.id) {
                 return NextResponse.json({ message: 'Not authorized' }, { status: 403 });
             }
 

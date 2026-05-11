@@ -289,7 +289,7 @@ function CheckoutContent() {
                                     {cartItems.map(item => (
                                         <div key={`${item.id}-${item.selectedSize}`} className='flex gap-3'>
                                             <div className='relative w-12 h-14 bg-neutral-100 rounded-lg shrink-0 overflow-hidden'>
-                                                <Image src={item.image} alt={item.name} fill className='object-cover' sizes='48px' />
+                                                <Image src={item.image} alt={item.name} fill className='object-cover' sizes='48px' quality={85} />
                                             </div>
                                             <div className='min-w-0 flex-1'>
                                                 <p className='text-xs font-medium text-neutral-900 truncate'>{item.name}</p>

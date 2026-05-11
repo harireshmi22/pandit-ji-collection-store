@@ -50,7 +50,7 @@ export default function CartPage() {
                         {cartItems.map(item => (
                             <div key={`${item.id}-${item.selectedSize}`} className='flex gap-4 p-4 border border-neutral-100 rounded-2xl'>
                                 <div className='relative w-20 h-24 bg-neutral-100 rounded-xl shrink-0 overflow-hidden'>
-                                    <Image src={item.image} alt={item.name} fill className='object-cover' sizes='80px' />
+                                    <Image src={item.image} alt={item.name} fill className='object-cover' sizes='80px' quality={85} />
                                 </div>
                                 <div className='flex-1 flex flex-col justify-between'>
                                     <div>

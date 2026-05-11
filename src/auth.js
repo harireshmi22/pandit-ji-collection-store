@@ -25,8 +25,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
             authorize: async (credentials) => {
                 try {
-                    const email = credentials?.email?.toString().trim().toLowerCase()
-                    const password = credentials?.password?.toString()
+                    const email = credentials?.email ? String(credentials.email).trim().toLowerCase() : ''
+                    const password = credentials?.password ? String(credentials.password) : ''
 
                     if (!email || !password) {
                         return null
@@ -55,7 +55,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                     // 5. Return user object
                     return {
-                        id: user._id.toString(),
+                        id: user._id ? String(user._id) : '',
                         name: user.name,
                         email: user.email,
                         role: user.role,
@@ -88,7 +88,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             })
                         }
                         // Return the MongoDB ObjectId
-                        user.id = existingUser._id.toString()
+                        user.id = existingUser._id ? String(existingUser._id) : ''
                     } else {
                         // Create new user with googleId
                         const newUser = await User.create({
@@ -97,7 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                             googleId: profile?.sub,
                             avatar: user.image,
                         })
-                        user.id = newUser._id.toString()
+                        user.id = newUser._id ? String(newUser._id) : ''
                     }
                 } catch (error) {
                     console.error("Google sign-in error:", error)

@@ -112,7 +112,7 @@ function SearchContent() {
     }, [debouncedDraftQuery, searchQuery, category, brand])
 
     const updateSearchParams = (updates = {}, resetPage = true) => {
-        const params = new URLSearchParams(searchParams?.toString() || '')
+        const params = new URLSearchParams(searchParams ? String(searchParams) : '')
 
         Object.entries(updates).forEach(([key, value]) => {
             if (value === null || value === undefined || value === '') params.delete(key)
@@ -153,7 +153,7 @@ function SearchContent() {
                                         <div className='flex items-center gap-3'>
                                             <div className='relative w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden shrink-0'>
                                                 {item.image ? (
-                                                    <Image src={item.image} fill alt={item.name} className='object-cover' unoptimized={isCloudinaryUrl(item.image)} sizes='40px' />
+                                                    <Image src={item.image} fill alt={item.name} className='object-cover' unoptimized={isCloudinaryUrl(item.image)} sizes='40px' quality={85} />
                                                 ) : (
                                                     <div className='w-full h-full flex items-center justify-center text-[10px] text-neutral-400'>No image</div>
                                                 )}
@@ -242,18 +242,18 @@ function SearchContent() {
                         {products.map((p, index) => {
                             const listingImage = getOptimizedProductImage(p, 640)
                             return (
-                            <div key={p._id} className='group relative'>
-                                <Link href={`/shop/${p._id}`} className='block'>
-                                    <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
-                                        {listingImage ? <Image src={listingImage} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' priority={index < 2} unoptimized={isCloudinaryUrl(listingImage)} sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
-                                    </div>
-                                    <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
-                                    <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
-                                </Link>
-                                <button onClick={() => toggleWishlist({ id: p._id, name: p.name, price: p.price, image: listingImage })} className='absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all z-10 cursor-pointer'>
-                                    <Heart className={`w-4 h-4 ${isInWishlist(p._id) ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />
-                                </button>
-                            </div>
+                                <div key={p._id} className='group relative'>
+                                    <Link href={`/shop/${p._id}`} className='block'>
+                                        <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
+                                            {listingImage ? <Image src={listingImage} fill alt={p.name} className='object-cover group-hover:scale-105 transition-transform duration-500' priority={index < 2} unoptimized={isCloudinaryUrl(listingImage)} sizes='(max-width:640px) 50vw, 25vw' /> : <div className='absolute inset-0 flex items-center justify-center text-neutral-300 text-xs'>No image</div>}
+                                        </div>
+                                        <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
+                                        <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>
+                                    </Link>
+                                    <button onClick={() => toggleWishlist({ id: p._id, name: p.name, price: p.price, image: listingImage })} className='absolute top-2 right-2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all z-10 cursor-pointer'>
+                                        <Heart className={`w-4 h-4 ${isInWishlist(p._id) ? 'fill-red-500 text-red-500' : 'text-neutral-400'}`} />
+                                    </button>
+                                </div>
                             )
                         })}
                     </div>

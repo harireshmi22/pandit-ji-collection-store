@@ -54,7 +54,7 @@ const ShopPageContent = () => {
     useEffect(() => { fetchProducts() }, [fetchProducts])
 
     const setCategory = (cat) => {
-        const params = new URLSearchParams(searchParams?.toString() || '')
+        const params = new URLSearchParams(searchParams ? String(searchParams) : '')
         if (cat === 'All') params.delete('category')
         else params.set('category', cat)
         params.delete('page')
@@ -62,7 +62,7 @@ const ShopPageContent = () => {
     }
 
     const setPage = (page) => {
-        const params = new URLSearchParams(searchParams?.toString() || '')
+        const params = new URLSearchParams(searchParams ? String(searchParams) : '')
         if (page <= 1) params.delete('page')
         else params.set('page', String(page))
         router.push(`/shop${params.toString() ? '?' + params.toString() : ''}`)
@@ -135,7 +135,7 @@ const ShopPageContent = () => {
                                 return (
                                     <div key={productId} className='group relative rounded-2xl p-2 bg-white/80 border border-neutral-200/80 shadow-sm hover:shadow-[0_14px_30px_-18px_rgba(15,118,110,0.35)] transition-all'>
                                         <Link href={`/shop/${productId}`} className='block'>
-                                            <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100'>
+                                            <div className='relative aspect-3-4 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100'>
                                                 {cardImage ? (
                                                     <Image
                                                         src={cardImage}
@@ -145,6 +145,7 @@ const ShopPageContent = () => {
                                                         priority={index < 2}
                                                         unoptimized={isCloudinaryUrl(cardImage)}
                                                         sizes='(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw'
+                                                        quality={85}
                                                     />
                                                 ) : (
                                                     <div className='w-full h-full flex items-center justify-center'>

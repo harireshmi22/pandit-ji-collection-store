@@ -6,8 +6,8 @@ export async function POST(req) {
     try {
         const { name, email, password, role = 'user' } = await req.json()
 
-        const normalizedName = name?.toString().trim()
-        const normalizedEmail = email?.toString().trim().toLowerCase()
+        const normalizedName = name ? String(name).trim() : ''
+        const normalizedEmail = email ? String(email).trim().toLowerCase() : ''
 
         if (!normalizedName || !normalizedEmail || !password) {
             return NextResponse.json(

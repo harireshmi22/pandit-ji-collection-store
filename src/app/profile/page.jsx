@@ -146,7 +146,7 @@ export default function ProfilePage() {
                                                     </div>
                                                     <div className='flex gap-2'>
                                                         {order.orderItems?.slice(0, 3).map((item, i) => (
-                                                            <div key={i} className='relative w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden'><Image src={item.image} alt={item.name} fill className='object-cover' sizes='40px' /></div>
+                                                            <div key={i} className='relative w-10 h-10 rounded-lg bg-neutral-100 overflow-hidden'><Image src={item.image} alt={item.name} fill className='object-cover' sizes='40px' quality={85} /></div>
                                                         ))}
                                                     </div>
                                                 </Link>
@@ -169,8 +169,8 @@ export default function ProfilePage() {
                                     <div className='grid grid-cols-2 sm:grid-cols-3 gap-4'>
                                         {wishlistItems.map(p => (
                                             <Link key={p.id} href={`/shop/${p.id}`} className='group block'>
-                                                <div className='relative aspect-3/4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
-                                                    <Image src={p.image} alt={p.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 33vw' />
+                                                <div className='relative aspect-3-4 bg-neutral-100 rounded-2xl overflow-hidden mb-2'>
+                                                    <Image src={p.image} alt={p.name} fill className='object-cover group-hover:scale-105 transition-transform duration-500' sizes='(max-width:640px) 50vw, 33vw' quality={85} />
                                                 </div>
                                                 <h3 className='text-xs font-medium text-neutral-900 truncate'>{p.name}</h3>
                                                 <p className='text-xs font-semibold text-neutral-900 mt-0.5'>₹{p.price}</p>

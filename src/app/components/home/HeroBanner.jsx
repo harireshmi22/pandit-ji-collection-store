@@ -41,6 +41,11 @@ export default async function HeroBanner() {
     const sideImage = getProductImage(sideProduct) || FALLBACK_SIDE_IMAGE
     const thirdImage = getProductImage(thirdProduct) || FALLBACK_THIRD_IMAGE
 
+    // Preload critical images for LCP
+    const heroImageWithParams = `${heroImage}?w=800&h=1000&fit=crop&q=90&auto=format`
+    const sideImageWithParams = `${sideImage}?w=400&h=500&fit=crop&q=85&auto=format`
+    const thirdImageWithParams = `${thirdImage}?w=400&h=500&fit=crop&q=85&auto=format`
+
     return (
         <section className='relative overflow-hidden bg-white'>
             <div className='absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_10%_18%,rgba(14,165,233,0.14),transparent_34%),radial-gradient(circle_at_88%_20%,rgba(59,130,246,0.12),transparent_32%),radial-gradient(circle_at_54%_82%,rgba(37,99,235,0.08),transparent_34%)]' />
@@ -83,17 +88,19 @@ export default async function HeroBanner() {
 
                     <div className='relative rounded-3xl border border-blue-100 bg-white/85 backdrop-blur-sm p-4 md:p-5 shadow-[0_24px_44px_-26px_rgba(37,99,235,0.4)] animate-fade-up delay-200'>
                         <div className='grid grid-cols-5 gap-3'>
-                            <div className='col-span-3 relative rounded-2xl overflow-hidden min-h-72 md:min-h-96 ring-1 ring-blue-100/70 group'>
+                            <div className='col-span-3 relative rounded-2xl overflow-hidden ring-1 ring-blue-100/70 group' style={{ aspectRatio: '4/5' }}>
                                 <Image
-                                    src={heroImage}
+                                    src={heroImageWithParams}
                                     alt={heroProduct?.name || 'Featured fashion product'}
                                     fill
                                     priority
-                                    sizes='(max-width: 1024px) 100vw, 60vw'
+                                    fetchPriority="high"
+                                    sizes='(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 60vw'
+                                    quality={90}
                                     className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
                                 />
                                 <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
-                                <div className='absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent' />
+                                <div className='absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent' />
                                 <div className='absolute bottom-3 left-3 right-3'>
                                     <p className='text-white/85 text-[11px] uppercase tracking-[0.18em]'>Top Pick</p>
                                     <p className='text-white text-sm md:text-base font-semibold truncate'>
@@ -103,17 +110,18 @@ export default async function HeroBanner() {
                             </div>
 
                             <div className='col-span-2 flex flex-col gap-3'>
-                                <div className='relative rounded-2xl overflow-hidden min-h-36 md:min-h-48 ring-1 ring-blue-100/70 group animate-fade-up' style={{ animationDelay: '0.24s' }}>
+                                <div className='relative rounded-2xl overflow-hidden ring-1 ring-blue-100/70 group animate-fade-up' style={{ aspectRatio: '4/5', animationDelay: '0.24s' }}>
                                     <Image
-                                        src={sideImage}
+                                        src={sideImageWithParams}
                                         alt={sideProduct?.name || 'New arrival fashion product'}
                                         fill
                                         loading='lazy'
                                         sizes='(max-width: 1024px) 40vw, 24vw'
+                                        quality={85}
                                         className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
                                     />
                                     <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
-                                    <div className='absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent' />
+                                    <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent' />
                                     <div className='absolute bottom-2 left-2 right-2'>
                                         <p className='text-white text-xs font-medium truncate'>
                                             {sideProduct?.name || 'Fresh New Arrivals'}
@@ -121,17 +129,18 @@ export default async function HeroBanner() {
                                     </div>
                                 </div>
 
-                                <div className='relative rounded-2xl overflow-hidden min-h-36 md:min-h-45 ring-1 ring-blue-100/70 group animate-fade-up' style={{ animationDelay: '0.34s' }}>
+                                <div className='relative rounded-2xl overflow-hidden ring-1 ring-blue-100/70 group animate-fade-up' style={{ aspectRatio: '4/5', animationDelay: '0.34s' }}>
                                     <Image
-                                        src={thirdImage}
+                                        src={thirdImageWithParams}
                                         alt={thirdProduct?.name || 'Modern fashion style'}
                                         fill
                                         loading='lazy'
                                         sizes='(max-width: 1024px) 40vw, 24vw'
+                                        quality={85}
                                         className='w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105'
                                     />
                                     <div className='absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-blue-500/10' />
-                                    <div className='absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent' />
+                                    <div className='absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent' />
                                     <div className='absolute bottom-2 left-2 right-2'>
                                         <p className='text-white text-xs font-medium truncate'>
                                             {thirdProduct?.name || 'Modern Everyday Style'}

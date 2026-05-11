@@ -22,15 +22,20 @@ const ProductCard = ({ product }) => {
     const [imageSrc, setImageSrc] = React.useState(() => getProductImage(product));
     const productId = product._id || product.id;
 
+    // Optimize image URL with parameters
+    const optimizedImageSrc = `${imageSrc}?w=400&h=500&fit=crop&q=85&auto=format`;
+
     return (
         <Link href={`/shop/${productId}`} className='group block'>
-            <div className='relative aspect-3/4 overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100'>
+            <div className='relative overflow-hidden rounded-2xl bg-neutral-100 ring-1 ring-neutral-100' style={{ aspectRatio: '4/5' }}>
                 <Image
-                    src={imageSrc}
+                    src={optimizedImageSrc}
                     alt={product.name}
                     fill
                     className='object-cover transition-transform duration-500 group-hover:scale-105'
                     sizes='(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw'
+                    quality={85}
+                    loading="lazy"
                     onError={() => setImageSrc(FALLBACK_IMAGE)}
                 />
                 {product.category && (
@@ -60,7 +65,7 @@ export default function ProductSwiper({ title = 'Trending Now', category, sort, 
         async function fetchProducts() {
             try {
                 const params = new URLSearchParams();
-                params.append('limit', limit.toString());
+                params.append('limit', String(limit || 8));
                 if (category) params.append('category', category);
                 if (sort) params.append('sort', sort);
                 const res = await fetch(`/api/products?${params.toString()}`);
@@ -91,7 +96,7 @@ export default function ProductSwiper({ title = 'Trending Now', category, sort, 
                     <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5'>
                         {[1, 2, 3, 4].map(i => (
                             <div key={i} className='animate-pulse'>
-                                <div className='aspect-3/4 bg-neutral-100 rounded-2xl mb-3' />
+                                <div className='bg-neutral-100 rounded-2xl mb-3' style={{ aspectRatio: '4/5' }} />
                                 <div className='h-3 bg-neutral-100 rounded w-3/4 mb-2' />
                                 <div className='h-3 bg-neutral-100 rounded w-1/2' />
                             </div>

@@ -5,7 +5,7 @@ import { NextResponse } from "next/server"
 export async function POST(req) {
     try {
         const { email } = await req.json()
-        const normalizedEmail = email?.toString().trim().toLowerCase()
+        const normalizedEmail = email ? String(email).trim().toLowerCase() : ''
 
         if (!normalizedEmail) {
             return NextResponse.json(

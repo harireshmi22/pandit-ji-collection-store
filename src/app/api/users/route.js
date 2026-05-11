@@ -70,7 +70,7 @@ export async function GET(request) {
         ]);
 
         const statsMap = new Map(
-            orderStats.map((item) => [item._id?.toString(), {
+            orderStats.map((item) => [item._id ? String(item._id) : 'unknown', {
                 orders: item.orders,
                 paidOrders: item.paidOrders,
                 totalSpent: item.totalSpent
@@ -78,7 +78,7 @@ export async function GET(request) {
         );
 
         const usersWithStats = users.map((user) => {
-            const stats = statsMap.get(user._id.toString());
+            const stats = statsMap.get(user._id ? String(user._id) : 'unknown');
             return {
                 ...user,
                 orders: stats?.orders || 0,

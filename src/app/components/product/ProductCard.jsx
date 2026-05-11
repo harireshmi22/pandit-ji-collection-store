@@ -22,8 +22,17 @@ const ProductCard = () => {
             <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 gap-6">
                 {FilterProducts.map((product) => (
                     <div key={product.id} className="border border-gray-300 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
-                        <div className="relative w-full h-64">
-                            <Image src={product.image} alt={product.name} objectFit="cover" layout='fill' />
+                        <div className="relative w-full" style={{ aspectRatio: '4/5' }}>
+                            <Image
+                                src={`${product.image}?w=400&h=500&fit=crop&q=85&auto=format`}
+                                alt={product.name}
+                                fill
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                quality={85}
+                                priority={false}
+                                loading="lazy"
+                                className="object-cover"
+                            />
                         </div>
                         <div className="p-4">
                             <h3 className="text-lg font-medium text-gray-800">{product.name}</h3>

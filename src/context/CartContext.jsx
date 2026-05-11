@@ -126,8 +126,12 @@ export function CartProvider({ children }) {
     }, [savedShippingDetails])
 
     // Calculate cartTotal first to avoid circular dependency
-    const cartTotal = useMemo(() => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0), [cartItems])
-    const cartItemCount = useMemo(() => cartItems.reduce((acc, item) => acc + item.quantity, 0), [cartItems])
+    const cartTotal = useMemo(() => cartItems.reduce((acc, item) => {
+        const price = Number(item.price) || 0
+        const quantity = Number(item.quantity) || 0
+        return acc + (price * quantity)
+    }, 0), [cartItems])
+    const cartItemCount = useMemo(() => cartItems.reduce((acc, item) => acc + (Number(item.quantity) || 0), 0), [cartItems])
 
     // Process order with saved details using the backend API
     const createOrderWithSavedDetails = useCallback(async (paymentMethod = 'Cash on Delivery') => {

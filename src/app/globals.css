@@ -28,10 +28,120 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Font display optimization to prevent CLS */
+@font-face {
+  font-family: 'Inter';
+  font-display: swap;
+  src: local('Inter'), url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+}
+
+/* Prevent CLS by reserving space for images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Aspect ratio containers to prevent CLS */
+.aspect-3-4 {
+  aspect-ratio: 3 / 4;
+}
+
+.aspect-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.aspect-4-5 {
+  aspect-ratio: 4 / 5;
+}
+
+/* Prevent layout shifts during loading */
+.image-container {
+  contain: layout;
+  overflow: hidden;
+}
+
+/* Optimize image loading to reduce CLS */
+img {
+  content-visibility: auto;
+  contain-intrinsic-size: 400px 500px;
+}
+
+/* Improve LCP by preloading critical fonts */
+@font-face {
+  font-family: 'Inter';
+  font-display: swap;
+  src: local('Inter');
+}
+
+/* Reduce CLS by preventing text jumps */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.2;
+}
+
+/* Optimize animations to reduce CLS */
+.animate-fade-up {
+  animation: fadeUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Prevent layout shifts in grid layouts */
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+/* Ensure consistent spacing */
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.aspect-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+/* Prevent layout shifts from dynamic content */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -54,6 +164,7 @@ select:focus:not(.no-global-focus) {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -64,6 +175,7 @@ select:focus:not(.no-global-focus) {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -72,15 +184,19 @@ select:focus:not(.no-global-focus) {
 .animate-fade-up {
   animation: fadeUp 0.5s var(--ease-out) both;
 }
+
 .animate-fade-in {
   animation: fadeIn 0.4s ease both;
 }
+
 .delay-100 {
   animation-delay: 0.1s;
 }
+
 .delay-200 {
   animation-delay: 0.2s;
 }
+
 .delay-300 {
   animation-delay: 0.3s;
 }
@@ -106,11 +222,9 @@ select:focus:not(.no-global-focus) {
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 223 100% 58%;
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(223 100% 58%),
-    hsl(190 95% 44%)
-  );
+  --gradient-primary: linear-gradient(135deg,
+      hsl(223 100% 58%),
+      hsl(190 95% 44%));
   --gradient-surface: linear-gradient(180deg, #ffffff, #f8fafc);
   --shadow-glow: 0 20px 40px -12px hsl(223 100% 58% / 0.27);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.1);
@@ -139,23 +253,17 @@ body::before {
   pointer-events: none;
   background-image:
     radial-gradient(circle at 8% 12%, rgba(41, 98, 255, 0.14), transparent 34%),
-    radial-gradient(
-      circle at 90% 14%,
+    radial-gradient(circle at 90% 14%,
       rgba(79, 70, 229, 0.12),
-      transparent 32%
-    ),
+      transparent 32%),
     radial-gradient(circle at 52% 88%, rgba(6, 182, 212, 0.1), transparent 36%),
-    radial-gradient(
-      circle at 14% 86%,
+    radial-gradient(circle at 14% 86%,
       rgba(245, 158, 11, 0.09),
-      transparent 26%
-    ),
-    linear-gradient(
-      180deg,
+      transparent 26%),
+    linear-gradient(180deg,
       var(--bg-base) 0%,
       var(--bg-soft) 58%,
-      var(--bg-warm) 100%
-    ),
+      var(--bg-warm) 100%),
     linear-gradient(90deg, var(--bg-line) 1px, transparent 1px),
     linear-gradient(0deg, var(--bg-line) 1px, transparent 1px);
   background-size:
@@ -192,16 +300,12 @@ body::before {
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 263 70% 56%;
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(263 70% 56%),
-    hsl(195 100% 59%)
-  );
-  --gradient-surface: linear-gradient(
-    180deg,
-    hsl(222.2 84% 4.9%),
-    hsl(217.2 32.6% 17.5%)
-  );
+  --gradient-primary: linear-gradient(135deg,
+      hsl(263 70% 56%),
+      hsl(195 100% 59%));
+  --gradient-surface: linear-gradient(180deg,
+      hsl(222.2 84% 4.9%),
+      hsl(217.2 32.6% 17.5%));
   --shadow-glow: 0 20px 40px -12px hsl(263 70% 56% / 0.4);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
   --sidebar-background: 240 5.9% 10%;
@@ -244,12 +348,15 @@ body::before {
   0% {
     transform: translate(0px, 0px) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 20px) scale(0.9);
   }
+
   100% {
     transform: translate(0px, 0px) scale(1);
   }
