@@ -1,5 +1,4 @@
 'use client'
-export const dynamic = 'force-dynamic'
 import React, { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Navbar from '../components/home/Navbar'
@@ -16,6 +15,7 @@ function LoginForm() {
     const [rememberMe, setRememberMe] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false)
     const [error, setError] = useState(() => {
         // Map NextAuth error codes to user-friendly messages
         if (authError === 'Configuration') return 'Server configuration error. Please try again.'
@@ -57,6 +57,16 @@ function LoginForm() {
         finally { setIsLoading(false) }
     }
 
+    const handleGoogleSignIn = async () => {
+        setIsGoogleLoading(true)
+        try {
+            await signIn('google', { callbackUrl })
+        } catch (error) {
+            setError('Failed to sign in with Google. Please try again.')
+            setIsGoogleLoading(false)
+        }
+    }
+
     const handleChangeInput = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
         setError('')
@@ -71,13 +81,14 @@ function LoginForm() {
                 handleChangeInput={handleChangeInput}
                 showPassword={showPassword}
                 isLoading={isLoading}
+                isGoogleLoading={isGoogleLoading}
                 error={error}
                 onEmailChange={e => setFormData({ ...formData, email: e.target.value })}
                 onPasswordChange={e => { setFormData({ ...formData, password: e.target.value }); setError('') }}
                 onRememberMeChange={e => setRememberMe(e.target.checked)}
                 onTogglePassword={() => setShowPassword(!showPassword)}
                 onSubmit={handleSubmit}
-                onGoogleSignIn={() => signIn('google', { callbackUrl })}
+                onGoogleSignIn={handleGoogleSignIn}
                 forgotPasswordHref='/forgot-password'
                 signUpHref='/signup'
             />
