@@ -14,9 +14,9 @@ export default function ErrorHandler() {
                     console.log('Arguments:', args);
                     console.log('=== END ERROR DETAILS ===');
                 }
-                originalError.apply(console, args);
+                originalError(...args);
             };
-            
+
             return () => {
                 console.error = originalError;
             };

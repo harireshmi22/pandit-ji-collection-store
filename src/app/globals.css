@@ -157,7 +157,7 @@ h6 {
 }
 
 /* Prevent layout shifts in grid layouts */
-.grid > * {
+.grid>* {
   contain: layout;
 }
 
@@ -185,19 +185,14 @@ img {
 }
 
 /* Prevent layout shifts in flex containers */
-.flex > * {
-  contain: layout;
-}
-
-/* Skeleton loading optimizations */
-.animate-pulse {
+.flex>* {
   contain: layout;
 }
 
 /* Prevent layout shifts in buttons */
 button,
 a {
-  contain: layout style;
+  contain: layout;
 }
 
 /* Skeleton loading animation */
@@ -291,6 +286,7 @@ select:focus:not(.no-global-focus) {
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -302,10 +298,12 @@ select:focus:not(.no-global-focus) {
 }
 
 @keyframes heroIconFloat {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -316,10 +314,12 @@ select:focus:not(.no-global-focus) {
 }
 
 @keyframes orbDrift {
+
   0%,
   100% {
     transform: translate(0, 0);
   }
+
   50% {
     transform: translate(20px, -20px);
   }
@@ -330,10 +330,12 @@ select:focus:not(.no-global-focus) {
 }
 
 @keyframes orbDriftSoft {
+
   0%,
   100% {
     transform: translate(0, 0);
   }
+
   50% {
     transform: translate(-24px, 16px);
   }
@@ -344,10 +346,12 @@ select:focus:not(.no-global-focus) {
 }
 
 @keyframes cancelPulse {
+
   0%,
   100% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 0.9;
   }
@@ -358,10 +362,12 @@ select:focus:not(.no-global-focus) {
 }
 
 @keyframes cancelPulseSoft {
+
   0%,
   100% {
     opacity: 0.4;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -372,13 +378,11 @@ select:focus:not(.no-global-focus) {
 }
 
 .cancel-stripes {
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 10px,
-    rgba(255, 255, 255, 0.1) 10px,
-    rgba(255, 255, 255, 0.1) 20px
-  );
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 255, 255, 0.1) 10px,
+      rgba(255, 255, 255, 0.1) 20px);
   animation: stripeAnimation 2s linear infinite;
 }
 
@@ -386,18 +390,17 @@ select:focus:not(.no-global-focus) {
   0% {
     background-position: 0 0;
   }
+
   100% {
     background-position: 20px 20px;
   }
 }
 
 .timeline-sheen {
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.4),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent);
   animation: sheen 2s infinite;
 }
 
@@ -405,6 +408,7 @@ select:focus:not(.no-global-focus) {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -431,11 +435,9 @@ select:focus:not(.no-global-focus) {
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 223 100% 58%;
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(223 100% 58%),
-    hsl(190 95% 44%)
-  );
+  --gradient-primary: linear-gradient(135deg,
+      hsl(223 100% 58%),
+      hsl(190 95% 44%));
   --gradient-surface: linear-gradient(180deg, #ffffff, #f8fafc);
   --shadow-glow: 0 20px 40px -12px hsl(223 100% 58% / 0.27);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.1);
@@ -464,23 +466,17 @@ body::before {
   pointer-events: none;
   background-image:
     radial-gradient(circle at 8% 12%, rgba(41, 98, 255, 0.14), transparent 34%),
-    radial-gradient(
-      circle at 90% 14%,
+    radial-gradient(circle at 90% 14%,
       rgba(79, 70, 229, 0.12),
-      transparent 32%
-    ),
+      transparent 32%),
     radial-gradient(circle at 52% 88%, rgba(6, 182, 212, 0.1), transparent 36%),
-    radial-gradient(
-      circle at 14% 86%,
+    radial-gradient(circle at 14% 86%,
       rgba(245, 158, 11, 0.09),
-      transparent 26%
-    ),
-    linear-gradient(
-      180deg,
+      transparent 26%),
+    linear-gradient(180deg,
       var(--bg-base) 0%,
       var(--bg-soft) 58%,
-      var(--bg-warm) 100%
-    ),
+      var(--bg-warm) 100%),
     linear-gradient(90deg, var(--bg-line) 1px, transparent 1px),
     linear-gradient(0deg, var(--bg-line) 1px, transparent 1px);
   background-size:
@@ -517,16 +513,12 @@ body::before {
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 263 70% 56%;
-  --gradient-primary: linear-gradient(
-    135deg,
-    hsl(263 70% 56%),
-    hsl(195 100% 59%)
-  );
-  --gradient-surface: linear-gradient(
-    180deg,
-    hsl(222.2 84% 4.9%),
-    hsl(217.2 32.6% 17.5%)
-  );
+  --gradient-primary: linear-gradient(135deg,
+      hsl(263 70% 56%),
+      hsl(195 100% 59%));
+  --gradient-surface: linear-gradient(180deg,
+      hsl(222.2 84% 4.9%),
+      hsl(217.2 32.6% 17.5%));
   --shadow-glow: 0 20px 40px -12px hsl(263 70% 56% / 0.4);
   --shadow-subtle: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
   --sidebar-background: 240 5.9% 10%;

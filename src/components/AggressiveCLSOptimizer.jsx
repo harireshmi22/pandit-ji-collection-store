@@ -7,6 +7,8 @@ export default function AggressiveCLSOptimizer() {
     const layoutShiftsRef = useRef([])
 
     useEffect(() => {
+        // Temporarily disabled to prevent hydration mismatches
+        return
         // Aggressive CLS prevention
         const preventAllLayoutShifts = () => {
             // Reserve space for ALL images before they load

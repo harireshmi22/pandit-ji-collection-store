@@ -104,6 +104,7 @@ export async function GET(req) {
         }
 
         return NextResponse.json(orders);
+
     } catch (error) {
         console.error('API Error:', error);
         return NextResponse.json(
@@ -288,6 +289,7 @@ export async function POST(req) {
         // A smarter strategy would be to use tags or just let TTL expire (5 mins is okay for lists).
 
         return NextResponse.json(createdOrder, { status: 201 });
+
     } catch (error) {
         console.error('API Error in POST /api/orders:', error);
         console.error('Error stack:', error.stack);
@@ -333,6 +335,7 @@ export async function ORDER_POST(req) {
         if (!session || !session.user) {
             return NextResponse.json({ message: 'Not authorized' }, { status: 401 });
         }
+
     } catch (error) {
         console.error('API Error in POST /api/orders:', error);
         return NextResponse.json(

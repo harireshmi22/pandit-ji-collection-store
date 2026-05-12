@@ -129,6 +129,7 @@ export const GET = async (req) => {
         })}`;
 
         const cachedPayload = await getCachedValue(cacheKey);
+
         if (cachedPayload) {
             return NextResponse.json(cachedPayload, {
                 status: 200,
@@ -475,6 +476,11 @@ export const GET = async (req) => {
             searchParams.get("search")?.trim() ||
             "";
 
+        const category = searchParams.get("category") || "";
+        const minPrice = searchParams.get("minPrice");
+        const maxPrice = searchParams.get("maxPrice");
+
+
         if (!query || query.length < 2) {
             return NextResponse.json({
                 success: true,
@@ -483,15 +489,25 @@ export const GET = async (req) => {
 
         const filter = {}
 
-        if(query) {
+        if (query) {
             filter.$text = { $search: query }
         }
 
-        const products = await Product.find(filter).limit(10).lean();
-        
+        if(category) {
+            filter.category = category; 
+        }
+
+        if(minPrice || maxPrice) {
+            filter.price = {}; 
+            if(minPrice) filter.price.$gte = Number(minPrice);
+            if(maxPrice) filter.price.$lte = Number(maxPrice);
+        }
+
+        const products = await Product.find(filter).select("name price image category").limit(10).lean();
+
 
         return NextResponse.json({
-            success: true, 
+            success: true,
             data: products
         });
 

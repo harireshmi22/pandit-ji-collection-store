@@ -15,7 +15,7 @@ const categories = ['All', 'New in', 'Top Wear', 'Bottom Wear', 'T-shirt', 'Form
 const ShopPageContent = () => {
     const { isInWishlist, toggleWishlist } = useWishlist()
     const [products, setProducts] = useState([])
-    const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 20, pages: 0 })
+    const [pagination, setPagination] = useState({ total: 0, page: 1, limit: 12, pages: 0 })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [showFilters, setShowFilters] = useState(false)
@@ -25,7 +25,7 @@ const ShopPageContent = () => {
     const searchQuery = searchParams?.get('search') || ''
     const activeCategory = searchParams?.get('category') || 'All'
     const currentPage = Math.max(1, Number(searchParams?.get('page')) || 1)
-    const pageLimit = 20
+    const pageLimit = 12
 
     const fetchProducts = useCallback(async () => {
         try {

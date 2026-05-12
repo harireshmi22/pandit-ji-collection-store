@@ -18,6 +18,7 @@ const isAllowedProductImage = (value) => {
     return trimmed.startsWith("https://res.cloudinary.com/");
 };
 
+/* 
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
@@ -33,11 +34,13 @@ export async function GET(req) {
         const isNewArrival = searchParams.get('isNewArrival') || '';
         const sortBy = searchParams.get('sort') || '';
         const fields = searchParams.get('fields') || '';
+        const minPrice = searchParams.get('minPrice');
+        const maxPrice = searchParams.get('maxPrice');
         const page = Math.max(1, parseInt(searchParams.get('page')) || 1);
         const limit = Math.max(1, parseInt(searchParams.get('limit')) || 20);
 
         // Create a unique cache key
-        const cacheKey = `products:query:${JSON.stringify({ search, category, brand, colors, sizes, materials, featured, isNewArrival, sortBy, page, limit })}`;
+        const cacheKey = `products:query:${JSON.stringify({ search, category, brand, colors, sizes, materials, featured, isNewArrival, sortBy, minPrice, maxPrice, page, limit })}`;
 
         // 2. Try cache (Redis -> in-memory fallback)
         try {
@@ -97,6 +100,7 @@ export async function GET(req) {
             await dbConnect();
 
             const filter = {};
+
             if (search) {
                 filter.$or = [
                     { name: { $regex: search, $options: 'i' } },
@@ -104,10 +108,18 @@ export async function GET(req) {
                     { category: { $regex: search, $options: 'i' } }
                 ];
             }
+
             if (category && category !== 'all') filter.category = category;
             if (brand && brand !== 'all') filter.brand = brand;
             if (featured === 'true') filter.featured = true;
             if (isNewArrival === 'true') filter.isNewArrival = true;
+
+            // Add price range filtering
+            if (minPrice || maxPrice) {
+                filter.price = {};
+                if (minPrice) filter.price.$gte = Number(minPrice);
+                if (maxPrice) filter.price.$lte = Number(maxPrice);
+            }
 
             // Arrays ($in) filters
             if (colors) filter.colors = { $in: colors.split(',') };
@@ -116,7 +128,7 @@ export async function GET(req) {
 
             const skip = (page - 1) * limit;
             const projection = fields === 'card'
-                ? 'name price image images brand category stock isNewArrival createdAt'
+                ? 'name price image brand category stock'
                 : '';
 
             // Determine sort order
@@ -138,6 +150,7 @@ export async function GET(req) {
                 total = dbTotal;
                 source = 'database';
             }
+
         } catch (dbError) {
             console.error('MongoDB Error, falling back to Mock:', dbError.message);
             // ... (Your existing Mock Filtering Logic here) ...
@@ -188,6 +201,156 @@ export async function GET(req) {
     }
 }
 
+*/
+
+
+export async function GET(req) {
+    try {
+        await dbConnect();
+
+        const { searchParams } = new URL(req.url);
+
+        // Params
+        const search = searchParams.get('search')?.trim() || '';
+        const category = searchParams.get('category') || '';
+        const brand = searchParams.get('brand') || '';
+        const colors = searchParams.get('colors') || '';
+        const sizes = searchParams.get('sizes') || '';
+        const materials = searchParams.get('materials') || '';
+        const featured = searchParams.get('featured') || '';
+        const isNewArrival = searchParams.get('isNewArrival') || '';
+        const sortBy = searchParams.get('sort') || '';
+        const fields = searchParams.get('fields') || '';
+        const minPrice = searchParams.get('minPrice');
+        const maxPrice = searchParams.get('maxPrice');
+
+        const page = Math.max(
+            1,
+            parseInt(searchParams.get('page')) || 1
+        );
+
+        const limit = Math.max(
+            1,
+            parseInt(searchParams.get('limit')) || 12
+        );
+
+        const skip = (page - 1) * limit;
+
+        // Filter
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+                { name: { $regex: search, $options: 'i' } },
+                { brand: { $regex: search, $options: 'i' } },
+                { category: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        if (category && category !== 'all') {
+            filter.category = category;
+        }
+
+        if (brand && brand !== 'all') {
+            filter.brand = brand;
+        }
+
+        if (featured === 'true') {
+            filter.featured = true;
+        }
+
+        if (isNewArrival === 'true') {
+            filter.isNewArrival = true;
+        }
+
+        // Price Filter
+        if (minPrice || maxPrice) {
+            filter.price = {};
+
+            if (minPrice) {
+                filter.price.$gte = Number(minPrice);
+            }
+
+            if (maxPrice) {
+                filter.price.$lte = Number(maxPrice);
+            }
+        }
+
+        // Array Filters
+        if (colors) {
+            filter.colors = {
+                $in: colors.split(',')
+            };
+        }
+
+        if (sizes) {
+            filter.sizes = {
+                $in: sizes.split(',')
+            };
+        }
+
+        if (materials) {
+            filter.materials = {
+                $in: materials.split(',')
+            };
+        }
+
+        // Projection
+        const projection =
+            fields === 'card'
+                ? 'name price image brand category stock rating'
+                : '';
+
+        // Sorting
+        let sortOption = { createdAt: -1 };
+
+        if (sortBy === 'price_asc') {
+            sortOption = { price: 1 };
+        } else if (sortBy === 'price_desc') {
+            sortOption = { price: -1 };
+        } else if (sortBy === 'rating') {
+            sortOption = { rating: -1 };
+        } else if (sortBy === 'popular') {
+            sortOption = { reviews: -1 };
+        } else if (sortBy === 'name') {
+            sortOption = { name: 1 };
+        }
+
+        // Query
+        const [products, total] = await Promise.all([
+            Product.find(filter)
+                .select(projection)
+                .sort(sortOption)
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+
+            Product.countDocuments(filter)
+        ]);
+
+        return NextResponse.json({
+            success: true,
+            data: products,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
+        });
+
+    } catch (error) {
+        console.error('Products API Error:', error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                message: 'Failed to fetch products'
+            },
+            { status: 500 }
+        );
+    }
+}
 
 // POST /api/products - Create a new product
 export async function POST(req) {

@@ -10,7 +10,7 @@ import { useWishlist } from '@/context/WishlistContext'
 import { Heart, Loader, Search, ArrowRight, SlidersHorizontal } from 'lucide-react'
 import { getOptimizedProductImage, isCloudinaryUrl } from '@/lib/image-utils'
 
-function useDebouncedValue(value, delay = 350) {
+function useDebouncedValue(value, delay = 300) {
     const [debounced, setDebounced] = useState(value)
 
     useEffect(() => {
@@ -41,6 +41,7 @@ function SearchContent() {
     const [showFilters, setShowFilters] = useState(false)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+
     const searchParams = useSearchParams()
     const searchQuery = searchParams?.get('q') || searchParams?.get('search') || ''
     const category = searchParams?.get('category') || ''
@@ -71,7 +72,9 @@ function SearchContent() {
             if (minRating) params.set('minRating', minRating)
 
             const res = await fetch(`/api/search?${String(params)}`)
+            
             const data = await res.json()
+
             if (data.success) {
                 setProducts(data.data || [])
                 setFacets(data.facets || { categories: [], brands: [] })

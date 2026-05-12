@@ -18,14 +18,17 @@ const isAllowedProductImage = (value) => {
 	return trimmed.startsWith("https://res.cloudinary.com/");
 };
 
+/*
 export async function GET(request, { params }) {
 	try {
 		const { searchParams } = new URL(request.url);
 		const view = searchParams.get("view") || "";
 		const isStorefrontView = view === "storefront";
-		const storefrontProjection =
-			"name price image images brand stock description category sizes size colors color material";
 
+		const storefrontProjection =
+			"name price image brand stock description category sizes size colors color material";
+
+		
 		// Handle async params for Next.js 16
 		if (params instanceof Promise) {
 			params = await params;
@@ -37,8 +40,20 @@ export async function GET(request, { params }) {
 				{ status: 400 },
 			);
 		}
+		
 
-		let { id } = params;
+		// Next.js async params support
+		const resolvedParams = params instanceof Promise ? await params : params;
+
+		if (!resolvedParams?.id) {
+			return NextResponse.json(
+				{ success: false, message: "Product ID is required in URL path" },
+				{ status: 400 },
+			);
+		}
+
+
+		let id = resolvedParams.id;
 
 		// Handle URL-encoded IDs
 		try {
@@ -56,10 +71,20 @@ export async function GET(request, { params }) {
 			);
 		}
 
+		if (!mongoose.Types.ObjectId.isValid(trimmedId)) {
+			return NextResponse.json(
+				{ success: false, message: "Invalid product ID format" },
+				{ status: 400 },
+			);
+		}
+
+
 		console.log(`[API] Fetching product: ${trimmedId}`);
 
 		// 1. Check cache (Redis → in-memory fallback)
-		const cacheKey = `product:${trimmedId}`;
+		const cacheKey = `product:${trimmedId}:view:${view}`;
+
+		// 1. Check cache
 		try {
 			let cachedProduct = null;
 			let cacheLayer = "none";
@@ -104,7 +129,7 @@ export async function GET(request, { params }) {
 					{
 						status: 200,
 						headers: {
-								"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+							"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
 							"X-Cache": "HIT",
 							"X-Cache-Layer": cacheLayer,
 							"X-Redis-Enabled": String(Boolean(redis)),
@@ -166,7 +191,7 @@ export async function GET(request, { params }) {
 				{
 					status: 200,
 					headers: {
-							"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+						"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
 						"X-Cache": "MISS",
 						"X-Cache-Layer": "none",
 						"X-Redis-Enabled": String(Boolean(redis)),
@@ -189,6 +214,181 @@ export async function GET(request, { params }) {
 	}
 }
 
+*/
+
+
+export async function GET(request, { params }) {
+	try {
+		const { searchParams } = new URL(request.url);
+
+		const view = searchParams.get("view") || "full";
+		const isStorefrontView = view === "storefront";
+
+		const storefrontProjection =
+			"name price image brand stock category sizes size colors color material";
+
+		// Next.js async params support
+		const resolvedParams = params instanceof Promise ? await params : params;
+
+		if (!resolvedParams?.id) {
+			return NextResponse.json(
+				{ success: false, message: "Product ID is required in URL path" },
+				{ status: 400 }
+			);
+		}
+
+		let id = resolvedParams.id;
+
+		try {
+			id = decodeURIComponent(id);
+		} catch (e) {
+			console.warn("Failed to decode URI component:", e);
+		}
+
+		const trimmedId = id.trim();
+
+		if (!trimmedId) {
+			return NextResponse.json(
+				{ success: false, message: "Product ID is required" },
+				{ status: 400 }
+			);
+		}
+
+		if (!mongoose.Types.ObjectId.isValid(trimmedId)) {
+			return NextResponse.json(
+				{ success: false, message: "Invalid product ID format" },
+				{ status: 400 }
+			);
+		}
+
+		const cacheKey = `product:${trimmedId}:view:${view}`;
+
+		// 1. Check cache
+		try {
+			let cachedProduct = null;
+			let cacheLayer = "none";
+			let redisTtl = null;
+
+			if (redis) {
+				try {
+					cachedProduct = await redis.get(cacheKey);
+
+					if (cachedProduct) {
+						cacheLayer = "redis";
+						redisTtl = await redis.ttl(cacheKey);
+					}
+				} catch (err) {
+					console.warn("[API] Redis cache error:", err.message);
+				}
+			}
+
+			if (!cachedProduct) {
+				cachedProduct = memCache.get(cacheKey);
+
+				if (cachedProduct) {
+					cacheLayer = "memory";
+				}
+			}
+
+			if (cachedProduct) {
+				const productData =
+					typeof cachedProduct === "string"
+						? JSON.parse(cachedProduct)
+						: cachedProduct;
+
+				return NextResponse.json(
+					{
+						success: true,
+						data: productData,
+						source: "cache",
+						cache: {
+							hit: true,
+							layer: cacheLayer,
+							ttlSeconds:
+								cacheLayer === "redis"
+									? redisTtl
+									: PRODUCT_DETAIL_CACHE_TTL_SECONDS,
+						},
+					},
+					{
+						status: 200,
+						headers: {
+							"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+							"X-Cache": "HIT",
+							"X-Cache-Layer": cacheLayer,
+							"X-Redis-Enabled": String(Boolean(redis)),
+						},
+					}
+				);
+			}
+		} catch (cacheError) {
+			console.warn("[API] Cache read error:", cacheError.message);
+		}
+
+		// 2. Database query
+		await dbConnect();
+
+		const product = await Product.findById(trimmedId)
+			.select(isStorefrontView ? storefrontProjection : undefined)
+			.lean();
+
+		if (!product) {
+			return NextResponse.json(
+				{ success: false, message: "Product not found" },
+				{ status: 404 }
+			);
+		}
+
+		// 3. Save cache
+		memCache.set(cacheKey, product, PRODUCT_DETAIL_CACHE_TTL_SECONDS);
+
+		if (redis) {
+			try {
+				await redis.set(cacheKey, JSON.stringify(product), {
+					ex: PRODUCT_DETAIL_CACHE_TTL_SECONDS,
+				});
+			} catch (err) {
+				console.warn("[API] Redis SET failed:", err.message);
+			}
+		}
+
+		return NextResponse.json(
+			{
+				success: true,
+				data: product,
+				source: "database",
+				cache: {
+					hit: false,
+					layer: "none",
+					ttlSeconds: PRODUCT_DETAIL_CACHE_TTL_SECONDS,
+				},
+			},
+			{
+				status: 200,
+				headers: {
+					"Cache-Control": "public, max-age=60, stale-while-revalidate=300",
+					"X-Cache": "MISS",
+					"X-Cache-Layer": "none",
+					"X-Redis-Enabled": String(Boolean(redis)),
+				},
+			}
+		);
+	} catch (error) {
+		console.error("[API] GET /api/products/[id] error:", error);
+
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Server error",
+				error:
+					process.env.NODE_ENV === "development"
+						? error.message
+						: undefined,
+			},
+			{ status: 500 }
+		);
+	}
+}
 // Update a product by ID
 export async function PUT(request, { params }) {
 	try {

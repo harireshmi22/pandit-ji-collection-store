@@ -13,9 +13,14 @@ import { useWishlist } from '@/context/WishlistContext'
 import { getOptimizedProductImage, isCloudinaryUrl } from '@/lib/image-utils'
 
 export default function ProductDetailClient({ initialProduct }) {
+    // store initial product in product variable
     const product = initialProduct
     const router = useRouter()
-    const { addToCart, canUseSavedDetails, createOrderWithSavedDetails, savedShippingDetails } = useCart()
+
+    // get cart context
+    const { addToCart, canUseSavedDetails, createOrderWithSavedDetails, savedShippingDetails } = useCart() 
+
+    // get wishlist context
     const { isInWishlist, toggleWishlist } = useWishlist()
 
     const availableSizes = (Array.isArray(product?.sizes) && product.sizes.length > 0)
