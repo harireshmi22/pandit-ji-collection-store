@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import Product from "@/models/Product";
 import { dbConnect } from "@/lib/dbConnect";
-import redis, { memCache } from "@/lib/redis";
+
+/*
 
 const MAX_LIMIT = 50;
 const DEFAULT_LIMIT = 20;
@@ -58,6 +59,7 @@ function getPrimaryImage(product) {
     return "";
 }
 
+// Get frequent cache value from the redis 
 async function getCachedValue(key) {
     let cached = null;
     if (redis) {
@@ -73,6 +75,7 @@ async function getCachedValue(key) {
     return typeof cached === "string" ? JSON.parse(cached) : cached;
 }
 
+// Set frequent data in redis because redis is fast 
 async function setCachedValue(key, value, ttlSeconds) {
     const json = JSON.stringify(value);
     memCache.set(key, json, ttlSeconds);
@@ -94,6 +97,7 @@ export const GET = async (req) => {
             searchParams.get("q")?.trim() ||
             searchParams.get("search")?.trim() ||
             "";
+
         const category = searchParams.get("category")?.trim() || "";
         const brand = searchParams.get("brand")?.trim() || "";
         const sortRaw = searchParams.get("sort")?.trim() || "relevance";
@@ -334,6 +338,163 @@ export const GET = async (req) => {
                 "X-Cache": "MISS",
             },
         });
+    } catch (error) {
+        console.error("Error searching products:", error);
+        return NextResponse.json(
+            { success: false, message: "Internal server error" },
+            { status: 500 }
+        );
+    }
+};
+
+*/
+
+
+/*
+export const GET = async (req) => {
+    try {
+        // 1. connect to the database 
+        await dbConnect();
+
+        // extract the 
+        const { searchParams } = new URL(req.url);
+
+        const q =
+            searchParams.get("q")?.trim() ||
+            searchParams.get("search")?.trim() ||
+            "";
+
+        if (!q || q.length < 2) {
+            return NextResponse.json({
+                success: true,
+                suggestions: [],
+            })
+        }
+
+        
+        const filter = {}
+
+        if(query) {
+            filter.$text = { $search: query }
+        }
+
+        // const products = await Product.find(filter).limit(10).lean();
+        const cacheKey = `atlas:suggestions:${q.toLowerCase()}`;
+
+        // first check cache 
+        const cached = await redis.get(cacheKey);
+
+        if (cached) {
+            return NextResponse.json({
+                success: true,
+                cached: true,
+                suggestions: cached,
+            })
+        };
+
+        // Atlas Search 
+        const suggestions = await Product.aggregate([
+            {
+                $search: {
+                    index: "default",
+                    compound: {
+                        should: [
+                            {
+                                autocomplete: {
+                                    query: q,
+                                    path: "name",
+                                    fuzzy: {
+                                        maxEdits: 1,
+                                    },
+                                },
+                            },
+
+                            {
+                                autocomplete: {
+                                    query: q,
+                                    path: "category",
+                                    fuzzy: {
+                                        maxEdits: 1,
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    category: 1,
+                    image: 1,
+                    price: 1,
+                    score: {
+                        $meta: "searchScore",
+                    }
+                }
+            },
+
+            {
+                $limit: 24,
+            }
+        ])
+
+        // save Cache
+        await redis.set(cacheKey, suggestions, {
+            ex: 60 * 10,
+        }); 
+
+
+        return NextResponse.json({
+            success: true,
+            cached: false, 
+            suggestions,
+        });
+
+    } catch (error) {
+        console.error("Error searching products:", error);
+        return NextResponse.json(
+            { success: false, message: "Internal server error" },
+            { status: 500 }
+        );
+    }
+}; 
+*/
+export const GET = async (req) => {
+    try {
+        // 1. connect to the database 
+        await dbConnect();
+
+        // extract the 
+        const { searchParams } = new URL(req.url);
+
+        const query =
+            searchParams.get("q")?.trim() ||
+            searchParams.get("search")?.trim() ||
+            "";
+
+        if (!query || query.length < 2) {
+            return NextResponse.json({
+                success: true,
+            })
+        }
+
+        const filter = {}
+
+        if(query) {
+            filter.$text = { $search: query }
+        }
+
+        const products = await Product.find(filter).limit(10).lean();
+        
+
+        return NextResponse.json({
+            success: true, 
+            data: products
+        });
+
     } catch (error) {
         console.error("Error searching products:", error);
         return NextResponse.json(

@@ -24,7 +24,9 @@ export default async function HeroBanner() {
         const res = await fetch('/api/products?limit=6&sort=popular', {
             next: { revalidate: 300 } // Cache for 5 minutes
         })
+
         const data = await res.json()
+
         if (data.success && Array.isArray(data.data) && data.data.length > 0) {
             heroProduct = data.data[0]
             sideProduct = data.data[1] || data.data[0]
